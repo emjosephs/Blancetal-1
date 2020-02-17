@@ -10,4 +10,4 @@ editor_options:
 
 Welcome to my research website.
 
-Population Structure [link](Population_structure.html): 
+Population Structure [link](Population_Structure.html): 
