@@ -112,7 +112,6 @@ for (j in 1:ncol(df2)){
 ## Calculate P-values from recorded F values 
 P_values_comb <- data.frame(matrix(ncol=ncol(df2), nrow =1))
 for (j in 1:ncol(F_values)){
-  print(j)
   for (r in 1:1) {
     f_stat <- F_values[r, j]
     p_value <- pf(q=f_stat, df1=5, df2=10, lower.tail=FALSE) 
@@ -139,7 +138,7 @@ lman26 <- t(read.table("../output/Identifying_Selected_Genes/P_values_ALL_LMAN26
 ```
 
 Calculate the Q-values for each PC in each tissue and record the number of genes with Q-value < 0.1
-```{r,echo=FALSE}
+```{r}
 # Create table to collect selected genes
 FDR <- as.data.frame(matrix(ncol=6, nrow=9))
 colnames(FDR) <- c("PC1", "PC2", "PC3", "PC4", "PC5", "PC1:5")
