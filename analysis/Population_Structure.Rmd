@@ -18,8 +18,8 @@ Here is the code to create figure 1.
 
 First we need to read in the file containing the 302 Maize lines in the data set and the mean centered expression values for the 207 lines that had expression data for the Kernel tissue. In this matrix each row corresponds to a line and each column is a gene. We then merge the tables by line name. 
 ```{r}
-pop <- read.csv("data/FlintGarciaTableS1_fixednew.csv")
-kern_all <- read.table("data/Mean_centered_expression/Kern.txt")
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv")
+kern_all <- read.table("../data/Mean_centered_expression/Kern.txt")
 rows <- row.names(kern_all)
 kern_all$lines <- rows
 pop_dat <- merge(pop, kern_all, by.x = "Inbred", by.y = "lines" )
@@ -28,7 +28,7 @@ pop_dat <- merge(pop, kern_all, by.x = "Inbred", by.y = "lines" )
 Next we read in the Kinship matrix for the 207 kernel lines and get the Eigen vectors and values. 
 ```{r}
 ## Kinship Matrix for all 207 Kern lines
-myF <- read.table('data/Kinship_matrices/F_Kern.txt')
+myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
 
 ## Get Eigen Values and Vectors 
 myE <- eigen(myF)
