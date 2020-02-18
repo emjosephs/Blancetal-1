@@ -1,0 +1,33 @@
+---
+title: "Selection on Expression of Cold Response Genes"
+author: "Jennifer Blanc"
+date: "2/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Intro 
+
+
+## Code 
+
+First, read in the Avila et al. differential Expression data and pick only differentially expressed genes on Day1 and Day 4. 
+```{r}
+cold <- read.csv("../data/Cold.csv", header = F)
+cold <-cold[,2:19] 
+colnames(cold) <- c("V3_Gene_Name","V4_Gene_Name","Arabidopsis_Ortholog","Rice_Ortholog","Cold_1D_CG60_Means","Cold_1D_CG102_Means","Control_1D_CG60_Means","Control_1D_CG102_Means","FDR_1D_Genotype","FDR_1D_Treatment","FDR_\
+1D_Interaction","Cold_4D_CG60_Means","Cold_4D_CG102_Means","Control_4D_CG60_Means","Control_4D_CG102_Means","FDR_4D_Genotype","FDR_4D_Treatment","FDR_4D_Interaction")
+
+D1_Cold <- subset(cold, cold$FDR_1D_Treatment < 0.05)
+D4_Cold <- subset(cold, cold$FDR_4D_Treatment < 0.05)
+```
+
+We need to pick only the genes for which we have expression data for. To do this we will load the names for the genes we have for each tissue and take the overlap with the Avila data.  
+```{r}
+
+```
+
