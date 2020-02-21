@@ -87,6 +87,8 @@ for (i in 1:ncol(df2)) {
     df2[k,i] <- value
   }
 }
+#df2 <- read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/intermediate.txt")
+
 
 ## Get the square root of the Eigen values   
 de <- data.frame(matrix(nrow = nrow(df1),ncol = 2))
@@ -127,7 +129,7 @@ Now we have the p-values for all of the genes that overlap between our dataset a
 
 Again, the code below is specific to the Kernel tissue but can be modified to work for each tissue type.  
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 Cold <- cold %>%
   select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
 names <- as.data.frame(colnames(exp)) # Here exp is expression of Kern 
@@ -135,44 +137,55 @@ colnames(names) <- "V3_Gene_Name"
 Cold <- inner_join(names, Cold)
 ```
 
-Now will will add a column to our that indicated if the gene is differentially expressed in cold and then divide into two dataframes.  
+Now will will add a column to our dataframe that indicates if the gene is differentially expressed in cold and then divide into two dataframes.  
 ```{r}
-Cold$Sig <- FALSE
-Cold[is.na(Cold)] <- NA
-for (i in 1:nrow(Cold)) {
-  a <- Cold[i,3]
-  b <- Cold[i,4]
-  if (is.na(a)) {a <- 1}
-  if (is.na(b)) {b <- 1}
-  if (a  < 0.05) {Cold[i,5] <- TRUE }
-  if (b < 0.05) {Cold[i,5] <- TRUE}
+sig_DE <- function(Cold) {
+  Cold$Sig <- FALSE
+  Cold[is.na(Cold)] <- NA
+  for (i in 1:nrow(Cold)) {
+    a <- Cold[i,3]
+    b <- Cold[i,4]
+    if (is.na(a)) {a <- 1}
+    if (is.na(b)) {b <- 1}
+    if (a  < 0.05) {Cold[i,5] <- TRUE }
+    if (b < 0.05) {Cold[i,5] <- TRUE}
+  }
+  return(Cold)
 }
-
-cold_sig <- subset(Cold, Cold$Sig == TRUE)
-cold_nonsig <- subset(Cold, Cold$Sig == FALSE)
+Cold <- sig_DE(Cold)
 ```
 
-Finally we can do the Chi-squared test  
+Finally, we can do the Chi-squared test  
 ```{r}
-P_vals <- t(P_values_ind) # For other tissues you can load the tables of P-values for individual and combined from "../output/Selection_on_Expression_of_Cold_Expression_Genes/" and join them together
+P_vals <- as.data.frame(t(P_values_ind)) # For other tissues you can load the tables of P-values for individual and combined from "../output/Selection_on_Expression_of_Cold_Expression_Genes/" and join them together
+
+write.table(P_values_ind, "../output/Selection_on_Expression_of_Cold_Response_Genes/Kern.txt")
+P_vals<- as.data.frame(t(read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/Kern.txt")))
 
 ## Chi-squared test 
-chi_pvals <- as.data.frame(matrix(ncol=5,nrow = 1))
-dat <- Cold %>% 
-  select(Sig)
-for (i in 1:ncol(chi_pvals)) {
-  x <- P_vals[,i]
-  dat$Pvals <- as.data.frame(x)
-  dat$Cutoff <- FALSE
-  for (j in 1:nrow(dat)) {
-    p <- dat[j,2]
-    if (p  < 0.05) {dat[j,3] <- TRUE }
+run_chi_sq <- function(Cold, P_vals) {
+  chi_pvals <- as.data.frame(matrix(ncol=5,nrow = 1))
+  cont_tables <- list()
+  dat <- Cold %>% 
+    select(Sig)
+  for (i in 1:ncol(chi_pvals)) {
+    x <- P_vals[,i]
+    dat$Pvals <- as.data.frame(x)
+    dat$Cutoff <- FALSE
+    for (j in 1:nrow(dat)) {
+      p <- dat[j,2]
+      if (p  < 0.05) {dat[j,3] <- TRUE }
+      }
+    tbl <- table(dat$Sig, dat$Cutoff)
+    cont_tables[[i]] <- tbl
+    chi <- chisq.test(tbl)
+    chi_pvals[1,i] <- chi$p.value
   }
-  tbl <- table(dat$Sig, dat$Cutoff)
-  chi <- chisq.test(tbl)
-  chi_pvals[1,i] <- chi$p.value
+  return(list(cont_tables,chi_pvals))
 }
 
+out <- run_chi_sq(Cold,P_vals)
+chi_pvals <- out[[2]]
 colnames(chi_pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
 kable(chi_pvals)
 ```
@@ -185,9 +198,87 @@ kable(chi_all)
 ```
 
 
+## Figure  
+
+Now we want to plot Figure 3 in the main text. First we will look at LMAD26/PC5 which has a p-value of 0.00103 as an example of PC/tissue combination where selected genes are enriched for DE cold genes. To run this code we need the p-values and the contigency table of selected genes vs DE genes. The key to generating these figures for every tissue/PC combination is to load the correct p-values and use the "run_chi_sq" function to extract the contingency table. 
+
+```{r,warning=FALSE}
+dat <- read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/GShoot_Individual.txt") # Pick Tissuee
+
+Cold <- cold %>%
+  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
+names <- as.data.frame(olap_gshoot) # Pick Tissue 
+colnames(names) <- "V3_Gene_Name"
+Cold <- inner_join(names, Cold)
+Cold <- sig_DE(Cold) # Get which genes are DE
+
+# Get contingency table
+out <- run_chi_sq(Cold, t(dat))
+dt <- out[[1]][[5]] # Pick correct contingency table 
+df <- as.data.frame(as.table(dt))
+col <- c("darkslategray2","darkslateblue")
+```
+
+Plot data  
+```{r}
+colnames(df) <- c("CR", "Sel", "Freq")
+df1 <- subset(df, Sel == TRUE)
+df1[1,3] <- df1[1,3] / sum(df1[1,3] + df[1,3])
+df1[2,3] <- df1[2,3] / sum(df1[2,3] + df[2,3])
+
+col <- c( "#0072B2")
+pl1 <- ggplot(data = df1, aes(x = CR, y = Freq)) + geom_bar(stat="identity", fill = col)  +  ylab("proportion p < 0.05") + xlab("") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + ggtitle("LMAD26 PC 5") + theme(plot.title = element_text(hjust = 0.5, size = 14))
+
+pl1
+```
+
+
+```{r}
+Cold <- cold %>%
+  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
+names <- as.data.frame(olap_gshoot) # Pick Tissue 
+colnames(names) <- "V3_Gene_Name"
+Cold <- inner_join(names, Cold)
 
 
 
+# GShoot
+Cold <- cold %>%
+  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
+tissue <- read.table("~/Documents/Coop_Lab/Maize/Cold_Response/Full_expression/GShoot.txt")
+names <- as.data.frame(colnames(tissue))
+colnames(names) <- "V3_Gene_Name"
+Cold <- inner_join(names, Cold)
 
+
+Cold$Sig <- FALSE
+Cold[is.na(Cold)] <- 1
+for (i in 1:nrow(Cold)) {
+  p <- Cold[i,3]
+  q <- Cold[i,4]
+  if (p  < 0.05) {Cold[i,5] <- TRUE }
+  if (q < 0.05) {Cold[i,5] <- TRUE}
+}
+P_vals <- as.data.frame(t(read.table("~/Documents/Coop_Lab/Maize/Cold_Response/P_values_all_genes/GShoot_Individual.txt")))
+P_com <- as.data.frame(t(read.table("~/Documents/Coop_Lab/Maize/Cold_Response/P_values_all_genes/GShoot_Combined.txt")))
+P_vals <- cbind(P_vals, P_com)
+dat <- Cold %>% 
+  select(Sig)
+for (i in 1:ncol(chi_pvals)) {
+  print(i)
+  x <- P_vals[,i]
+  print(length(x))
+  dat$Pvals <- as.data.frame(x)
+  dat$Cutoff <- FALSE
+  for (j in 1:nrow(dat)) {
+    p <- dat[j,2]
+    if (p  < 0.05) {dat[j,3] <- TRUE }
+  }
+  tbl <- table(dat$Sig, dat$Cutoff)
+  chi <- chisq.test(tbl)
+  chi_pvals[2,i] <- chi$p.value
+}
+
+```
 
 
