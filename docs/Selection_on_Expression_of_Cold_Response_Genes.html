@@ -12,7 +12,7 @@
 <meta name="author" content="Jennifer Blanc" />
 
 
-<title>Population Structure</title>
+<title>Selection on Expression of Cold Response Genes</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -417,7 +417,7 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Population Structure</h1>
+<h1 class="title toc-ignore">Selection on Expression of Cold Response Genes</h1>
 <h4 class="author">Jennifer Blanc</h4>
 <h4 class="date">2/17/2020</h4>
 
@@ -554,9 +554,6 @@ Ignored files:
     Ignored:    output/Identifying_Selected_Genes/.DS_Store
     Ignored:    output/Selection_on_Expression_of_Cold_Response_Genes/.DS_Store
 
-Untracked files:
-    Untracked:  docs/figure/Selection_on_Expression_of_Cold_Response_Genes.Rmd/
-
 </code></pre>
 <p>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
@@ -599,33 +596,16 @@ Message
 Rmd
 </td>
 <td>
-<a href="https://github.com/jgblanc/Blancetal/blob/1daa625750c8f9a32551a42987629b82fdada2e6/analysis/Population_Structure.Rmd" target="_blank">1daa625</a>
+<a href="https://github.com/jgblanc/Blancetal/blob/ffeebb7fbf37d545f488cbf6c3d566b8da45fa7f/analysis/Selection_on_Expression_of_Cold_Response_Genes.Rmd" target="_blank">ffeebb7</a>
 </td>
 <td>
 jgblanc
 </td>
 <td>
-2020-02-17
+2020-02-23
 </td>
 <td>
-Added Identifying selected genes
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/jgblanc/Blancetal/075c82619e533e35c174ef8745cb982d4df65e91/docs/Population_Structure.html" target="_blank">075c826</a>
-</td>
-<td>
-jgblanc
-</td>
-<td>
-2020-02-17
-</td>
-<td>
-Build site.
+Cold Response Analysis
 </td>
 </tr>
 <tr>
@@ -633,7 +613,41 @@ Build site.
 Rmd
 </td>
 <td>
-<a href="https://github.com/jgblanc/Blancetal/blob/4ba762584b200d57ba087fae3b101fd40e496143/analysis/Population_Structure.Rmd" target="_blank">4ba7625</a>
+<a href="https://github.com/jgblanc/Blancetal/blob/7a480582bab9278d0108936f3169f97491d5d7bf/analysis/Selection_on_Expression_of_Cold_Response_Genes.Rmd" target="_blank">7a48058</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-02-20
+</td>
+<td>
+got cold gene pvals
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/5d4228b993a39d9a8313c00c4e299e62aff37431/analysis/Selection_on_Expression_of_Cold_Response_Genes.Rmd" target="_blank">5d4228b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-02-18
+</td>
+<td>
+starting cold
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/f3e5cbabec5a3f0f5e2052fef4cf8b5e7a5a52e2/analysis/Selection_on_Expression_of_Cold_Response_Genes.Rmd" target="_blank">f3e5cba</a>
 </td>
 <td>
 jgblanc
@@ -642,7 +656,7 @@ jgblanc
 2020-02-17
 </td>
 <td>
-Publish the initial files for myproject
+Adding Expression
 </td>
 </tr>
 </tbody>
@@ -654,71 +668,352 @@ Publish the initial files for myproject
 </div>
 <div id="intro" class="section level2">
 <h2>Intro</h2>
-<p>Here is the code to create figure 1.</p>
+<p>The goal of this analysis is to determine if genes that have been shown to be differentially expressed in response to cold treatment are enriched for genes whose expression is under selection.</p>
 </div>
 <div id="code" class="section level2">
 <h2>Code</h2>
-<p>First we need to read in the file containing the 302 Maize lines in the data set and the mean centered expression values for the 207 lines that had expression data for the Kernel tissue. In this matrix each row corresponds to a line and each column is a gene. We then merge the tables by line name.</p>
-<pre class="r"><code>pop &lt;- read.csv(&quot;../data/FlintGarciaTableS1_fixednew.csv&quot;)
-kern_all &lt;- read.table(&quot;../data/Mean_centered_expression/Kern.txt&quot;)
-rows &lt;- row.names(kern_all)
-kern_all$lines &lt;- rows
-pop_dat &lt;- merge(pop, kern_all, by.x = &quot;Inbred&quot;, by.y = &quot;lines&quot; )</code></pre>
-<p>Next we read in the Kinship matrix for the 207 kernel lines and get the Eigen vectors and values.</p>
-<pre class="r"><code>## Kinship Matrix for all 207 Kern lines
+<p>First, read in the Avila et al. differential expression data and get the names of the genes used in their analysis.</p>
+<pre class="r"><code>cold &lt;- read.csv(&quot;../data/Cold.csv&quot;, header = F)
+cold &lt;-cold[,2:19] 
+colnames(cold) &lt;- c(&quot;V3_Gene_Name&quot;,&quot;V4_Gene_Name&quot;,&quot;Arabidopsis_Ortholog&quot;,&quot;Rice_Ortholog&quot;,&quot;Cold_1D_CG60_Means&quot;,&quot;Cold_1D_CG102_Means&quot;,&quot;Control_1D_CG60_Means&quot;,&quot;Control_1D_CG102_Means&quot;,&quot;FDR_1D_Genotype&quot;,&quot;FDR_1D_Treatment&quot;,&quot;FDR_\
+1D_Interaction&quot;,&quot;Cold_4D_CG60_Means&quot;,&quot;Cold_4D_CG102_Means&quot;,&quot;Control_4D_CG60_Means&quot;,&quot;Control_4D_CG102_Means&quot;,&quot;FDR_4D_Genotype&quot;,&quot;FDR_4D_Treatment&quot;,&quot;FDR_4D_Interaction&quot;)
+
+cold_names &lt;- cold$V3_Gene_Name</code></pre>
+<p>We need to pick only the genes for which we have expression data for. To do this we will load the names for the genes we have for each tissue and take the overlap with the Avila data.</p>
+<pre class="r"><code>kern_genes &lt;- read.table(&quot;../data/Mean_centered_expression/Kern.txt&quot;, nrows = 1)
+gshoot_genes &lt;- read.table(&quot;../data/Mean_centered_expression/GShoot.txt&quot;, nrows = 1)
+groot_genes &lt;- read.table(&quot;../data/Mean_centered_expression/GRoot.txt&quot;, nrows = 1)
+base_genes &lt;- read.table(&quot;../data/Mean_centered_expression/L3Base.txt&quot;, nrows = 1)
+tip_genes &lt;- read.table(&quot;../data/Mean_centered_expression/L3Tip.txt&quot;, nrows = 1)
+lmad8_genes &lt;- read.table(&quot;../data/Mean_centered_expression/LMAD8.txt&quot;, nrows = 1)
+lman8_genes &lt;- read.table(&quot;../data/Mean_centered_expression/LMAN8.txt&quot;, nrows = 1)
+lmad26_genes &lt;- read.table(&quot;../data/Mean_centered_expression/LMAD26.txt&quot;, nrows = 1)
+lman26_genes &lt;- read.table(&quot;../data/Mean_centered_expression/LMAN26.txt&quot;, nrows = 1)</code></pre>
+<pre class="r"><code>olap_kern &lt;- Reduce(intersect, list(unname(unlist(kern_genes[1,])), cold_names))
+olap_gshoot &lt;- Reduce(intersect, list(unname(unlist(gshoot_genes[1,])), cold_names ))
+olap_groot &lt;- Reduce(intersect, list(unname(unlist(groot_genes[1,])), cold_names ))
+olap_base &lt;- Reduce(intersect, list(unname(unlist(base_genes[1,])), cold_names))
+olap_tip &lt;- Reduce(intersect, list(unname(unlist(tip_genes[1,])), cold_names ))
+olap_lmad8 &lt;-Reduce(intersect, list(unname(unlist(lmad8_genes[1,])), cold_names ))
+olap_lman8 &lt;- Reduce(intersect, list(unname(unlist(lman8_genes[1,])), cold_names))
+olap_lmad26 &lt;- Reduce(intersect, list(unname(unlist(lmad26_genes[1,])), cold_names))
+olap_lman26 &lt;- Reduce(intersect, list(unname(unlist(lman26_genes[1,])), cold_names ))</code></pre>
+<p>Now we will select select the expression values for the Avila genes from our data set and run our test for selection on all of them (including both differentially and non-differentially expressed ones). Below I am only showing the code for Kernel tissue - by loading the expression for a different tissue and changing the “olap_tissue” variable to the correct tissue name you can run this analysis for all tissues. To save time during the knitting process, I commented out this slow step and pre-loaded the file.</p>
+<pre class="r"><code># Select tissue and genes 
+exp &lt;- read.table(&quot;../data/Mean_centered_expression/Kern.txt&quot;) # Change for different tissue 
+df1 &lt;- exp %&gt;%
+  select(olap_kern) # Change for differnt tissue </code></pre>
+<p>Test for selection</p>
+<pre class="r"><code>## Pick Correct Kinship Matrix 
 myF &lt;- read.table(&#39;../data/Kinship_matrices/F_Kern.txt&#39;)
 
 ## Get Eigen Values and Vectors 
 myE &lt;- eigen(myF)
 E_vectors &lt;- myE$vectors
-E_values &lt;- myE$values</code></pre>
-<p>Finally we add the first and second eigen vectors to the dataframe that has the population and expression information.</p>
-<pre class="r"><code>pop_dat$one &lt;- E_vectors[,1]
-pop_dat$two &lt;- E_vectors[,2]</code></pre>
-</div>
-<div id="figure" class="section level2">
-<h2>Figure</h2>
-<pre class="r"><code>col &lt;- c(&#39;#E69F00&#39;, &#39;#56B4E9&#39;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;)
-pl &lt;- ggplot(data=pop_dat, aes(x = one, y= two , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;sweet&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 1&quot;) +  ylab(&quot;PC 2&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = &quot;bottom&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 10), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 1.5) 
-pl</code></pre>
-<p><img src="figure/Population_Structure.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
-Past versions of unnamed-chunk-4-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-4-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
+E_values &lt;- myE$values
+
+## Make new matrix to collect Z values
+df2 &lt;- data.frame(matrix(ncol=ncol(df1), nrow=nrow(df1)))
+colnames(df2) &lt;- colnames(df1[1:ncol(df1)])
+rownames(df2) &lt;- rownames(df1)
+
+## Calculate Q values by multiplying the mean-centered expression value by each eigen vector 
+#for (i in 1:ncol(df2)) {
+#  mean_centered_data &lt;- t(as.matrix(as.numeric(df1[,i])))
+#  for (k in 1:nrow(df2)){
+#    u &lt;- as.matrix(as.numeric(E_vectors[,k]))
+#    value &lt;- mean_centered_data %*% u
+#    df2[k,i] &lt;- value
+#  }
+#}
+df2 &lt;- read.table(&quot;../output/Selection_on_Expression_of_Cold_Response_Genes/intermediate.txt&quot;)
+
+## Get the square root of the Eigen values   
+de &lt;- data.frame(matrix(nrow = nrow(df1),ncol = 2))
+de$Egien_values &lt;- E_values 
+de$Sqrt_EV &lt;- sqrt(de$Egien_values)
+
+## Calculate C-values by dividing Q values by the square root of the eigen values
+df4 &lt;- data.frame(matrix(ncol=ncol(df2),nrow=nrow(df2)))
+for (i in 1:ncol(df2)){
+  df4[,i] &lt;- (df2[,i] / de$Sqrt_EV)
+}
+
+## Calculate F-values by dividing variances - for each PC individually 
+F_values &lt;- data.frame(matrix(ncol=ncol(df2), nrow = 5))
+for (j in 1:ncol(df2)){
+  for (i in 1:5){
+    q &lt;- df4[i,j] 
+    t &lt;- df4[11:20,j]
+    var_q &lt;- (q^2)
+    var_t &lt;- mean(t^2)
+    F_value &lt;- var_q / var_t
+    F_values[i,j] &lt;- F_value
+  }
+}
+
+## Calculate P-values from recorded F values 
+P_values_ind &lt;- data.frame(matrix(ncol=ncol(df2), nrow =1))
+for (j in 1:ncol(F_values)){
+  for (r in 1:5) {
+    f_stat &lt;- F_values[r, j]
+    p_value &lt;- pf(q=f_stat, df1=1, df2=10, lower.tail=FALSE) 
+    P_values_ind[r, j] &lt;- p_value
+  }
+}</code></pre>
+<p>Now we have the p-values for all of the genes that overlap between our dataset and Avila et al. The p-value results for all of the tissus are in the “../output/Selection_on_Expression_of_Cold_Response_Genes/” folder.The next step is to determine if differentially expressed genes are more likely to be under selection in every PC/Tissue combination. To do this we will use a chi-squared test.</p>
+<p>Again, the code below is specific to the Kernel tissue but can be modified to work for each tissue type.</p>
+<pre class="r"><code>Cold &lt;- cold %&gt;%
+  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
+names &lt;- as.data.frame(colnames(exp)) # Here exp is expression of Kern 
+colnames(names) &lt;- &quot;V3_Gene_Name&quot;
+Cold &lt;- inner_join(names, Cold)</code></pre>
+<p>Now will will add a column to our dataframe that indicates if the gene is differentially expressed in cold and then divide into two dataframes.</p>
+<pre class="r"><code>sig_DE &lt;- function(Cold) {
+  Cold$Sig &lt;- FALSE
+  Cold[is.na(Cold)] &lt;- NA
+  for (i in 1:nrow(Cold)) {
+    a &lt;- Cold[i,3]
+    b &lt;- Cold[i,4]
+    if (is.na(a)) {a &lt;- 1}
+    if (is.na(b)) {b &lt;- 1}
+    if (a  &lt; 0.05) {Cold[i,5] &lt;- TRUE }
+    if (b &lt; 0.05) {Cold[i,5] &lt;- TRUE}
+  }
+  return(Cold)
+}
+Cold &lt;- sig_DE(Cold)</code></pre>
+<p>Finally, we can do the Chi-squared test</p>
+<pre class="r"><code>P_vals &lt;- as.data.frame(t(P_values_ind)) 
+
+# Fo other tissues uncomment next line and change tissue name
+#P_vals&lt;- as.data.frame(t(read.table(&quot;../output/Selection_on_Expression_of_Cold_Response_Genes/Kern.txt&quot;)))
+
+## Chi-squared test 
+run_chi_sq &lt;- function(Cold, P_vals) {
+  chi_pvals &lt;- as.data.frame(matrix(ncol=5,nrow = 1))
+  cont_tables &lt;- list()
+  dat &lt;- Cold %&gt;% 
+    select(Sig)
+  for (i in 1:ncol(chi_pvals)) {
+    x &lt;- P_vals[,i]
+    dat$Pvals &lt;- as.data.frame(x)
+    dat$Cutoff &lt;- FALSE
+    for (j in 1:nrow(dat)) {
+      p &lt;- dat[j,2]
+      if (p  &lt; 0.05) {dat[j,3] &lt;- TRUE }
+      }
+    tbl &lt;- table(dat$Sig, dat$Cutoff)
+    cont_tables[[i]] &lt;- tbl
+    chi &lt;- chisq.test(tbl)
+    chi_pvals[1,i] &lt;- chi$p.value
+  }
+  return(list(cont_tables,chi_pvals))
+}
+
+out &lt;- run_chi_sq(Cold,P_vals)
+chi_pvals &lt;- out[[2]]
+colnames(chi_pvals) &lt;- c(&quot;PC1&quot;, &quot;PC2&quot;, &quot;PC3&quot;, &quot;PC4&quot;, &quot;PC5&quot;)
+kable(chi_pvals)</code></pre>
+<table>
 <thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
+<tr class="header">
+<th align="right">PC1</th>
+<th align="right">PC2</th>
+<th align="right">PC3</th>
+<th align="right">PC4</th>
+<th align="right">PC5</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>
-<a href="https://github.com/jgblanc/Blancetal/blob/075c82619e533e35c174ef8745cb982d4df65e91/docs/figure/Population_Structure.Rmd/unnamed-chunk-4-1.png" target="_blank">075c826</a>
-</td>
-<td>
-jgblanc
-</td>
-<td>
-2020-02-17
-</td>
+<tr class="odd">
+<td align="right">0.0266736</td>
+<td align="right">0.6817413</td>
+<td align="right">0.1352914</td>
+<td align="right">0.7499593</td>
+<td align="right">0.4013942</td>
+</tr>
+</tbody>
+</table>
+<p>These are the undjusted p-values for our chi-square test for independence between the two categorical variables (Genes under selection and DE cold genes). From the p-value alone we don’t know what direction the enrichment is in (Are DE genes more or less likely to be under selection). Below is the results of the chi-square test for the 5 PC’s in each of the 9 tissues (Table S3) - this table can be generated my running the code above for each tissue type.</p>
+<pre class="r"><code>chi_all &lt;- read.table(&quot;../output/Selection_on_Expression_of_Cold_Response_Genes/Chi_sqr_pvals.txt&quot;) 
+kable(chi_all)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">PC1</th>
+<th align="right">PC2</th>
+<th align="right">PC3</th>
+<th align="right">PC4</th>
+<th align="right">PC5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Kern</td>
+<td align="right">0.0266736</td>
+<td align="right">0.6817413</td>
+<td align="right">0.1352914</td>
+<td align="right">0.7499593</td>
+<td align="right">0.4013942</td>
+</tr>
+<tr class="even">
+<td>GShoot</td>
+<td align="right">0.3068080</td>
+<td align="right">0.9968723</td>
+<td align="right">0.1215469</td>
+<td align="right">0.4562872</td>
+<td align="right">0.8645661</td>
+</tr>
+<tr class="odd">
+<td>GRoot</td>
+<td align="right">0.2951578</td>
+<td align="right">0.0090328</td>
+<td align="right">0.8382773</td>
+<td align="right">0.1424532</td>
+<td align="right">0.7564260</td>
+</tr>
+<tr class="even">
+<td>L3Base</td>
+<td align="right">0.7707657</td>
+<td align="right">0.0319442</td>
+<td align="right">0.1313966</td>
+<td align="right">0.4700622</td>
+<td align="right">0.9318617</td>
+</tr>
+<tr class="odd">
+<td>L3Tip</td>
+<td align="right">1.0000000</td>
+<td align="right">0.7093509</td>
+<td align="right">0.0616248</td>
+<td align="right">0.8706036</td>
+<td align="right">0.8329363</td>
+</tr>
+<tr class="even">
+<td>LMAD8</td>
+<td align="right">0.4153836</td>
+<td align="right">0.2623356</td>
+<td align="right">0.0874473</td>
+<td align="right">0.0396060</td>
+<td align="right">0.6481210</td>
+</tr>
+<tr class="odd">
+<td>LMAN8</td>
+<td align="right">0.7559163</td>
+<td align="right">1.0000000</td>
+<td align="right">0.3358749</td>
+<td align="right">0.7682853</td>
+<td align="right">0.9080514</td>
+</tr>
+<tr class="even">
+<td>LMAD26</td>
+<td align="right">0.0966230</td>
+<td align="right">0.1466515</td>
+<td align="right">0.9486752</td>
+<td align="right">0.5582359</td>
+<td align="right">0.0010293</td>
+</tr>
+<tr class="odd">
+<td>LMAN26</td>
+<td align="right">0.6305450</td>
+<td align="right">0.2987301</td>
+<td align="right">0.0966033</td>
+<td align="right">0.3345099</td>
+<td align="right">0.5331202</td>
 </tr>
 </tbody>
 </table>
 </div>
-</div>
+<div id="figure" class="section level2">
+<h2>Figure</h2>
+<p>Now we want to plot Figure 3 in the main text. First we will look at LMAD26/PC5 which has a p-value of 0.00103 as an example of PC/tissue combination where selected genes are enriched for DE cold genes. To run this code we need the p-values and the contigency table of selected genes vs DE genes. The key to generating these figures for every tissue/PC combination is to load the correct p-values and use the “run_chi_sq” function to extract the contingency table.</p>
+<pre class="r"><code>dat &lt;- read.table(&quot;../output/Selection_on_Expression_of_Cold_Response_Genes/LMAD26.txt&quot;) # Pick Tissuee
+
+Cold &lt;- cold %&gt;%
+  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
+names &lt;- as.data.frame(olap_lmad26) # Pick Tissue 
+colnames(names) &lt;- &quot;V3_Gene_Name&quot;
+Cold &lt;- inner_join(names, Cold)
+Cold &lt;- sig_DE(Cold) # Get which genes are DE
+
+# Get contingency table
+out &lt;- run_chi_sq(Cold, t(dat))
+dt &lt;- out[[1]][[5]] # Pick correct contingency table 
+df &lt;- as.data.frame(as.table(dt))</code></pre>
+<p>Plot Bar Chart</p>
+<pre class="r"><code>colnames(df) &lt;- c(&quot;CR&quot;, &quot;Sel&quot;, &quot;Freq&quot;)
+df1 &lt;- subset(df, Sel == TRUE)
+df1[1,3] &lt;- df1[1,3] / sum(df1[1,3] + df[1,3])
+df1[2,3] &lt;- df1[2,3] / sum(df1[2,3] + df[2,3])
+
+col &lt;- c( &quot;#0072B2&quot;)
+pl1 &lt;- ggplot(data = df1, aes(x = CR, y = Freq)) + geom_bar(stat=&quot;identity&quot;, fill = col)  +  ylab(&quot;proportion p &lt; 0.05&quot;) + xlab(&quot;&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = &quot;right&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + ggtitle(&quot;LMAD26 PC 5&quot;) + theme(plot.title = element_text(hjust = 0.5, size = 14))
+
+pl1</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Cold_Response_Genes.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Plot Historgram</p>
+<pre class="r"><code>tdat &lt;- as.data.frame(t(dat))
+colnames(tdat) &lt;- c(&quot;PC1&quot;, &quot;PC2&quot;, &quot;PC3&quot;, &quot;PC4&quot;, &quot;PC5&quot;)
+df &lt;- cbind(Cold, tdat)
+
+mysig = subset(df, Sig==TRUE)
+sighist = hist(mysig$PC5, plot=FALSE)
+mynot = subset(df, Sig==FALSE)
+nothist = hist(mynot$PC5, plot=FALSE)
+combinedHist = rbind(nothist$density, sighist$density)
+
+x &lt;- t(combinedHist)
+colnames(x) &lt;- c(&quot;Not cold-response&quot;, &quot;Cold-response&quot;)
+m &lt;- melt(x)
+
+pl2 &lt;- ggplot(data = m, aes(x = Var1/10, y = value, fill = Var2)) + geom_bar(stat=&quot;identity&quot;,position=&quot;dodge&quot;) + scale_fill_manual(name = &quot;&quot;, values = c(&quot;#CC79A7&quot;,   &quot;#F0E442&quot;)) + theme_classic() + ylab(&quot;proportion&quot;) + xlab(&quot;&quot;) +  scale_x_continuous(breaks=seq(0, 1, 0.1)) + theme(legend.position = c(0.8, 0.9)) + ggtitle(&quot;LMAD26 PC5&quot;) + theme(plot.title = element_text(hjust = 0.5, size = 14), axis.title.y = element_text(size=12), legend.text = element_text(size=8), legend.key.size = unit(0.8, &quot;line&quot;))
+
+pl2</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Cold_Response_Genes.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now we will plot Figure 3 CD</p>
+<pre class="r"><code>dat &lt;- read.table(&quot;../output/Selection_on_Expression_of_Cold_Response_Genes/LMAD8.txt&quot;) # Pick Tissue
+
+Cold &lt;- cold %&gt;%
+  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
+names &lt;- as.data.frame(olap_lmad8) # Pick Tissue 
+colnames(names) &lt;- &quot;V3_Gene_Name&quot;
+Cold &lt;- inner_join(names, Cold)
+Cold &lt;- sig_DE(Cold) # Get which genes are DE
+
+# Get contingency table
+out &lt;- run_chi_sq(Cold, t(dat))
+dt &lt;- out[[1]][[4]] # Pick correct contingency table out[[1]][[x]] -&gt; x is the PC you want to look at 
+df &lt;- as.data.frame(as.table(dt))</code></pre>
+<p>Plot Bar Chart</p>
+<pre class="r"><code>colnames(df) &lt;- c(&quot;CR&quot;, &quot;Sel&quot;, &quot;Freq&quot;)
+df1 &lt;- subset(df, Sel == TRUE)
+df1[1,3] &lt;- df1[1,3] / sum(df1[1,3] + df[1,3])
+df1[2,3] &lt;- df1[2,3] / sum(df1[2,3] + df[2,3])
+
+col &lt;- c( &quot;#0072B2&quot;)
+pl1 &lt;- ggplot(data = df1, aes(x = CR, y = Freq)) + geom_bar(stat=&quot;identity&quot;, fill = col)  +  ylab(&quot;proportion p &lt; 0.05&quot;) + xlab(&quot;&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = &quot;right&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + ggtitle(&quot;LMAD8 PC 4&quot;) + theme(plot.title = element_text(hjust = 0.5, size = 14))
+
+pl1</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Cold_Response_Genes.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>tdat &lt;- as.data.frame(t(dat))
+colnames(tdat) &lt;- c(&quot;PC1&quot;, &quot;PC2&quot;, &quot;PC3&quot;, &quot;PC4&quot;, &quot;PC5&quot;)
+df &lt;- cbind(Cold, tdat)
+
+mysig = subset(df, Sig==TRUE)
+sighist = hist(mysig$PC5, plot=FALSE)
+mynot = subset(df, Sig==FALSE)
+nothist = hist(mynot$PC5, plot=FALSE) # Change to correct PC
+combinedHist = rbind(nothist$density, sighist$density)
+
+x &lt;- t(combinedHist)
+colnames(x) &lt;- c(&quot;Not cold-response&quot;, &quot;Cold-response&quot;)
+m &lt;- melt(x)
+
+pl2 &lt;- ggplot(data = m, aes(x = Var1/10, y = value, fill = Var2)) + geom_bar(stat=&quot;identity&quot;,position=&quot;dodge&quot;) + scale_fill_manual(name = &quot;&quot;, values = c(&quot;#CC79A7&quot;,   &quot;#F0E442&quot;)) + theme_classic() + ylab(&quot;proportion&quot;) + xlab(&quot;&quot;) +  scale_x_continuous(breaks=seq(0, 1, 0.1)) + theme(legend.position = c(0.8, 0.9)) + ggtitle(&quot;LMAD8 PC4&quot;) + theme(plot.title = element_text(hjust = 0.5, size = 14), axis.title.y = element_text(size=12), legend.text = element_text(size=8), legend.key.size = unit(0.8, &quot;line&quot;))
+
+pl2</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Cold_Response_Genes.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -742,16 +1037,16 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_3.2.1
+[1] reshape2_1.4.3 knitr_1.23     dplyr_0.8.1    ggplot2_3.2.1 
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.3       compiler_3.5.1   pillar_1.4.2     git2r_0.25.2    
- [5] workflowr_1.4.0  tools_3.5.1      digest_0.6.22    evaluate_0.14   
- [9] lifecycle_0.1.0  tibble_2.1.3     gtable_0.3.0     pkgconfig_2.0.3 
-[13] rlang_0.4.1      yaml_2.2.0       xfun_0.7         withr_2.1.2     
-[17] stringr_1.4.0    dplyr_0.8.1      knitr_1.23       fs_1.3.1        
+ [1] Rcpp_1.0.3       highr_0.8        compiler_3.5.1   pillar_1.4.2    
+ [5] git2r_0.25.2     plyr_1.8.4       workflowr_1.4.0  tools_3.5.1     
+ [9] digest_0.6.22    evaluate_0.14    lifecycle_0.1.0  tibble_2.1.3    
+[13] gtable_0.3.0     pkgconfig_2.0.3  rlang_0.4.1      yaml_2.2.0      
+[17] xfun_0.7         withr_2.1.2      stringr_1.4.0    fs_1.3.1        
 [21] rprojroot_1.3-2  grid_3.5.1       tidyselect_0.2.5 glue_1.3.1      
-[25] R6_2.4.1         rmarkdown_1.13   purrr_0.3.2      farver_2.0.1    
+[25] R6_2.4.1         rmarkdown_1.13   farver_2.0.1     purrr_0.3.2     
 [29] magrittr_1.5     whisker_0.3-2    backports_1.1.5  scales_1.1.0    
 [33] htmltools_0.3.6  assertthat_0.2.1 colorspace_1.4-1 labeling_0.3    
 [37] stringi_1.4.3    lazyeval_0.2.2   munsell_0.5.0    crayon_1.3.4    </code></pre>
