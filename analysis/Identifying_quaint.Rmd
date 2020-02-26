@@ -1,0 +1,164 @@
+---
+title: "Identifying Selected Genes with Quaint"
+author: "Emily Josephs"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('~/Documents/Blancetal-1//analysis/')
+
+library(ggplot2)
+library(reshape2)
+library(ggpubr)
+library(quaint)
+library(tidyr)
+```
+
+
+## Intro 
+
+I'm rerunning the code to identify selected genes with the Quaint package
+
+
+
+
+```{r}
+
+### function for testing all genes
+testAllGenes <- function(myTissue){
+# Read in mean-centered expression values
+df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+# Read in tissue specific kinship matrix 
+myF <- read.table(paste('../data/Kinship_matrices/F_',myTissue,'.txt',sep=""))
+
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+## Testing for selection on first 5 PCs
+myM = 1:5
+
+## Using the last 1/2 of PCs to estimate Va
+myL = 6:dim(myF)[1]
+
+## test for selection on each gene
+allGeneOutput <- sapply(1:ncol(df1), function(x){
+myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
+return(myQpc)
+})
+
+return(allGeneOutput)
+}
+
+###run on all genes
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base","LMAD8","LMAN8")
+alltissueresults = lapply(alltissues, testAllGenes)
+names(alltissueresults) <- alltissues
+
+
+
+##look at sig results
+sigresults = lapply(1:length(alltissues), function(i){
+# extract the pvalues
+pvals = matrix(unlist(alltissueresults[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+
+##look at pvalue distributions
+par(mfrow=c(3,2), mar=c(4,4,1,1))
+sapply(1:5, function(x){
+hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
+})
+
+## test fpr sogmofocamce
+pbonf = data.frame(apply(pvals,2, function(x){p.adjust(x, method='bonferroni')}))
+
+## how many are significant?
+numsig <- apply(pbonf, 2, function(x){sum(x<0.25)})
+numsig
+})
+
+###make a big image of how many sig results we have
+sigTable = as.data.frame(matrix(unlist(sigresults), ncol=5, byrow=T))
+names(sigTable) = c('PC1','PC2','PC3','PC4','PC5')
+sigTable$tissue = alltissues
+sigLong = tidyr::gather(sigTable, 'variable','value', -tissue)
+
+
+pl <- ggplot(data=sigLong,aes(x=variable,y=tissue)) + 
+  geom_tile(aes(fill=value),color='black') + scale_fill_gradient(low = 'lightyellow', high = "#CC79A7", guide = FALSE, na.value = "white") + theme_bw() + xlab("\n") + ylab("Tissue") + 
+  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=3.5)
+
+
+```
+
+I think the main difference is the PCs that I'm using to estimate Va are different from Jennifer's (she uses 11:20). Let's check.
+
+```{r}
+
+### function for testing all genes
+testAllGenes1120 <- function(myTissue){
+# Read in mean-centered expression values
+df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+# Read in tissue specific kinship matrix 
+myF <- read.table(paste('../data/Kinship_matrices/F_',myTissue,'.txt',sep=""))
+
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+## Testing for selection on first 5 PCs
+myM = 1:5
+
+## Using the last 1/2 of PCs to estimate Va
+myL = 11:20
+
+## test for selection on each gene
+allGeneOutput <- sapply(1:ncol(df1), function(x){
+myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
+return(myQpc)
+})
+
+return(allGeneOutput)
+}
+
+
+
+alltissueresults1120 = lapply(alltissues, testAllGenes1120)
+names(alltissueresults1120) <- alltissues
+
+
+
+##look at sig results
+sigresults1120 = lapply(1:length(alltissues), function(i){
+# extract the pvalues
+pvals = matrix(unlist(alltissueresults1120[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+
+##look at pvalue distributions
+par(mfrow=c(3,2), mar=c(4,4,1,1))
+sapply(1:5, function(x){
+hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
+})
+
+## test fpr sogmofocamce
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
+
+## how many are significant?
+numsig <- apply(pfdr, 2, function(x){sum(x<0.1)})
+numsig
+})
+
+###make a big image of how many sig results we have
+sigTable1120 = as.data.frame(matrix(unlist(sigresults1120), ncol=5, byrow=T))
+names(sigTable1120) = c('PC1','PC2','PC3','PC4','PC5')
+sigTable1120$tissue = alltissues
+sigLong1120 = tidyr::gather(sigTable1120, 'variable','value', -tissue)
+
+
+pl <- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) + 
+  geom_tile(aes(fill=value),color='black') + scale_fill_gradient(low = 'lightyellow', high = "#CC79A7", guide = FALSE, na.value = "white") + theme_bw() + xlab("\n") + ylab("Tissue") + 
+  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=3.5)
+
+pl
+```
