@@ -74,7 +74,7 @@ hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = p
 pbonf = data.frame(apply(pvals,2, function(x){p.adjust(x, method='bonferroni')}))
 
 ## how many are significant?
-numsig <- apply(pbonf, 2, function(x){sum(x<0.25)})
+numsig <- apply(pbonf, 2, function(x){sum(x<0.05)})
 numsig
 })
 
@@ -83,7 +83,7 @@ sigTable = as.data.frame(matrix(unlist(sigresults), ncol=5, byrow=T))
 names(sigTable) = c('PC1','PC2','PC3','PC4','PC5')
 sigTable$tissue = alltissues
 sigLong = tidyr::gather(sigTable, 'variable','value', -tissue)
-
+sigLong[sigLong == 0] <- NA
 
 pl <- ggplot(data=sigLong,aes(x=variable,y=tissue)) + 
   geom_tile(aes(fill=value),color='black') + scale_fill_gradient(low = 'lightyellow', high = "#CC79A7", guide = FALSE, na.value = "white") + theme_bw() + xlab("\n") + ylab("Tissue") + 

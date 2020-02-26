@@ -1,0 +1,26 @@
+---
+title: "Drought-genes"
+author: "Emily Josephs"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd('~/Documents/Blancetal-1/analysis/')
+```
+
+Are genes involved in drought response more likely to be under selection?
+
+Paper here:
+https://link.springer.com/article/10.1007/s11105-013-0622-z#Sec12
+data froms from supplementary table 1
+
+
+
+### read in data
+```{r}
+upreg <- read.csv('../data/drought-up-reg.csv', stringsAsFactors = F)
+downreg <- read.csv('../data/drought-down-reg.csv', stringsAsFactors = F)
+
+
+```
