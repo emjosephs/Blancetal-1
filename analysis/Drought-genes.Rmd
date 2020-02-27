@@ -7,6 +7,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 setwd('~/Documents/Blancetal-1/analysis/')
+library(dplyr)
+library(quaint)
 ```
 
 Are genes involved in drought response more likely to be under selection?
@@ -15,12 +17,105 @@ Paper here:
 https://link.springer.com/article/10.1007/s11105-013-0622-z#Sec12
 data froms from supplementary table 1
 
+```{r, echo=F}
+##function for testing selection for genes
 
+testAllGenes <- function(myTissue){
+# Read in mean-centered expression values
+df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+# Read in tissue specific kinship matrix 
+myF <- read.table(paste('../data/Kinship_matrices/F_',myTissue,'.txt',sep=""))
 
-### read in data
-```{r}
-upreg <- read.csv('../data/drought-up-reg.csv', stringsAsFactors = F)
-downreg <- read.csv('../data/drought-down-reg.csv', stringsAsFactors = F)
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+## Testing for selection on first 5 PCs
+myM = 1:5
+
+## Using the last 1/2 of PCs to estimate Va
+myL = 6:dim(myF)[1]
+
+## test for selection on each gene
+allGeneOutput <- sapply(1:ncol(df1), function(x){
+myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
+return(myQpc)
+})
+
+return(allGeneOutput)
+}
 
 
 ```
+
+### read in data
+```{r}
+## read in genes
+upreg <- read.csv('../data/drought-up-reg.csv', stringsAsFactors = F)
+downreg <- read.csv('../data/drought-down-reg.csv', stringsAsFactors = F)
+
+##we specifically care about leaf day 26
+
+##read in expression data
+dft <- data.frame(t(read.table("../data/Mean_centered_expression/LMAD26.txt", stringsAsFactors = F)), stringsAsFactors = F)
+dft$gene <- row.names(dft)
+
+##are there any overlapping genes?
+upreg$shortgene = sapply(upreg$Gene, function(x){strsplit(x, split='_')[[1]][1]})  ##format the names to match
+downreg$shortgene = sapply(downreg$Gene, function(x){strsplit(x, split='_')[[1]][1]})
+sum(upreg$shortgene %in% dft$gene)
+sum(downreg$shortgene %in% dft$gene)
+
+
+##test for selection in LMAD26
+selresults <- testAllGenes('LMAD26')
+
+#extract p values for PC 5
+pvals5 = matrix(unlist(selresults[4,]), ncol=5, byrow=TRUE)[,5]
+dfp <- data.frame(gene = dft$gene, pc5 = pvals5, stringsAsFactors = F)## add back to genes
+
+### 
+dfp$fdr = p.adjust(dfp$pc5, method="fdr")
+dfp$bonf = p.adjust(dfp$pc5, method="bonferroni")
+sigs = dplyr::filter(dfp,fdr < 0.1) ##get significant results
+
+##are any of the drought genes significant?
+summary(dplyr::filter(dfp, gene %in% upreg$shortgene)$fdr)
+summary(dplyr::filter(dfp, gene %in% downreg$shortgene)$fdr)
+
+##nope
+
+##what about in top 500 or something?
+top500 = dplyr::top_n(dfp, 500, -log10(pc5))
+
+##if there's an enrichment, expect a larger proportion of drought-responsive genes to be in top500, then of all genes
+top500prop = 500/nrow(dft)####prop of all genes in top500
+up500prop = nrow(dplyr::filter(top500, gene %in% upreg$shortgene))/nrow(upreg)
+down500prop = nrow(dplyr::filter(top500, gene %in% downreg$shortgene))/nrow(downreg)
+
+
+par(mfrow=c(1,1), mar=c(5,5,2,2))
+plot(1:3, c(top500prop, up500prop, down500prop), bty="n", xlim = c(0.5,3.5), ylim = c(0,0.1), xaxt="n", yaxt= "n", cex=2, lwd=2, ylab="Prop in top 500 genes", xlab="")
+axis(1, at=c(1,2,3), lab = c("all","up","down"), cex.axis=1.5)
+axis(2, las=2)
+
+
+
+##what about in top 1000 or something?
+top1000 = dplyr::top_n(dfp, 1000, -log10(pc5))
+
+##if there's an enrichment, expect a larger proportion of drought-responsive genes to be in top500, then of all genes
+top1000prop = 1000/nrow(dft)####prop of all genes in top500
+up1000prop = nrow(dplyr::filter(top1000, gene %in% upreg$shortgene))/nrow(upreg)
+down1000prop = nrow(dplyr::filter(top1000, gene %in% downreg$shortgene))/nrow(downreg)
+
+
+par(mfrow=c(1,1), mar=c(5,5,2,2))
+plot(1:3, c(top1000prop, up1000prop, down1000prop), bty="n", xlim = c(0.5,3.5), ylim = c(0,0.15), xaxt="n", yaxt= "n", cex=2, lwd=2, ylab="Prop in top 1000 genes", xlab="")
+axis(1, at=c(1,2,3), lab = c("all","up","down"), cex.axis=1.5)
+axis(2, las=2)
+
+```
+
+Seems like there's no enrichment, or even an anti-enrichment. Worth reporting?

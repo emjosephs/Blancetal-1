@@ -12,7 +12,7 @@
 <meta name="author" content="Emily Josephs" />
 
 
-<title>Identifying Selected Genes with Quaint</title>
+<title>Drought-genes</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -384,7 +384,7 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">Identifying Selected Genes with Quaint</h1>
+<h1 class="title toc-ignore">Drought-genes</h1>
 <h4 class="author">Emily Josephs</h4>
 
 </div>
@@ -511,7 +511,7 @@ relative
 <tbody>
 <tr>
 <td style="text-align:left;">
-~/Documents/Blancetal-1//analysis/
+~/Documents/Blancetal-1/analysis/
 </td>
 <td style="text-align:left;">
 .
@@ -580,7 +580,7 @@ Message
 Rmd
 </td>
 <td>
-<a href="https://github.com/emjosephs/Blancetal-1/blob/c018f1d8b3f42a5540825d4ed7aec043c8c8220c/analysis/Identifying_quaint.Rmd" target="_blank">c018f1d</a>
+<a href="https://github.com/emjosephs/Blancetal-1/blob/c018f1d8b3f42a5540825d4ed7aec043c8c8220c/analysis/Drought-genes.Rmd" target="_blank">c018f1d</a>
 </td>
 <td>
 Em
@@ -592,74 +592,6 @@ Em
 added drought info
 </td>
 </tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/emjosephs/Blancetal-1/blob/227a4b612f14a5ef1e8649b79a54a8d6acf12506/analysis/Identifying_quaint.Rmd" target="_blank">227a4b6</a>
-</td>
-<td>
-Em
-</td>
-<td>
-2020-02-26
-</td>
-<td>
-added figure
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/emjosephs/Blancetal-1/227a4b612f14a5ef1e8649b79a54a8d6acf12506/docs/Identifying_quaint.html" target="_blank">227a4b6</a>
-</td>
-<td>
-Em
-</td>
-<td>
-2020-02-26
-</td>
-<td>
-added figure
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/emjosephs/Blancetal-1/blob/a597c91b02de97b3610bd9934c764d1dd6b3d98b/analysis/Identifying_quaint.Rmd" target="_blank">a597c91</a>
-</td>
-<td>
-Em
-</td>
-<td>
-2020-02-26
-</td>
-<td>
-stuff
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/emjosephs/Blancetal-1/a597c91b02de97b3610bd9934c764d1dd6b3d98b/docs/Identifying_quaint.html" target="_blank">a597c91</a>
-</td>
-<td>
-Em
-</td>
-<td>
-2020-02-26
-</td>
-<td>
-stuff
-</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -667,143 +599,77 @@ stuff
 </div>
 </div>
 </div>
-<div id="intro" class="section level2">
-<h2>Intro</h2>
-<p>I’m rerunning the code to identify selected genes with the Quaint package</p>
-<pre class="r"><code>### function for testing all genes
-testAllGenes &lt;- function(myTissue){
-# Read in mean-centered expression values
-df1 &lt;- read.table(paste(&quot;../data/Mean_centered_expression/&quot;,myTissue,&quot;.txt&quot;,sep=&quot;&quot;))
-# Read in tissue specific kinship matrix 
-myF &lt;- read.table(paste(&#39;../data/Kinship_matrices/F_&#39;,myTissue,&#39;.txt&#39;,sep=&quot;&quot;))
+<p>Are genes involved in drought response more likely to be under selection?</p>
+<p>Paper here: <a href="https://link.springer.com/article/10.1007/s11105-013-0622-z#Sec12" class="uri">https://link.springer.com/article/10.1007/s11105-013-0622-z#Sec12</a> data froms from supplementary table 1</p>
+<div id="read-in-data" class="section level3">
+<h3>read in data</h3>
+<pre class="r"><code>## read in genes
+upreg &lt;- read.csv(&#39;../data/drought-up-reg.csv&#39;, stringsAsFactors = F)
+downreg &lt;- read.csv(&#39;../data/drought-down-reg.csv&#39;, stringsAsFactors = F)
 
-## Get Eigen Values and Vectors 
-myE &lt;- eigen(myF)
-E_vectors &lt;- myE$vectors
-E_values &lt;- myE$values
+##we specifically care about leaf day 26
 
-## Testing for selection on first 5 PCs
-myM = 1:5
+##read in expression data
+dft &lt;- data.frame(t(read.table(&quot;../data/Mean_centered_expression/LMAD26.txt&quot;, stringsAsFactors = F)), stringsAsFactors = F)
+dft$gene &lt;- row.names(dft)
 
-## Using the last 1/2 of PCs to estimate Va
-myL = 6:dim(myF)[1]
+##are there any overlapping genes?
+upreg$shortgene = sapply(upreg$Gene, function(x){strsplit(x, split=&#39;_&#39;)[[1]][1]})  ##format the names to match
+downreg$shortgene = sapply(downreg$Gene, function(x){strsplit(x, split=&#39;_&#39;)[[1]][1]})
+sum(upreg$shortgene %in% dft$gene)</code></pre>
+<pre><code>[1] 50</code></pre>
+<pre class="r"><code>sum(downreg$shortgene %in% dft$gene)</code></pre>
+<pre><code>[1] 61</code></pre>
+<pre class="r"><code>##test for selection in LMAD26
+selresults &lt;- testAllGenes(&#39;LMAD26&#39;)
 
-## test for selection on each gene
-allGeneOutput &lt;- sapply(1:ncol(df1), function(x){
-myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
-return(myQpc)
-})
+#extract p values for PC 5
+pvals5 = matrix(unlist(selresults[4,]), ncol=5, byrow=TRUE)[,5]
+dfp &lt;- data.frame(gene = dft$gene, pc5 = pvals5, stringsAsFactors = F)## add back to genes
 
-return(allGeneOutput)
-}
+### 
+dfp$fdr = p.adjust(dfp$pc5, method=&quot;fdr&quot;)
+dfp$bonf = p.adjust(dfp$pc5, method=&quot;bonferroni&quot;)
+sigs = dplyr::filter(dfp,fdr &lt; 0.1) ##get significant results
 
-###run on all genes
-alltissues = c(&#39;GRoot&#39;,&quot;Kern&quot;,&quot;LMAD26&quot;,&quot;LMAN26&quot;, &quot;L3Tip&quot;,&quot;GShoot&quot;,&quot;L3Base&quot;,&quot;LMAD8&quot;,&quot;LMAN8&quot;)
-alltissueresults = lapply(alltissues, testAllGenes)
-names(alltissueresults) &lt;- alltissues
+##are any of the drought genes significant?
+summary(dplyr::filter(dfp, gene %in% upreg$shortgene)$fdr)</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.4815  0.9118  0.9684  0.9284  0.9976  0.9990 </code></pre>
+<pre class="r"><code>summary(dplyr::filter(dfp, gene %in% downreg$shortgene)$fdr)</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.2390  0.9388  0.9976  0.9321  0.9985  0.9990 </code></pre>
+<pre class="r"><code>##nope
 
+##what about in top 500 or something?
+top500 = dplyr::top_n(dfp, 500, -log10(pc5))
 
-
-##look at sig results
-sigresults = lapply(1:length(alltissues), function(i){
-# extract the pvalues
-pvals = matrix(unlist(alltissueresults[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
-
-##look at pvalue distributions
-par(mfrow=c(3,2), mar=c(4,4,1,1))
-sapply(1:5, function(x){
-hist(pvals[,x], border=&quot;white&quot;, col = &quot;darkgray&quot;, main=&quot;&quot;, breaks = 20, xlab = paste(&#39;PC &#39;,x,&#39; &#39;,alltissues[i],sep=&quot;&quot;))
-})
-
-## test fpr sogmofocamce
-pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method=&#39;fdr&#39;)}))
-
-## how many are significant?
-numsig &lt;- apply(pfdr, 2, function(x){sum(x&lt;0.1)})
-numsig
-})</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-8.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>###make a big image of how many sig results we have
-sigTable = as.data.frame(matrix(unlist(sigresults), ncol=5, byrow=T))
-names(sigTable) = c(&#39;PC1&#39;,&#39;PC2&#39;,&#39;PC3&#39;,&#39;PC4&#39;,&#39;PC5&#39;)
-sigTable$tissue = alltissues
-sigLong = tidyr::gather(sigTable, &#39;variable&#39;,&#39;value&#39;, -tissue)
-sigLong[sigLong == 0] &lt;- NA
-
-pl &lt;- ggplot(data=sigLong,aes(x=variable,y=tissue)) + 
-  geom_tile(aes(fill=value),color=&#39;black&#39;) + scale_fill_gradient(low = &#39;lightyellow&#39;, high = &quot;#CC79A7&quot;, guide = FALSE, na.value = &quot;white&quot;) + theme_bw() + xlab(&quot;\n&quot;) + ylab(&quot;Tissue&quot;) + 
-  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour=&quot;grey15&quot;,size=3.5)
-
-pl</code></pre>
-<pre><code>Warning: Removed 29 rows containing missing values (geom_text).</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-9.png" width="672" style="display: block; margin: auto;" /></p>
-<p>I think the main difference is the PCs that I’m using to estimate Va are different from Jennifer’s (she uses 11:20). Let’s check.</p>
-<pre class="r"><code>### function for testing all genes
-testAllGenes1120 &lt;- function(myTissue){
-# Read in mean-centered expression values
-df1 &lt;- read.table(paste(&quot;../data/Mean_centered_expression/&quot;,myTissue,&quot;.txt&quot;,sep=&quot;&quot;))
-# Read in tissue specific kinship matrix 
-myF &lt;- read.table(paste(&#39;../data/Kinship_matrices/F_&#39;,myTissue,&#39;.txt&#39;,sep=&quot;&quot;))
-
-## Get Eigen Values and Vectors 
-myE &lt;- eigen(myF)
-E_vectors &lt;- myE$vectors
-E_values &lt;- myE$values
-
-## Testing for selection on first 5 PCs
-myM = 1:5
-
-## Using the last 1/2 of PCs to estimate Va
-myL = 11:20
-
-## test for selection on each gene
-allGeneOutput &lt;- sapply(1:ncol(df1), function(x){
-myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
-return(myQpc)
-})
-
-return(allGeneOutput)
-}
+##if there&#39;s an enrichment, expect a larger proportion of drought-responsive genes to be in top500, then of all genes
+top500prop = 500/nrow(dft)####prop of all genes in top500
+up500prop = nrow(dplyr::filter(top500, gene %in% upreg$shortgene))/nrow(upreg)
+down500prop = nrow(dplyr::filter(top500, gene %in% downreg$shortgene))/nrow(downreg)
 
 
+par(mfrow=c(1,1), mar=c(5,5,2,2))
+plot(1:3, c(top500prop, up500prop, down500prop), bty=&quot;n&quot;, xlim = c(0.5,3.5), ylim = c(0,0.1), xaxt=&quot;n&quot;, yaxt= &quot;n&quot;, cex=2, lwd=2, ylab=&quot;Prop in top 500 genes&quot;, xlab=&quot;&quot;)
+axis(1, at=c(1,2,3), lab = c(&quot;all&quot;,&quot;up&quot;,&quot;down&quot;), cex.axis=1.5)
+axis(2, las=2)</code></pre>
+<p><img src="figure/Drought-genes.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>##what about in top 1000 or something?
+top1000 = dplyr::top_n(dfp, 1000, -log10(pc5))
 
-alltissueresults1120 = lapply(alltissues, testAllGenes1120)
-names(alltissueresults1120) &lt;- alltissues
-
-
-
-##look at sig results
-sigresults1120 = lapply(1:length(alltissues), function(i){
-# extract the pvalues
-pvals = matrix(unlist(alltissueresults1120[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
-
-##look at pvalue distributions
-par(mfrow=c(3,2), mar=c(4,4,1,1))
-sapply(1:5, function(x){
-hist(pvals[,x], border=&quot;white&quot;, col = &quot;darkgray&quot;, main=&quot;&quot;, breaks = 20, xlab = paste(&#39;PC &#39;,x,&#39; &#39;,alltissues[i],sep=&quot;&quot;))
-})
-
-## test fpr sogmofocamce
-pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method=&#39;fdr&#39;)}))
-
-## how many are significant?
-numsig &lt;- apply(pfdr, 2, function(x){sum(x&lt;0.1)})
-numsig
-})</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-4.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-5.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-6.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-7.png" width="672" style="display: block; margin: auto;" /><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-8.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>###make a big image of how many sig results we have
-sigTable1120 = as.data.frame(matrix(unlist(sigresults1120), ncol=5, byrow=T))
-names(sigTable1120) = c(&#39;PC1&#39;,&#39;PC2&#39;,&#39;PC3&#39;,&#39;PC4&#39;,&#39;PC5&#39;)
-sigTable1120$tissue = alltissues
-sigLong1120 = tidyr::gather(sigTable1120, &#39;variable&#39;,&#39;value&#39;, -tissue)
+##if there&#39;s an enrichment, expect a larger proportion of drought-responsive genes to be in top500, then of all genes
+top1000prop = 1000/nrow(dft)####prop of all genes in top500
+up1000prop = nrow(dplyr::filter(top1000, gene %in% upreg$shortgene))/nrow(upreg)
+down1000prop = nrow(dplyr::filter(top1000, gene %in% downreg$shortgene))/nrow(downreg)
 
 
-pl &lt;- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) + 
-  geom_tile(aes(fill=value),color=&#39;black&#39;) + scale_fill_gradient(low = &#39;lightyellow&#39;, high = &quot;#CC79A7&quot;, guide = FALSE, na.value = &quot;white&quot;) + theme_bw() + xlab(&quot;\n&quot;) + ylab(&quot;Tissue&quot;) + 
-  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour=&quot;grey15&quot;,size=3.5)
-
-pl</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-9.png" width="672" style="display: block; margin: auto;" /></p>
+par(mfrow=c(1,1), mar=c(5,5,2,2))
+plot(1:3, c(top1000prop, up1000prop, down1000prop), bty=&quot;n&quot;, xlim = c(0.5,3.5), ylim = c(0,0.15), xaxt=&quot;n&quot;, yaxt= &quot;n&quot;, cex=2, lwd=2, ylab=&quot;Prop in top 1000 genes&quot;, xlab=&quot;&quot;)
+axis(1, at=c(1,2,3), lab = c(&quot;all&quot;,&quot;up&quot;,&quot;down&quot;), cex.axis=1.5)
+axis(2, las=2)</code></pre>
+<p><img src="figure/Drought-genes.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Seems like there’s no enrichment, or even an anti-enrichment. Worth reporting?</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -832,22 +698,18 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] tidyr_1.0.2       quaint_0.0.0.9000 ggpubr_0.2.5      magrittr_1.5     
-[5] reshape2_1.4.3    ggplot2_3.2.1    
+[1] quaint_0.0.0.9000 dplyr_0.8.4      
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.3       plyr_1.8.5       compiler_3.6.2   pillar_1.4.3    
- [5] later_1.0.0      git2r_0.26.1     highr_0.8        workflowr_1.6.0 
- [9] tools_3.6.2      digest_0.6.25    evaluate_0.14    lifecycle_0.1.0 
-[13] tibble_2.1.3     gtable_0.3.0     pkgconfig_2.0.3  rlang_0.4.4     
-[17] yaml_2.2.1       xfun_0.12        withr_2.1.2      stringr_1.4.0   
-[21] dplyr_0.8.4      knitr_1.28       vctrs_0.2.3      fs_1.3.1        
-[25] rprojroot_1.3-2  grid_3.6.2       tidyselect_1.0.0 glue_1.3.1      
-[29] R6_2.4.1         rmarkdown_2.1    farver_2.0.3     purrr_0.3.3     
-[33] whisker_0.4      ellipsis_0.3.0   backports_1.1.5  scales_1.1.0    
-[37] promises_1.1.0   htmltools_0.4.0  assertthat_0.2.1 colorspace_1.4-1
-[41] ggsignif_0.6.0   httpuv_1.5.2     stringi_1.4.6    lazyeval_0.2.2  
-[45] munsell_0.5.0    crayon_1.3.4    </code></pre>
+ [1] Rcpp_1.0.3       knitr_1.28       whisker_0.4      magrittr_1.5    
+ [5] workflowr_1.6.0  tidyselect_1.0.0 R6_2.4.1         rlang_0.4.4     
+ [9] stringr_1.4.0    highr_0.8        tools_3.6.2      xfun_0.12       
+[13] git2r_0.26.1     htmltools_0.4.0  yaml_2.2.1       digest_0.6.25   
+[17] rprojroot_1.3-2  assertthat_0.2.1 tibble_2.1.3     crayon_1.3.4    
+[21] purrr_0.3.3      later_1.0.0      promises_1.1.0   fs_1.3.1        
+[25] glue_1.3.1       evaluate_0.14    rmarkdown_2.1    stringi_1.4.6   
+[29] pillar_1.4.3     compiler_3.6.2   backports_1.1.5  httpuv_1.5.2    
+[33] pkgconfig_2.0.3 </code></pre>
 </div>
 </div>
 

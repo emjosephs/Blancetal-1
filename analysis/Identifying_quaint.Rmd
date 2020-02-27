@@ -71,10 +71,10 @@ hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = p
 })
 
 ## test fpr sogmofocamce
-pbonf = data.frame(apply(pvals,2, function(x){p.adjust(x, method='bonferroni')}))
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
 
 ## how many are significant?
-numsig <- apply(pbonf, 2, function(x){sum(x<0.05)})
+numsig <- apply(pfdr, 2, function(x){sum(x<0.1)})
 numsig
 })
 
