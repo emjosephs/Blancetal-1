@@ -93,6 +93,94 @@ pl
 
 ```
 
+Make some individual gene ploes
+```{r}
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv")
+lmad26_all <- read.table("../data/Mean_centered_expression/LMAD26.txt")
+lmad26_all$lines <- row.names(lmad26_all)
+pop_dat <- merge(pop, lmad26_all, by.x = "Inbred", by.y = "lines" )
+
+myF <- read.table('../data/Kinship_matrices/F_LMAD26.txt')
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+
+##what gene to plot
+pvals = matrix(unlist(alltissueresults[['LMAD26']][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
+pfdr$index = 1:nrow(pfdr)
+
+##the sig LMAD26 one on PC 1
+sigPC1 = dplyr::filter(pfdr, X1 < 0.1)
+pop_dat$sel <- lmad26_all[,sigPC1$index]
+pop_dat$one <- E_vectors[,1]
+lambda <- E_values[1]
+
+##calculate the CIs
+generesults = alltissueresults[['LMAD26']][,sigPC1$index]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+##gene name
+names(lmad26_all)[sigPC1$index]
+
+lR <- lm(pop_dat$sel ~ pop_dat$one) 
+coeff <- lR$coefficients[[2]]
+
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl1 <- ggplot(data=pop_dat, aes(x = one, y= sel , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("Mean-centered Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+
+pl1
+
+
+###make a plot for a nonsig gene
+mgi= sigPC1$index+27
+pop_dat$sel1 <- lmad26_all[,mgi]
+
+##gene name
+names(lmad26_all)[mgi]
+
+generesults = alltissueresults[['LMAD26']][,mgi]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+
+lR <- lm(pop_dat$sel1 ~ pop_dat$one) 
+coeff <- lR$coefficients[[2]]
+
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl2 <- ggplot(data=pop_dat, aes(x = one, y= sel1 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("Mean-centered Expression") + theme_bw() + ylim(-100,100) + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+
+pl2
+
+
+###make a plot for PC5
+sigPC5 = dplyr::filter(pfdr, X5 < 0.1)
+sigPC5$gene = names(lmad26_all)[sigPC5$index]
+mgi = sigPC5$index[6]
+
+pop_dat$sel5 <- lmad26_all[,mgi]
+pop_dat$one <- E_vectors[,5]
+lambda <- E_values[5]
+
+##calculate the CIs
+generesults = alltissueresults[['LMAD26']][,mgi]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+##gene name
+names(lmad26_all)[sigPC1$index]
+
+lR <- lm(pop_dat$sel5 ~ pop_dat$one) 
+coeff <- lR$coefficients[[2]]
+
+pl3 <- ggplot(data=pop_dat, aes(x = one, y= sel5 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("Mean-centered Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+
+pl3
+
+```
+
 I think the main difference is the PCs that I'm using to estimate Va are different from Jennifer's (she uses 11:20). Let's check.
 
 ```{r}
