@@ -251,3 +251,22 @@ pl <- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) +
 
 pl
 ```
+
+Make a PC plot
+```{r}
+pop_dat$PC1 = E_vectors[,1]
+pop_dat$PC2 = E_vectors[,2]
+pop_dat$PC3 = E_vectors[,3]
+pop_dat$PC4 = E_vectors[,4]
+
+
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+plpc <- ggplot(data=pop_dat, aes(x = PC1, y= PC2 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("PC 2") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = "bottom",  legend.text = element_text(size = 14), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 2 )
+plpc
+
+
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+plpc <- ggplot(data=pop_dat, aes(x = PC3, y= PC4 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 3") +  ylab("PC 4") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = "bottom",  legend.text = element_text(size = 14), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 2 )
+plpc
+
+```

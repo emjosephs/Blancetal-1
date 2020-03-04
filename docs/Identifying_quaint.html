@@ -410,7 +410,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-03
+<strong>Last updated:</strong> 2020-03-04
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
@@ -525,10 +525,10 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1treea2e0aec4fc3f36c96ca76f737c893320df7c19adtargetblanka2e0aeca"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/emjosephs/Blancetal-1/tree/a2e0aec4fc3f36c96ca76f737c893320df7c19ad" target="_blank">a2e0aec</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree993e4b7c0b498483da583de0425358be07d37ff6targetblank993e4b7a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/emjosephs/Blancetal-1/tree/993e4b7c0b498483da583de0425358be07d37ff6" target="_blank">993e4b7</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1treea2e0aec4fc3f36c96ca76f737c893320df7c19adtargetblanka2e0aeca" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree993e4b7c0b498483da583de0425358be07d37ff6targetblank993e4b7a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -577,6 +577,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/emjosephs/Blancetal-1/blob/993e4b7c0b498483da583de0425358be07d37ff6/analysis/Identifying_quaint.Rmd" target="_blank">993e4b7</a>
+</td>
+<td>
+Em
+</td>
+<td>
+2020-03-03
+</td>
+<td>
+mroe stuff
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/emjosephs/Blancetal-1/993e4b7c0b498483da583de0425358be07d37ff6/docs/Identifying_quaint.html" target="_blank">993e4b7</a>
+</td>
+<td>
+Em
+</td>
+<td>
+2020-03-03
+</td>
+<td>
+mroe stuff
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -808,10 +842,54 @@ names(lmad26_all)[sigPC1$index]</code></pre>
 coeff &lt;- lR$coefficients[[2]]
 
 col &lt;- c(&#39;#E69F00&#39;, &#39;#56B4E9&#39;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;)
-pl1 &lt;- ggplot(data=pop_dat, aes(x = one, y= sel , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 1&quot;) +  ylab(&quot;Mean-centered Expression&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = &quot;right&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 2.5) + geom_abline(slope = myCI, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2)
+pl1 &lt;- ggplot(data=pop_dat, aes(x = one, y= sel , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 1&quot;) +  ylab(&quot;Mean-centered Expression&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = &quot;right&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = &#39;#56B4E9&#39;, size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = &#39;#56B4E9&#39;, size=1.2)
 
 pl1</code></pre>
 <p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>###make a plot for a nonsig gene
+mgi= sigPC1$index+27
+pop_dat$sel1 &lt;- lmad26_all[,mgi]
+
+##gene name
+names(lmad26_all)[mgi]</code></pre>
+<pre><code>[1] &quot;GRMZM2G153215&quot;</code></pre>
+<pre class="r"><code>generesults = alltissueresults[[&#39;LMAD26&#39;]][,mgi]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+
+lR &lt;- lm(pop_dat$sel1 ~ pop_dat$one) 
+coeff &lt;- lR$coefficients[[2]]
+
+col &lt;- c(&#39;#E69F00&#39;, &#39;#56B4E9&#39;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;)
+pl2 &lt;- ggplot(data=pop_dat, aes(x = one, y= sel1 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 1&quot;) +  ylab(&quot;Mean-centered Expression&quot;) + theme_bw() + ylim(-100,100) + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = &quot;right&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = &#39;#56B4E9&#39;, size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = &#39;#56B4E9&#39;, size=1.2)
+
+pl2</code></pre>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>###make a plot for PC5
+sigPC5 = dplyr::filter(pfdr, X5 &lt; 0.1)
+sigPC5$gene = names(lmad26_all)[sigPC5$index]
+mgi = sigPC5$index[6]
+
+pop_dat$sel5 &lt;- lmad26_all[,mgi]
+pop_dat$one &lt;- E_vectors[,5]
+lambda &lt;- E_values[5]
+
+##calculate the CIs
+generesults = alltissueresults[[&#39;LMAD26&#39;]][,mgi]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+##gene name
+names(lmad26_all)[sigPC1$index]</code></pre>
+<pre><code>[1] &quot;GRMZM2G152686&quot;</code></pre>
+<pre class="r"><code>lR &lt;- lm(pop_dat$sel5 ~ pop_dat$one) 
+coeff &lt;- lR$coefficients[[2]]
+
+pl3 &lt;- ggplot(data=pop_dat, aes(x = one, y= sel5 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 1&quot;) +  ylab(&quot;Mean-centered Expression&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = &quot;right&quot;, legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = &#39;#56B4E9&#39;, size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = &#39;#56B4E9&#39;, size=1.2)
+
+pl3</code></pre>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
 <p>I think the main difference is the PCs that I’m using to estimate Va are different from Jennifer’s (she uses 11:20). Let’s check.</p>
 <pre class="r"><code>### function for testing all genes
 testAllGenes1120 &lt;- function(myTissue){
@@ -879,6 +957,21 @@ pl &lt;- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) +
 
 pl</code></pre>
 <p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-3-9.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Make a PC plot</p>
+<pre class="r"><code>pop_dat$PC1 = E_vectors[,1]
+pop_dat$PC2 = E_vectors[,2]
+pop_dat$PC3 = E_vectors[,3]
+pop_dat$PC4 = E_vectors[,4]
+
+
+col &lt;- c(&#39;#E69F00&#39;, &#39;#56B4E9&#39;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;)
+plpc &lt;- ggplot(data=pop_dat, aes(x = PC1, y= PC2 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 1&quot;) +  ylab(&quot;PC 2&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = &quot;bottom&quot;,  legend.text = element_text(size = 14), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 2 )
+plpc</code></pre>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>col &lt;- c(&#39;#E69F00&#39;, &#39;#56B4E9&#39;, &quot;#009E73&quot;, &quot;#F0E442&quot;, &quot;#0072B2&quot;, &quot;#D55E00&quot;, &quot;#CC79A7&quot;)
+plpc &lt;- ggplot(data=pop_dat, aes(x = PC3, y= PC4 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c(&quot;mixed&quot;, &quot;non-stiff stalk&quot;, &quot;popcorn&quot;, &quot;stiff stalk&quot;, &quot;tropical&quot;)) + xlab(&quot;PC 3&quot;) +  ylab(&quot;PC 4&quot;) + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = &quot;bottom&quot;,  legend.text = element_text(size = 14), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 2 )
+plpc</code></pre>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-4-2.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
