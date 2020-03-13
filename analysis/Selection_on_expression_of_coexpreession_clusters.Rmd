@@ -1,0 +1,54 @@
+---
+title: "Selection_on_expression_of_coexpression_clusters"
+author: "Jennifer Blanc"
+date: "3/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Intro  
+
+Here is the code to reproduce figure 4 and figure 5.  
+
+## Code 
+
+For this analysis we want to test for selection within specific coexpression modules. We used coexpression modules from Walley et al. (2016) who used weight gene coexpression network analysis (WGCNA) to to group together genes that were similarly expressed in at least 4 tissues in one maize inbred line. Their analysis resulted in 66 co-expression networks. Below we will load their co-expression networks and select all the clusters that have at least 100 genes in them.  
+
+```{r}
+modules <- read.delim("../data/Modules.txt",na.strings=c("","NA"))
+num_genes <- apply(modules, 2, function(x) length(which(!is.na(x))))
+num_genes_100 <- which(num_genes >= 100)
+modules  <- modules[,num_genes_100]
+```
+
+We now have 51 modules that have at least 100 genes. We now need to the the names of the genes that we have in out RNA-seq dataset. To do this we will read in the header for each of the mean centered expression matrices.  
+
+```{r}
+kern_inds <- t(read.table("../data/Mean_centered_expression/Kern.txt", nrows = 1))
+gshoot_inds <- t(read.table("../data/Mean_centered_expression/GShoot.txt", nrows = 1))
+groot_inds <- t(read.table("../data/Mean_centered_expression/GRoot.txt", nrows = 1))
+base_inds <- t(read.table("../data/Mean_centered_expression/L3Base.txt", nrows = 1))
+tip_inds <- t(read.table("../data/Mean_centered_expression/L3Tip.txt", nrows = 1))
+lmad8_inds <- t(read.table("../data/Mean_centered_expression/LMAD8.txt", nrows = 1))
+lman8_inds <- t(read.table("../data/Mean_centered_expression/LMAN8.txt", nrows = 1))
+lmad26_inds <- t(read.table("../data/Mean_centered_expression/LMAD26.txt", nrows = 1))
+lman26_inds <- t(read.table("../data/Mean_centered_expression/LMAN26.txt", nrows = 1))
+```
+
+Now we have the list of gene names in each of the 51 coexpression modules and the name of the genes we have RNAseq data from in each of our nine tissue types. Now we need to find the overlap between our data and the genes in the submodules. The chuck of code below can be used to get the overlap for any tissue, you just need to change "kern_inds" to be the tissue from above that you are interested in. 
+
+```{r}
+tissue_list <- list()
+tissue_list_length <- list()
+for (i in 1:ncol(modules)) {
+  lis <- modules[,i]
+  olap <- Reduce(intersect, list(kern_inds[,1], lis)) # Change tissue 
+  tissue_list[[i]] <- olap
+  tissue_list_length[[i]] <- length(olap)
+}
+```
+
