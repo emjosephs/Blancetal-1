@@ -1,0 +1,53 @@
+---
+title: "Expression_plots"
+author: "Jennifer Blanc"
+date: "3/16/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Intro  
+
+Here we have the code to plot Expression vs PC for any gen/PC combination in any tissue. This is the code used to generate Figure 6 in the main text. It is important to note that it is easy to plot Expression vs. PC with the line of best fit for any gene. However, to plot confidence intervals you need to get $\text{var}(C_{11:20})$ from the selection test. To plot the correct confidence interval you would need to record the "var_t" value from the selection test and plug that into the code below used to calculate "k_plus".     
+
+## Figures 
+
+```{r}
+# Read in Population and Expression Info 
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv")
+exp <- read.table("../data/Mean_centered_expression/Kern.txt")
+exp$lines <- row.names(exp)
+m <- merge(pop, exp, by.x = "Inbred", by.y = "lines" )
+pop_dat <- m[,1:8]
+
+# Read in Kinship Matrix 
+myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
+
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+# Get PC and Expression
+pop_dat$PC <- E_vectors[,2] # Can change PC
+pop_dat$Gene <- exp[,"GRMZM2G093574"] # Can change gene name
+
+# Get CI info
+lambda <- E_values[2]
+k_plus <-  1.96 * sqrt(4836.755 * lambda) 
+k_minus <- -k_plus
+
+# Do linear regression and get slope 
+lR <- lm(pop_dat$Gene ~ pop_dat$PC) 
+coeff <- lR$coefficients[[2]]
+
+# Plot 
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+ggplot(data=pop_dat, aes(x = PC, y= Gene , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")) + xlab("PC 2") +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "bottom", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + geom_point(size = 2.5) + geom_abline(slope = k_plus, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = k_minus, linetype = 2) + scale_y_continuous(limits = c(-300, 900), breaks = c(-300, 0, 300, 600, 900))
+
+```
+
