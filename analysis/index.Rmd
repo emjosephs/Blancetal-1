@@ -8,7 +8,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+This website contains the code used to do the analysis in the main text of Detecting Local Adaptation in Gene Expression in Maize. Click the link to each section to look at the code used to generate the figures in each section of the paper.   
 
 Population Structure [link](Population_Structure.html)   
 Identifying Selected Genes [link](Identifying_Selected_Genes.html)  
