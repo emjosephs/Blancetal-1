@@ -7,6 +7,9 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(reshape2)
+library(ggplot2)
+library(ggpubr)
 ```
 
 
@@ -25,7 +28,7 @@ num_genes_100 <- which(num_genes >= 100)
 modules  <- modules[,num_genes_100]
 ```
 
-We now have 51 modules that have at least 100 genes. We now need to the the names of the genes that we have in out RNA-seq dataset. To do this we will read in the header for each of the mean centered expression matrices.  
+We now have 51 modules that have at least 100 genes. We now need to the the names of the genes that we have in out RNA-seq data set. To do this we will read in the header for each of the mean centered expression matrices.  
 
 ```{r}
 kern_inds <- t(read.table("../data/Mean_centered_expression/Kern.txt", nrows = 1))
@@ -39,7 +42,7 @@ lmad26_inds <- t(read.table("../data/Mean_centered_expression/LMAD26.txt", nrows
 lman26_inds <- t(read.table("../data/Mean_centered_expression/LMAN26.txt", nrows = 1))
 ```
 
-Now we have the list of gene names in each of the 51 coexpression modules and the name of the genes we have RNAseq data from in each of our nine tissue types. Now we need to find the overlap between our data and the genes in the submodules. The chuck of code below can be used to get the overlap for any tissue, you just need to change "kern_inds" to be the tissue from above that you are interested in. 
+Now we have the list of gene names in each of the 51 coexpression modules and the name of the genes we have RNA seq data from in each of our nine tissue types. Now we need to find the overlap between our data and the genes in the sub modules. The chuck of code below can be used to get the overlap for any tissue, you just need to change "kern_inds" to be the tissue from above that you are interested in. 
 
 ```{r}
 tissue_list <- list()
@@ -51,4 +54,329 @@ for (i in 1:ncol(modules)) {
   tissue_list_length[[i]] <- length(olap)
 }
 ```
+
+Now the we have the overlap of gene name between our data and the coexpression modules, we now need find the median expression of all the overlap genes in each coexpression cluster. We also only want to keep clusters where the overlap number of genes is at least 50. The code below can be modified for all the tissues, the resulting tables for all nine tissues with the median expression of each coexpression clusters are save in "output/Selection_on_expression_of_coexpression_clusters/".  
+
+```{r}
+exp <- read.table("../data/Raw_expression/Kern.txt") # Change tissue
+median_exp <- as.data.frame(matrix(ncol=51, nrow=nrow(exp)))
+for (i in 1:ncol(modules)) {
+  gene <- tissue_list[[i]] # Make sure you ran correct tissue above 
+  avg_exp <- as.data.frame(matrix(nrow=nrow(exp), ncol = length(gene)))
+    for (k in 1:length(gene)) {
+      nam <- gene[k]
+      avg_exp[,k] <- as.numeric(exp[,nam])}
+    for (j in 1:nrow(exp)){
+      if (ncol(avg_exp) >= 50){
+        e <- t(avg_exp[j,])
+        median_exp[j,i] <- as.numeric(median(e[,1]))}
+      else {
+        median_exp[j,i] <- NA}
+    }
+}
+
+#write.table(median_exp,"../output/Selection_on_expression_of_coexpression_clusters/Median_Kern.txt")
+```
+
+Great, now we have the median expression value for each cluster. We now want to test for selection on the median values in each cluster. Below is the same code used to identify selected genes, we are simply conducting the test on median expression values in each line instead of a single gene expression in each line. For the test we are combining PC's 1-5 for the numerator of the selection test first (saved as output/Selection_on_expression_of_coexpression_clusters/tissuename_pvals.txt) and each PC individually next (saved as output/Selection_on_expression_of_coexpression_clusters/tissuename_pvals_ind.txt) 
+
+```{r}
+#df1 <- median_exp
+df1 <- read.table("../output/Selection_on_expression_of_coexpression_clusters/Median_Kern.txt") #Change tissue 
+
+## Mean center the data 
+for (i in 1:ncol(df1)){
+  df1[,i] <- scale(df1[,i], scale = FALSE)
+}
+
+## Remove last row
+df1 <- df1[-nrow(df1),]
+
+## Kinship Matrix for all 207 Kern lines - Change for different tissue
+myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
+
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+## Make new matrix to collect Z values
+df2 <- data.frame(matrix(ncol=ncol(df1), nrow=nrow(df1)))
+colnames(df2) <- colnames(df1[1:ncol(df1)])
+rownames(df2) <- rownames(df1)
+
+## Calculate Q values by multiplying the mean-centered expression value by each eigen vector 
+for (i in 1:ncol(df2)) {
+  mean_centered_data <- t(as.matrix(as.numeric(df1[,i])))
+  for (k in 1:nrow(df2)){
+    u <- as.matrix(as.numeric(E_vectors[,k]))
+    value <- mean_centered_data %*% u
+    df2[k,i] <- value
+  }
+}
+
+## Get the square root of the Eigen values   
+de <- data.frame(matrix(nrow = nrow(df1),ncol = 2))
+de$Egien_values <- E_values 
+de$Sqrt_EV <- sqrt(de$Egien_values)
+
+## Calculate C-values by dividing Q values by the square root of the eigen values
+df4 <- data.frame(matrix(ncol=ncol(df2),nrow=nrow(df2)))
+for (i in 1:ncol(df2)){
+  df4[,i] <- (df2[,i] / de$Sqrt_EV)
+}
+
+## Calculate F-values by dividing variances - for PCs 1-5 combined
+F_values <- data.frame(matrix(ncol=ncol(df2), nrow = 1))
+for (j in 1:ncol(df2)){
+  for (i in 1:1){
+    q <- df4[1:5,j] 
+    t <- df4[11:20,j]
+    var_q <- mean(q^2)
+    var_t <- mean(t^2)
+    F_value <- var_q / var_t
+    F_values[i,j] <- F_value
+  }
+}
+
+## Calculate P-values from recorded F values 
+P_values <- data.frame(matrix(ncol=ncol(df2), nrow =1))
+for (j in 1:ncol(F_values)){
+  for (r in 1:1) {
+    f_stat <- F_values[r, j]
+    p_value <- pf(q=f_stat, df1=5, df2=10, lower.tail=FALSE) 
+    P_values[r, j] <- p_value
+  }
+}
+
+#write.table(P_values,"../output/Selection_on_expression_of_coexpression_clusters/Kern_pvals.txt")
+
+## Calculate F-values by dividing variances 
+F_values <- data.frame(matrix(ncol=ncol(df2), nrow = 5))
+for (j in 1:ncol(df2)){
+  for (i in 1:5){
+    q <- df4[i,j] 
+    t <- df4[11:20,j]
+    var_q <- (q^2)
+    var_t <- mean(t^2)
+    F_value <- var_q / var_t
+    F_values[i,j] <- F_value
+  }
+}
+
+## Calculate P-values from recorded F values 
+P_values <- data.frame(matrix(ncol=ncol(df2), nrow =1))
+for (j in 1:ncol(F_values)){
+  for (r in 1:5) {
+    f_stat <- F_values[r, j]
+    p_value <- pf(q=f_stat, df1=1, df2=10, lower.tail=FALSE) 
+    P_values[r, j] <- p_value
+  }
+}
+
+#write.table(P_values,"../output/Selection_on_expression_of_coexpression_clusters/Kern_pvals_ind.txt")
+```
+
+## Figures  
+
+We now have the raw p-values from the results of our selection test. Let's plot the figure 4 from the main text using these p-values.  
+
+First let's read in the p-values. 
+```{r}
+kern <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/Kern_pvals.txt"))
+gshoot <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/GShoot_pvals.txt"))
+groot <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/GRoot_pvals.txt"))
+base <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/L3Base_pvals.txt"))
+tip <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/L3Tip_pvals.txt"))
+lmad8 <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/LMAD8_pvals.txt"))
+lman8 <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/LMAN8_pvals.txt"))
+lmad26 <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/LMAD26_pvals.txt"))
+lman26 <- t(read.table("../output/Selection_on_expression_of_coexpression_clusters/LMAN26_pvals.txt"))
+```
+
+We need to add the module names as the row names.  
+```{r}
+names <- colnames(modules)
+rownames(kern) <- names
+colnames(kern) <- c("Kern")
+rownames(groot) <- names
+colnames(groot) <- c("GRoot")
+rownames(gshoot) <- names
+colnames(gshoot) <- c("GShoot")
+rownames(base) <- names
+colnames(base) <- c("L3Base")
+rownames(tip) <- names
+colnames(tip) <- c("L3Tip")
+rownames(lmad8) <- names
+colnames(lmad8) <- c("LMAD8")
+rownames(lman8) <- names
+colnames(lman8) <- c("LMAN8")
+rownames(lmad26) <- names
+colnames(lmad26) <- c("LMAD26")
+rownames(lman26) <- names
+colnames(lman26) <- c("LMAN26")
+```
+
+Now we will check the q-value for each test using the FDR multiple testing correction. 
+```{r}
+kern_q <- p.adjust(kern, method = "fdr")
+gshoot_q <- p.adjust(gshoot, method = "fdr")
+groot_q <- p.adjust(groot, method = "fdr")
+base_q <- p.adjust(base, method = "fdr")
+tip_q <- p.adjust(tip, method = "fdr")
+lmad8_q <- p.adjust(lmad8, method = "fdr")
+lman8_q <- p.adjust(lman8, method = "fdr")
+lmad26_q <- p.adjust(lmad26, method = "fdr")
+lman26_q <- p.adjust(lman26, method = "fdr")
+
+dat_q <- cbind(kern_q, groot_q, gshoot_q, base_q, tip_q, lmad8_q, lman8_q, lmad26_q, lman26_q)
+dat_q <- as.data.frame(dat_q)
+dat_q$Module <- names
+dat_q <- dat_q[-c(29, 15, 36), ] # Remove modules that did not have at least 50 genes in any of the tissues 
+dat_q <- melt(dat_q,id="Module")
+colnames(dat_q) <- c("Module", "Tissue", "QVAL")
+```
+
+Now we will combine the p-values into one data frame and add a factor column that annotates the p-value range 
+```{r}
+dat <- cbind(kern, groot, gshoot, base, tip, lmad8, lman8, lmad26, lman26)
+dat <- as.data.frame(dat)
+dat$Module <- rownames(dat)
+
+dat <- dat[-c(29, 15,36), ] # Remove modules that did not have at least 50 genes in any of the tissues 
+
+dat2 <- melt(dat,id="Module")
+dat2[is.na(dat2)] <- 1
+dat2$cat <- "(0.1,1]"
+
+for (i in 1:nrow(dat2)) {
+  p <- dat2[i,3]
+  if (p  == 1) {dat2[i,4] <- "NA" }
+  else if (p > 0.001 & p <= 0.01 ) { dat2[i,4] <- "(0,0.01]"}
+  else if (p > 0.01 & p <= 0.05) {dat2[i,4] <- "(0.01,0.05]"}
+  else if (p > 0.05 & p <= 0.1) {dat2[i,4] <- "(0.05,0.1]"}
+}
+```
+
+Finally we will join the p-value and q-value information and plot the heat map. The asterisks are marking q-value ranges, one module has a q-value below 0.1.  
+```{r, warning=FALSE}
+dat3 <- cbind(dat2, dat_q)
+dat3$stars <- cut(dat3$QVAL, breaks=c(-Inf, 0.01, 0.05, 0.1, Inf), label=c("***", "**", "*", ""))
+dat3 <- dat3[, -5]
+
+pl <- ggplot(data=dat3, aes(x=Module,y=variable, fill = cat)) + geom_tile() + scale_fill_manual(values = c("#D55E00", '#56B4E9', "#F0E442", "white", "gray95"), name = "p-value range") + theme_bw() + xlab("Module") + ylab("Tissue") + theme(axis.text.x = element_text(angle = 45, hjust = 1), axis.text.y = element_text(size = 7),legend.key = element_rect(colour = 'black', size = 0.5), axis.title.y = element_text(size = 14), axis.title.x = element_text(size = 14)) + coord_flip() + geom_text(aes(label=stars), color="black", size=5, nudge_x = -.5)
+pl
+
+```
+
+Finally we will plot the expression plot Median RNA Root Cortex coexpression cluster. 
+
+```{r,echo=FALSE}
+# Load median expression of modules in each line - can change to different tissue
+df1 <- read.table("../output/Selection_on_expression_of_coexpression_clusters/Median_Kern.txt")
+
+## Mean center the data 
+for (i in 1:ncol(df1)){
+  df1[,i] <- scale(df1[,i], scale = FALSE)
+}
+
+## Remove last row
+df1 <- df1[-nrow(df1),]
+
+# Get Eigen Vector/Value Info
+myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+# Get names of modules
+colnames(df1) <- colnames(modules)
+
+# Get population membership info 
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv")
+
+# Merge pop info with expression info 
+tissue <- read.table("../data/Mean_centered_expression/Kern.txt") # Need to change to correct tissue
+rows <- row.names(tissue)
+df1$lines <- rows
+pop_dat <- merge(pop, df1, by.x = "Inbred", by.y = "lines" )
+```
+
+Now we have all the info to make the expression plots. It is important to note that we calculated the $\text{var}(C_{11:20})$ for this specific module in the kernel tissue when we were doing the selection test above and manually added used it to plot these confidence intervals. The code below can generate the expression plot at best fit line for all tissues and modules but NOT the correct confidence intervals. To plot the correct confidence interval you would need to record the "var_t" value for each module from the code above and plug that into the code below used to calculate "k_plus".  
+
+```{r}
+# PC 1
+pop_dat$one <- E_vectors[,1]
+lambda <- E_values[1]
+
+k_plus <-  1.96 * sqrt(9.137196 * lambda) # Excpected denominator calculated from script 
+k_minus <- - k_plus 
+
+lR <- lm(pop_dat$RNA_Root_Cortex ~ pop_dat$one) 
+coeff <- lR$coefficients[[2]]
+
+col <-c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl1 <- ggplot(data=pop_dat, aes(x = one, y= RNA_Root_Cortex  , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")) + xlab("PC 1") +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + geom_point(size = 1.5) + geom_abline(slope = k_plus, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = k_minus, linetype = 2)
+
+# PC 2 
+pop_dat$two <- E_vectors[,2]
+lambda <- E_values[2]
+
+k_plus <-  1.96 * sqrt(9.137196 * lambda) # Excpected denominator calculated from script 
+k_minus <- - k_plus 
+
+lR <- lm(pop_dat$RNA_Root_Cortex ~ pop_dat$two) 
+coeff <- lR$coefficients[[2]]
+
+col <-c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl2 <- ggplot(data=pop_dat, aes(x = two, y= RNA_Root_Cortex  , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")) + xlab("PC 1") +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + geom_point(size = 1.5) + geom_abline(slope = k_plus, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = k_minus, linetype = 2)
+
+# PC 3
+pop_dat$three <- E_vectors[,3]
+lambda <- E_values[3]
+
+k_plus <-  1.96 * sqrt(9.137196 * lambda) # Excpected denominator calculated from script 
+k_minus <- - k_plus 
+
+lR <- lm(pop_dat$RNA_Root_Cortex ~ pop_dat$three) 
+coeff <- lR$coefficients[[2]]
+
+col <-c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl3 <- ggplot(data=pop_dat, aes(x = three, y= RNA_Root_Cortex  , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")) + xlab("PC 1") +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + geom_point(size = 1.5) + geom_abline(slope = k_plus, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = k_minus, linetype = 2)
+
+# PC 4
+pop_dat$four <- E_vectors[,4]
+lambda <- E_values[4]
+
+k_plus <-  1.96 * sqrt(9.137196 * lambda) # Excpected denominator calculated from script 
+k_minus <- - k_plus 
+
+lR <- lm(pop_dat$RNA_Root_Cortex ~ pop_dat$four) 
+coeff <- lR$coefficients[[2]]
+
+col <-c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl4 <- ggplot(data=pop_dat, aes(x = four, y= RNA_Root_Cortex  , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")) + xlab("PC 1") +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + geom_point(size = 1.5) + geom_abline(slope = k_plus, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = k_minus, linetype = 2)
+
+# PC 5
+pop_dat$five <- E_vectors[,5]
+lambda <- E_values[5]
+
+k_plus <-  1.96 * sqrt(9.137196 * lambda) # Excpected denominator calculated from script 
+k_minus <- - k_plus 
+
+lR <- lm(pop_dat$RNA_Root_Cortex ~ pop_dat$five) 
+coeff <- lR$coefficients[[2]]
+
+col <-c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl5 <- ggplot(data=pop_dat, aes(x = five, y= RNA_Root_Cortex  , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")) + xlab("PC 1") +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + geom_point(size = 1.5) + geom_abline(slope = k_plus, linetype = 2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = k_minus, linetype = 2)
+
+```
+
+Finally plot them all together!
+```{r,echo=FALSE}
+final <- ggarrange(pl1, pl2, pl3, pl4, pl5, common.legend = T, legend = "bottom", nrow = 1, ncol = 5, labels = c('A', "B", "C", "D", "E")
+)
+final
+```
+
 
