@@ -21,8 +21,6 @@ library(tidyr)
 I'm rerunning the code to identify selected genes with the Quaint package
 
 
-
-
 ```{r}
 
 ### function for testing all genes
@@ -53,7 +51,7 @@ return(allGeneOutput)
 }
 
 ###run on all genes
-alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base","LMAD8","LMAN8")
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
 alltissueresults = lapply(alltissues, testAllGenes)
 names(alltissueresults) <- alltissues
 
@@ -65,12 +63,12 @@ sigresults = lapply(1:length(alltissues), function(i){
 pvals = matrix(unlist(alltissueresults[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
 
 ##look at pvalue distributions
-par(mfrow=c(3,2), mar=c(4,4,1,1))
-sapply(1:5, function(x){
-hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
-})
+#par(mfrow=c(3,2), mar=c(4,4,1,1))
+#sapply(1:5, function(x){
+#hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
+#})
 
-## test fpr sogmofocamce
+## test fpr significance with the fdr
 pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
 
 ## how many are significant?
@@ -80,31 +78,30 @@ numsig
 
 ###make a big image of how many sig results we have
 sigTable = as.data.frame(matrix(unlist(sigresults), ncol=5, byrow=T))
+
+
+
 names(sigTable) = c('PC1','PC2','PC3','PC4','PC5')
-sigTable$tissue = alltissues
-sigLong = tidyr::gather(sigTable, 'variable','value', -tissue)
+sigTable$nicename = c('Germinating root', 'Kernel','Adult Leaf Day', 'Adult Leaf Night', '3rd leaf tip', 'Germinating shoot','3rd leaf base')
+
+
+sigLong = tidyr::gather(sigTable, 'variable','value', -nicename)
 sigLong[sigLong == 0] <- NA
 
-pl <- ggplot(data=sigLong,aes(x=variable,y=tissue)) + 
+pl <- ggplot(data=sigLong,aes(x=variable,y=nicename)) + 
   geom_tile(aes(fill=value),color='black') + scale_fill_gradient(low = 'lightyellow', high = "#CC79A7", guide = FALSE, na.value = "white") + theme_bw() + xlab("\n") + ylab("Tissue") + 
-  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=3.5)
+  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=5.5)
 
 pl
 
+postscript("../figures/heatmap.eps",height=8,width=8,paper="special",horizontal=FALSE,colormodel="cymk")
+pl
+dev.off()
+
 ```
 
-Make some individual gene ploes
+Make some individual gene plots for leaf expression 26
 ```{r}
-pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv")
-lmad26_all <- read.table("../data/Mean_centered_expression/LMAD26.txt")
-lmad26_all$lines <- row.names(lmad26_all)
-pop_dat <- merge(pop, lmad26_all, by.x = "Inbred", by.y = "lines" )
-
-myF <- read.table('../data/Kinship_matrices/F_LMAD26.txt')
-myE <- eigen(myF)
-E_vectors <- myE$vectors
-E_values <- myE$values
-
 
 ##what gene to plot
 pvals = matrix(unlist(alltissueresults[['LMAD26']][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
@@ -113,46 +110,66 @@ pfdr$index = 1:nrow(pfdr)
 
 ##the sig LMAD26 one on PC 1
 sigPC1 = dplyr::filter(pfdr, X1 < 0.1)
-pop_dat$sel <- lmad26_all[,sigPC1$index]
-pop_dat$one <- E_vectors[,1]
-lambda <- E_values[1]
+
+
+
+
+### function for making plots
+makeGenePlot <- function(tissue, geneIndex, pc){
+
+## read in population data
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F)
+
+## read in expression data
+exp <- read.table(paste("../data/Mean_centered_expression/",tissue,".txt", sep=""), stringsAsFactors = F)
+expgene = data.frame(Inbred = row.names(exp), geneexp = exp[,geneIndex], stringsAsFactors = F)
+
+## merge data together
+pop_dat <- dplyr::inner_join(pop, expgene, by= "Inbred")
+
+#get the eigenvalues
+myF <- read.table(paste('../data/Kinship_matrices/F_',tissue,'.txt', sep=""))
+myE = eigen(myF)
+myPC = data.frame(pc = myE$vectors[,pc], stringsAsFactors = F)
+pop_dat <- dplyr::bind_cols(pop_dat, myPC)
+
+lambda <- myE$values[pc]
+
 
 ##calculate the CIs
-generesults = alltissueresults[['LMAD26']][,sigPC1$index]
+generesults = alltissueresults[[tissue]][,geneIndex]
 myVaest = var0(generesults$cml)
 myCI = 1.96*sqrt(myVaest*lambda)
 
 ##gene name
-names(lmad26_all)[sigPC1$index]
+geneName = names(exp)[geneIndex]
 
-lR <- lm(pop_dat$sel ~ pop_dat$one) 
+lR <- lm(pop_dat$geneexp ~ pop_dat$pc) 
 coeff <- lR$coefficients[[2]]
 
-col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-pl1 <- ggplot(data=pop_dat, aes(x = one, y= sel , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("Mean-centered Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
-
-pl1
-
-
-###make a plot for a nonsig gene
-mgi= sigPC1$index+27
-pop_dat$sel1 <- lmad26_all[,mgi]
-
-##gene name
-names(lmad26_all)[mgi]
-
-generesults = alltissueresults[['LMAD26']][,mgi]
-myVaest = var0(generesults$cml)
-myCI = 1.96*sqrt(myVaest*lambda)
-
-
-lR <- lm(pop_dat$sel1 ~ pop_dat$one) 
-coeff <- lR$coefficients[[2]]
+if(tissue=="LMAD26"){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")} else{mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")} ##no sweets in LMAD26
 
 col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-pl2 <- ggplot(data=pop_dat, aes(x = one, y= sel1 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("Mean-centered Expression") + theme_bw() + ylim(-100,100) + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab(paste(geneName,"Expression")) + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
 
-pl2
+return(pl1)
+}
+
+
+myplot = makeGenePlot(tissue = 'LMAD26',geneIndex = sigPC1$index, pc = 1)
+
+myplot
+
+
+##make a plot for PC2
+sigPC2 = dplyr::filter(pfdr, X2 < 0.1)
+pc2plot = makeGenePlot(tissue="LMAD26",geneIndex = sigPC2$index[2], pc=2)
+pc2plot
+
+##make a plot for PC3
+sigPC3 = dplyr::filter(pfdr, X3 < 0.1)
+pc3plot = makeGenePlot(tissue="LMAD26",geneIndex = sigPC3$index[3], pc=3)
+pc3plot
 
 
 ###make a plot for PC5
@@ -160,24 +177,20 @@ sigPC5 = dplyr::filter(pfdr, X5 < 0.1)
 sigPC5$gene = names(lmad26_all)[sigPC5$index]
 mgi = sigPC5$index[6]
 
-pop_dat$sel5 <- lmad26_all[,mgi]
-pop_dat$one <- E_vectors[,5]
-lambda <- E_values[5]
 
-##calculate the CIs
-generesults = alltissueresults[['LMAD26']][,mgi]
-myVaest = var0(generesults$cml)
-myCI = 1.96*sqrt(myVaest*lambda)
+pc5Plot = makeGenePlot(tissue='LMAD26',geneIndex=mgi, pc=5)
 
-##gene name
-names(lmad26_all)[sigPC1$index]
+pc5Plot
 
-lR <- lm(pop_dat$sel5 ~ pop_dat$one) 
-coeff <- lR$coefficients[[2]]
 
-pl3 <- ggplot(data=pop_dat, aes(x = one, y= sel5 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("Mean-centered Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+##kernel tissue on PC 4
+pvals = matrix(unlist(alltissueresults[['Kern']][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
+pfdr$index = 1:nrow(pfdr)
+sigPC4 = dplyr::filter(pfdr, X4<0.1)
 
-pl3
+pc4Plot = makeGenePlot(tissue='Kern',geneIndex=sigPC4$index[1], pc=4)
+pc4Plot
 
 ```
 
@@ -250,23 +263,4 @@ pl <- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) +
   theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=3.5)
 
 pl
-```
-
-Make a PC plot
-```{r}
-pop_dat$PC1 = E_vectors[,1]
-pop_dat$PC2 = E_vectors[,2]
-pop_dat$PC3 = E_vectors[,3]
-pop_dat$PC4 = E_vectors[,4]
-
-
-col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-plpc <- ggplot(data=pop_dat, aes(x = PC1, y= PC2 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 1") +  ylab("PC 2") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = "bottom",  legend.text = element_text(size = 14), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 2 )
-plpc
-
-
-col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-plpc <- ggplot(data=pop_dat, aes(x = PC3, y= PC4 , color=Subpopulation)) + scale_colour_manual(values = col, labels=c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")) + xlab("PC 3") +  ylab("PC 4") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=17), axis.title.x  = element_text(size=17), legend.position = "bottom",  legend.text = element_text(size = 14), plot.title = element_text(), axis.text.y = element_text(size=10), axis.text.x = element_text(size=10)) + geom_point(size = 2 )
-plpc
-
 ```
