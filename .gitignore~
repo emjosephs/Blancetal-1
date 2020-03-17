@@ -9,4 +9,4 @@ analysis/*png
 analysis/*html
 analysis/*_cache
 analysis/site_libs
-data/df_STAR_HTSeq_counts_B73_match_based_on_genet_dist_DESeq2_normed_rounded.txt
+data/
