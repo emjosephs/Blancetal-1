@@ -53,7 +53,7 @@ return(allGeneOutput)
 }
 
 ###run on all genes
-alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base","LMAD8","LMAN8")
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
 alltissueresults = lapply(alltissues, testAllGenes)
 names(alltissueresults) <- alltissues
 
@@ -65,10 +65,10 @@ sigresults = lapply(1:length(alltissues), function(i){
 pvals = matrix(unlist(alltissueresults[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
 
 ##look at pvalue distributions
-par(mfrow=c(3,2), mar=c(4,4,1,1))
-sapply(1:5, function(x){
-hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
-})
+#par(mfrow=c(3,2), mar=c(4,4,1,1))
+#sapply(1:5, function(x){
+#hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
+#})
 
 ## test fpr sogmofocamce
 pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
