@@ -27,6 +27,7 @@ I'm rerunning the code to identify selected genes with the Quaint package
 testAllGenes <- function(myTissue){
 # Read in mean-centered expression values
 df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+geneNames = names(df1)
 # Read in tissue specific kinship matrix 
 myF <- read.table(paste('../data/Kinship_matrices/F_',myTissue,'.txt',sep=""))
 
@@ -44,7 +45,7 @@ myL = 6:dim(myF)[1]
 ## test for selection on each gene
 allGeneOutput <- sapply(1:ncol(df1), function(x){
 myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
-return(myQpc)
+return(c(geneNames[x],myQpc))
 })
 
 return(allGeneOutput)
@@ -60,7 +61,7 @@ names(alltissueresults) <- alltissues
 ##look at sig results
 sigresults = lapply(1:length(alltissues), function(i){
 # extract the pvalues
-pvals = matrix(unlist(alltissueresults[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
 
 ##look at pvalue distributions
 #par(mfrow=c(3,2), mar=c(4,4,1,1))
@@ -98,6 +99,20 @@ postscript("../figures/heatmap.eps",height=8,width=8,paper="special",horizontal=
 pl
 dev.off()
 
+###how many genes total?
+sum(sigLong$value, na.rm=T) ##number of genes, but could have same gene for multiple tissues or PCs.
+
+#unique genes
+siggenes = unlist(lapply(1:length(alltissues), function(i){
+# extract the pvalues
+pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')})) ## test fpr significance with the fdr
+pfdr$numsig <- apply(pfdr, 1, function(x){sum(x<0.1)})
+pfdr$genes = unlist(alltissueresults[[i]][1,])
+return(dplyr::filter(pfdr, numsig>0)$genes)
+}))
+
+length(unique(siggenes)) ##number of unique genes
 ```
 
 Make some individual gene plots for leaf expression 26
