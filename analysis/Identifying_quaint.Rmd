@@ -95,10 +95,6 @@ pl <- ggplot(data=sigLong,aes(x=variable,y=nicename)) +
 
 pl
 
-postscript("../figures/heatmap.eps",height=8,width=8,paper="special",horizontal=FALSE,colormodel="cymk")
-pl
-dev.off()
-
 ###how many genes total?
 sum(sigLong$value, na.rm=T) ##number of genes, but could have same gene for multiple tissues or PCs.
 
@@ -119,7 +115,7 @@ Make some individual gene plots for leaf expression 26
 ```{r}
 
 ##what gene to plot
-pvals = matrix(unlist(alltissueresults[['LMAD26']][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
+pvals = matrix(unlist(alltissueresults[['LMAD26']][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
 pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
 pfdr$index = 1:nrow(pfdr)
 
@@ -165,7 +161,7 @@ coeff <- lR$coefficients[[2]]
 if(tissue=="LMAD26"){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")} else{mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")} ##no sweets in LMAD26
 
 col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab(paste(geneName,"Expression")) + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=20), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=15), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
 
 return(pl1)
 }
@@ -174,9 +170,9 @@ return(pl1)
 myplot = makeGenePlot(tissue = 'LMAD26',geneIndex = sigPC1$index, pc = 1)
 
 myplot
+#geneNames[sigPC1$index]
 
-
-##make a plot for PC2
+#make a plot for PC2
 sigPC2 = dplyr::filter(pfdr, X2 < 0.1)
 pc2plot = makeGenePlot(tissue="LMAD26",geneIndex = sigPC2$index[2], pc=2)
 pc2plot
@@ -189,7 +185,7 @@ pc3plot
 
 ###make a plot for PC5
 sigPC5 = dplyr::filter(pfdr, X5 < 0.1)
-sigPC5$gene = names(lmad26_all)[sigPC5$index]
+#sigPC5$gene = geneNames[sigPC5$index]
 mgi = sigPC5$index[6]
 
 
@@ -209,9 +205,22 @@ pc4Plot
 
 ```
 
-I think the main difference is the PCs that I'm using to estimate Va are different from Jennifer's (she uses 11:20). Let's check.
-
 ```{r}
+postscript("../figures/heatmap.eps",height=8,width=8,paper="special",horizontal=FALSE,colormodel="cymk")
+
+final <- ggarrange(pl,                                                 
+          ggarrange(myplot, pc5Plot, ncol = 2, labels = c("B", "C"),common.legend = T, legend = "bottom"), 
+          nrow = 2, 
+          labels = "A"                                       
+          )
+final
+
+dev.off()
+
+```
+
+
+```{r, eval=F, echo=F}
 
 ### function for testing all genes
 testAllGenes1120 <- function(myTissue){
