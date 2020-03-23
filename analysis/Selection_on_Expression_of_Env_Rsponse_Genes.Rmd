@@ -52,7 +52,7 @@ length(notsigGenes)
 
 
 ##function for running the chisq test on a specific pc/tissue combination
-run_chi_sq <- function(mytissue, sigGenes, notsigGenes, myPC) {
+run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes) {
   quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
   quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
   sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
@@ -68,6 +68,11 @@ run_chi_sq <- function(mytissue, sigGenes, notsigGenes, myPC) {
 }
 
 ##run on all PCs and all tissues for the cold genes
+sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, sigGenes, notsigGenes)
+  })
+})
 
 
 ```

@@ -109,6 +109,11 @@ return(dplyr::filter(pfdr, numsig>0)$genes)
 }))
 
 length(unique(siggenes)) ##number of unique genes
+
+
+###save output for other analyses
+save(alltissueresults, file = "../data/quaint-results.rda")
+
 ```
 
 Make some individual gene plots for leaf expression 26
@@ -163,14 +168,14 @@ if(tissue=="LMAD26"){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff sta
 col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=15), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
 
-return(pl1)
+return(c(pl1))
 }
 
 
 myplot = makeGenePlot(tissue = 'LMAD26',geneIndex = sigPC1$index, pc = 1)
 
 myplot
-#geneNames[sigPC1$index]
+alltissueresults[['LMAD26']][1,sigPC1$index]##get gene name
 
 #make a plot for PC2
 sigPC2 = dplyr::filter(pfdr, X2 < 0.1)
@@ -187,7 +192,7 @@ pc3plot
 sigPC5 = dplyr::filter(pfdr, X5 < 0.1)
 #sigPC5$gene = geneNames[sigPC5$index]
 mgi = sigPC5$index[6]
-
+alltissueresults[['LMAD26']][1,mgi]##get gene name
 
 pc5Plot = makeGenePlot(tissue='LMAD26',geneIndex=mgi, pc=5)
 
@@ -206,7 +211,7 @@ pc4Plot
 ```
 
 ```{r}
-postscript("../figures/heatmap.eps",height=8,width=8,paper="special",horizontal=FALSE,colormodel="cymk")
+postscript("../figures/heatmap.eps",height=10,width=10,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
 
 final <- ggarrange(pl,                                                 
           ggarrange(myplot, pc5Plot, ncol = 2, labels = c("B", "C"),common.legend = T, legend = "bottom"), 
