@@ -45,148 +45,95 @@ The next step is to determine if differentially expressed genes are more likely 
 coldsum <- cold %>% select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment) ## pull out important columns
 
 coldsum$sig = apply(coldsum[,3:4], 1, min, na.rm=T)
-sigGenes = dplyr::filter(coldsum, sig < 0.1)$V3_Gene_Name
-length(sigGenes)
-notsigGenes = dplyr::filter(coldsum, sig > 0.1)$V3_Gene_Name
-length(notsigGenes)
+coldsigGenes = dplyr::filter(coldsum, sig < 0.1)$V3_Gene_Name
+length(coldsigGenes)
+coldnotsigGenes = dplyr::filter(coldsum, sig > 0.1)$V3_Gene_Name
+length(coldnotsigGenes)
 
 
 ##function for running the chisq test on a specific pc/tissue combination
-run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes) {
+run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
   quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
   quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
   sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
   notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
   ##make the chisq table
-  bothsig = nrow(dplyr::filter(sigOver, pval < 0.05))
-  diffexponly = nrow(dplyr::filter(sigOver, pval >= 0.05))
-  selonly = nrow(dplyr::filter(notsigOver, pval < 0.05))
-  nothingsig = nrow(dplyr::filter(notsigOver, pval > 0.05))
-  chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2)
-  chitest = chisq.test(chitbl)
-  return(chisq.test$p.value)
+  bothsig = nrow(dplyr::filter(sigOver, pval < myp))
+  diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
+  selonly = nrow(dplyr::filter(notsigOver, pval < myp))
+  nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
+  chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
+  chitest = chisq.test(chitbl) ##run the test
+  return(chitest$p.value)
 }
 
 ##run on all PCs and all tissues for the cold genes
-sapply(alltissues, function(mytissue){
+myresults = sapply(alltissues, function(mytissue){
   sapply(1:5,function(myPC){
-    run_chi_sq(mytissue, myPC, sigGenes, notsigGenes)
+    run_chi_sq(mytissue, myPC, coldsigGenes, coldnotsigGenes, 0.05)
   })
 })
 
+##do we really just care about combos with significant evidence of selection in at least one gene?
+
+### note that we don't know what direction this goes in.
+
+
 
 ```
-
-
-These are the undjusted p-values for our chi-square test for independence between the two categorical variables (Genes under selection and DE cold genes). From the p-value alone we don't know what direction the enrichment is in (Are DE genes more or less likely to be under selection). Below is the results of the chi-square test for the 5 PC's in each of the 9 tissues (Table S3) - this table can be generated my running the code above for each tissue type.  
-
-```{r}
-chi_all <- read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/Chi_sqr_pvals.txt") 
-kable(chi_all)
-```
-
 
 ## Figure  
 
-Now we want to plot Figure 3 in the main text. First we will look at LMAD26/PC5 which has a p-value of 0.00103 as an example of PC/tissue combination where selected genes are enriched for DE cold genes. To run this code we need the p-values and the contigency table of selected genes vs DE genes. The key to generating these figures for every tissue/PC combination is to load the correct p-values and use the "run_chi_sq" function to extract the contingency table. 
+Now we want to plot Figure 3 in the main text. First we will look at LMAD26/PC5  as an example of PC/tissue combination where selected genes are enriched for DE cold genes. To run this code we need the p-values and the contigency table of selected genes vs DE genes. The key to generating these figures for every tissue/PC combination is to load the correct p-values and use the "run_chi_sq" function to extract the contingency table. 
 
-```{r,warning=FALSE, message=FALSE}
-dat <- read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/LMAD26.txt") # Pick Tissuee
-
-Cold <- cold %>%
-  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
-names <- as.data.frame(olap_lmad26) # Pick Tissue 
-colnames(names) <- "V3_Gene_Name"
-Cold <- inner_join(names, Cold)
-Cold <- sig_DE(Cold) # Get which genes are DE
-
-# Get contingency table
-out <- run_chi_sq(Cold, t(dat))
-dt <- out[[1]][[5]] # Pick correct contingency table 
-df <- as.data.frame(as.table(dt))
-```
 
 Plot Bar Chart   
 ```{r}
-colnames(df) <- c("CR", "Sel", "Freq")
-df1 <- subset(df, Sel == TRUE)
-df1[1,3] <- df1[1,3] / sum(df1[1,3] + df[1,3])
-df1[2,3] <- df1[2,3] / sum(df1[2,3] + df[2,3])
+myp = 0.05
+quaint_results = alltissueresults[['LMAD26']] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[5]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+##make the chisq table
+bothsig = nrow(dplyr::filter(sigOver, pval < myp))
+diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
+selonly = nrow(dplyr::filter(notsigOver, pval < myp))
+nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
+chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
+chitest = chisq.test(chitbl) ##run the test
+  
+propDiffSel = bothsig/(bothsig+diffexponly)
+propNotDiffSel = selonly/(selonly+nothingsig)
 
-col <- c( "#0072B2")
-pl1 <- ggplot(data = df1, aes(x = CR, y = Freq)) + geom_bar(stat="identity", fill = col)  +  ylab("proportion p < 0.05") + xlab("") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + ggtitle("LMAD26 PC 5") + theme(plot.title = element_text(hjust = 0.5, size = 14))
+par(mar=c(8,8,2,2))
+contplot = function(){
+bp = barplot(c(propDiffSel, propNotDiffSel), ylim=c(0,0.1), col = "#0072B2", border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Cold response','Other'), cex.axis=1.5)}
 
-pl1
+contplot()
+
+##p value histogram
+diffhist = hist(sigOver$pval, plot=FALSE)
+nothist = hist(notsigOver$pval, plot=FALSE)
+combinedHist = rbind(nothist$density, diffhist$density)
+
+
+pbarplot = function(){bp2 = barplot(combinedHist/10, beside=T, col = c("#CC79A7",   "#F0E442"), border="white", xaxt="n", yaxt="n")
+axis(2, las=2)
+mtext("Proportion",side=2, cex=1.5, line=4)
+axis(1, at=c(0.5,bp2[1,]+2), lab = c(0,nothist$mids+0.05))
+mtext("P values", side=1, cex=1.5, line=4)}
+
+pbarplot()
+
+
+postscript("../figures/coldgenes.eps",height=10,width=10,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+par(mfrow=c(1,2))
+contplot()
+mtext('A', cex=2,side=3, at = 0, line=2)
+pbarplot()
+mtext('B', cex=2,side=3, at = -0.1, line=2)
+dev.off()
 ```
 
-Plot Historgram  
-```{r}
-tdat <- as.data.frame(t(dat))
-colnames(tdat) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
-df <- cbind(Cold, tdat)
-
-mysig = subset(df, Sig==TRUE)
-sighist = hist(mysig$PC5, plot=FALSE)
-mynot = subset(df, Sig==FALSE)
-nothist = hist(mynot$PC5, plot=FALSE)
-combinedHist = rbind(nothist$density, sighist$density)
-
-x <- t(combinedHist)
-colnames(x) <- c("Not cold-response", "Cold-response")
-m <- melt(x)
-
-pl2 <- ggplot(data = m, aes(x = Var1/10, y = value, fill = Var2)) + geom_bar(stat="identity",position="dodge") + scale_fill_manual(name = "", values = c("#CC79A7",   "#F0E442")) + theme_classic() + ylab("proportion") + xlab("") +  scale_x_continuous(breaks=seq(0, 1, 0.1)) + theme(legend.position = c(0.8, 0.9)) + ggtitle("LMAD26 PC5") + theme(plot.title = element_text(hjust = 0.5, size = 14), axis.title.y = element_text(size=12), legend.text = element_text(size=8), legend.key.size = unit(0.8, "line"))
-
-pl2
-```
-
-
-Now we will plot Figure 3 CD
-```{r,warning=FALSE, message=FALSE}
-dat <- read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/LMAD8.txt") # Pick Tissue
-
-Cold <- cold %>%
-  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
-names <- as.data.frame(olap_lmad8) # Pick Tissue 
-colnames(names) <- "V3_Gene_Name"
-Cold <- inner_join(names, Cold)
-Cold <- sig_DE(Cold) # Get which genes are DE
-
-# Get contingency table
-out <- run_chi_sq(Cold, t(dat))
-dt <- out[[1]][[4]] # Pick correct contingency table out[[1]][[x]] -> x is the PC you want to look at 
-df <- as.data.frame(as.table(dt))
-```
-
-Plot Bar Chart   
-```{r}
-colnames(df) <- c("CR", "Sel", "Freq")
-df1 <- subset(df, Sel == TRUE)
-df1[1,3] <- df1[1,3] / sum(df1[1,3] + df[1,3])
-df1[2,3] <- df1[2,3] / sum(df1[2,3] + df[2,3])
-
-col <- c( "#0072B2")
-pl1 <- ggplot(data = df1, aes(x = CR, y = Freq)) + geom_bar(stat="identity", fill = col)  +  ylab("proportion p < 0.05") + xlab("") + theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.y = element_text(size=12), axis.title.x  = element_text(size=12), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 10)) + ggtitle("LMAD8 PC 4") + theme(plot.title = element_text(hjust = 0.5, size = 14))
-
-pl1
-```
-
-```{r}
-tdat <- as.data.frame(t(dat))
-colnames(tdat) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
-df <- cbind(Cold, tdat)
-
-mysig = subset(df, Sig==TRUE)
-sighist = hist(mysig$PC5, plot=FALSE)
-mynot = subset(df, Sig==FALSE)
-nothist = hist(mynot$PC5, plot=FALSE) # Change to correct PC
-combinedHist = rbind(nothist$density, sighist$density)
-
-x <- t(combinedHist)
-colnames(x) <- c("Not cold-response", "Cold-response")
-m <- melt(x)
-
-pl2 <- ggplot(data = m, aes(x = Var1/10, y = value, fill = Var2)) + geom_bar(stat="identity",position="dodge") + scale_fill_manual(name = "", values = c("#CC79A7",   "#F0E442")) + theme_classic() + ylab("proportion") + xlab("") +  scale_x_continuous(breaks=seq(0, 1, 0.1)) + theme(legend.position = c(0.8, 0.9)) + ggtitle("LMAD8 PC4") + theme(plot.title = element_text(hjust = 0.5, size = 14), axis.title.y = element_text(size=12), legend.text = element_text(size=8), legend.key.size = unit(0.8, "line"))
-
-pl2
-```
