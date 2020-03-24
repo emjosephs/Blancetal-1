@@ -411,7 +411,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-20
+<strong>Last updated:</strong> 2020-03-24
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
@@ -526,16 +526,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree450bdedc0cb3609cebf36bafb7a6e520a2fc0cf6targetblank450bdeda"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/emjosephs/Blancetal-1/tree/450bdedc0cb3609cebf36bafb7a6e520a2fc0cf6" target="_blank">450bded</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree02b87d29a08c3c37fa26b2c677c034d16f3f6f75targetblank02b87d2a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/emjosephs/Blancetal-1/tree/02b87d29a08c3c37fa26b2c677c034d16f3f6f75" target="_blank">02b87d2</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree450bdedc0cb3609cebf36bafb7a6e520a2fc0cf6targetblank450bdeda" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree02b87d29a08c3c37fa26b2c677c034d16f3f6f75targetblank02b87d2a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/emjosephs/Blancetal-1/tree/450bdedc0cb3609cebf36bafb7a6e520a2fc0cf6" target="_blank">450bded</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/emjosephs/Blancetal-1/tree/02b87d29a08c3c37fa26b2c677c034d16f3f6f75" target="_blank">02b87d2</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -544,10 +544,13 @@ Note that you need to be careful to ensure that all relevant files for the analy
 Ignored files:
     Ignored:    analysis/.Rhistory
 
+Untracked files:
+    Untracked:  data/quaint-results.rda
+
 Unstaged changes:
     Modified:   analysis/Identifying_quaint.Rmd
-    Modified:   analysis/Selection_on_Expression_of_Cold_Response_Genes.Rmd
-    Modified:   figures/heatmap.eps
+    Modified:   analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd
+    Modified:   figures/coldgenes.eps
 
 </code></pre>
 <p>
@@ -586,6 +589,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/emjosephs/Blancetal-1/blob/682f50edbd4c9ff5d9af98bf003298b0fd4a0444/analysis/Identifying_quaint.Rmd" target="_blank">682f50e</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/emjosephs/Blancetal-1/682f50edbd4c9ff5d9af98bf003298b0fd4a0444/docs/Identifying_quaint.html" target="_blank">682f50e</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+stuff
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -957,7 +994,7 @@ return(dplyr::filter(pfdr, numsig&gt;0)$genes)
 length(unique(siggenes)) ##number of unique genes</code></pre>
 <pre><code>[1] 60</code></pre>
 <pre class="r"><code>###save output for other analyses
-save(alltissueresults, file = &quot;../data/quaint-results.rda&quot;)</code></pre>
+save(alltissueresults, sigTable, sigLong, file = &quot;../data/quaint-results.rda&quot;)</code></pre>
 <p>Make some individual gene plots for leaf expression 26</p>
 <pre class="r"><code>##what gene to plot
 pvals = matrix(unlist(alltissueresults[[&#39;LMAD26&#39;]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
@@ -1767,7 +1804,7 @@ $facet
     super:  &lt;ggproto object: Class FacetNull, Facet, gg&gt;
 
 $plot_env
-&lt;environment: 0x1a4bb088&gt;
+&lt;environment: 0x2e2f49a0&gt;
 
 $labels
 $labels$y
@@ -2543,7 +2580,7 @@ $facet
     super:  &lt;ggproto object: Class FacetNull, Facet, gg&gt;
 
 $plot_env
-&lt;environment: 0x21d8fb30&gt;
+&lt;environment: 0x2718a4e0&gt;
 
 $labels
 $labels$y
@@ -3316,7 +3353,7 @@ $facet
     super:  &lt;ggproto object: Class FacetNull, Facet, gg&gt;
 
 $plot_env
-&lt;environment: 0x1b9f7300&gt;
+&lt;environment: 0x4363040&gt;
 
 $labels
 $labels$y
@@ -4095,7 +4132,7 @@ $facet
     super:  &lt;ggproto object: Class FacetNull, Facet, gg&gt;
 
 $plot_env
-&lt;environment: 0x28bf7168&gt;
+&lt;environment: 0x127763c0&gt;
 
 $labels
 $labels$y
@@ -5068,7 +5105,7 @@ $facet
     super:  &lt;ggproto object: Class FacetNull, Facet, gg&gt;
 
 $plot_env
-&lt;environment: 0x1ccd7aa0&gt;
+&lt;environment: 0xf6bf600&gt;
 
 $labels
 $labels$y

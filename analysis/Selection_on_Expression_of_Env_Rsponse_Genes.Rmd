@@ -74,7 +74,12 @@ myresults = sapply(alltissues, function(mytissue){
   })
 })
 
-##do we really just care about combos with significant evidence of selection in at least one gene?
+
+##we really just care about combos with significant evidence of selection in at least one gene
+
+newresults = myresults
+newresults[t(sigTable[,1:5]) ==0] <- NA
+newresults
 
 ### note that we don't know what direction this goes in.
 
@@ -82,16 +87,49 @@ myresults = sapply(alltissues, function(mytissue){
 
 ```
 
+## Drought response genes
+We use drought response genes from Forestan et al. (https://onlinelibrary-wiley-com.proxy2.cl.msu.edu/doi/full/10.1111/pce.13660)
+Only looking at NST0 vs WST0 because that shows comparison of expression changes in drought and control.
+
+
+```{r}
+droughtgenes = read.csv('../data/pce13660-supp-0004-supplementalfile3_cuffdiff.csv', stringsAsFactors = F)
+droughtgenes$v4_gene_model = sapply(droughtgenes$gene_id, function(x){strsplit(x, split=':')[[1]][2]}) #make a column for gene names
+
+#convert gene names from v4 to v3
+genemodel = read.csv('../data/gene_model_xref_v3.csv', stringsAsFactors = F)[,1:2]
+dgmerge = dplyr::inner_join(droughtgenes, genemodel, by = "v4_gene_model")
+dim(dgmerge)
+
+droughtsig = dplyr::filter(dgmerge, q_value < 0.1)$v3_gene_model ##filter out sig genes
+length(droughtsig)
+droughtnot = dplyr::filter(dgmerge, q_value > 0.1)$v3_gene_model ##filter out sig genes
+length(droughtnot)
+
+dresults = run_chi_sq(mytissue = 'LMAD26', myPC=5, sigGenes = droughtsig, notsigGenes = droughtnot, myp = 0.05)
+
+dresults = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, droughtsig, droughtnot, 0.05)
+  })
+})
+
+dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+
+
+dresults
+
+
+
+```
+
 ## Figure  
-
-Now we want to plot Figure 3 in the main text. First we will look at LMAD26/PC5  as an example of PC/tissue combination where selected genes are enriched for DE cold genes. To run this code we need the p-values and the contigency table of selected genes vs DE genes. The key to generating these figures for every tissue/PC combination is to load the correct p-values and use the "run_chi_sq" function to extract the contingency table. 
-
-
-Plot Bar Chart   
+  
 ```{r}
 myp = 0.05
-quaint_results = alltissueresults[['LMAD26']] ##pull out tissue specific genes
-quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[5]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+make_enrichment_fig <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
+quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
 sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
 notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
 ##make the chisq table
@@ -99,41 +137,65 @@ bothsig = nrow(dplyr::filter(sigOver, pval < myp))
 diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
 selonly = nrow(dplyr::filter(notsigOver, pval < myp))
 nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
-chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
-chitest = chisq.test(chitbl) ##run the test
   
 propDiffSel = bothsig/(bothsig+diffexponly)
 propNotDiffSel = selonly/(selonly+nothingsig)
 
-par(mar=c(8,8,2,2))
-contplot = function(){
-bp = barplot(c(propDiffSel, propNotDiffSel), ylim=c(0,0.1), col = "#0072B2", border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
-axis(2, las=2)
-axis(1, at = bp, lab = c('Cold response','Other'), cex.axis=1.5)}
+return(c(propDiffSel, propNotDiffSel))
+}
 
-contplot()
+test = make_enrichment_fig('LMAD26', 5, 0.05, coldsigGenes, coldnotsigGenes)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Cold Response','Other'), cex.axis=1.5)
+
+
+
+
+
 
 ##p value histogram
-diffhist = hist(sigOver$pval, plot=FALSE)
-nothist = hist(notsigOver$pval, plot=FALSE)
-combinedHist = rbind(nothist$density, diffhist$density)
+#diffhist = hist(sigOver$pval, plot=FALSE)
+#nothist = hist(notsigOver$pval, plot=FALSE)
+#combinedHist = rbind(diffhist$density, nothist$density)
 
 
-pbarplot = function(){bp2 = barplot(combinedHist/10, beside=T, col = c("#CC79A7",   "#F0E442"), border="white", xaxt="n", yaxt="n")
+#pbarplot = function(){bp2 = barplot(combinedHist/10, beside=T, col = c("#0072B2","#CC79A7"), border="white", xaxt="n", yaxt="n")
+#axis(2, las=2)
+#mtext("Proportion",side=2, cex=1.5, line=4)
+#axis(1, at=c(0.5,bp2[1,]+2), lab = c(0,nothist$mids+0.05))
+#mtext("P values", side=1, cex=1.5, line=4)}
+
+#pbarplot()
+
+
+#postscript("../figures/coldgenes.eps",height=6,width=9,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+#par(mfrow=c(1,2), mar=c(6,6,2,2))
+#contplot()
+#mtext('A', cex=2,side=3, at = 0, line=2)
+#pbarplot()
+#mtext('B', cex=2,side=3, at = -0.1, line=2)
+#dev.off()
+
+
+
+#### drought figure
+test = make_enrichment_fig('LMAD26', 5, 0.05, droughtsig, droughtnot)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
 axis(2, las=2)
-mtext("Proportion",side=2, cex=1.5, line=4)
-axis(1, at=c(0.5,bp2[1,]+2), lab = c(0,nothist$mids+0.05))
-mtext("P values", side=1, cex=1.5, line=4)}
-
-pbarplot()
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 
 
-postscript("../figures/coldgenes.eps",height=10,width=10,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
-par(mfrow=c(1,2))
-contplot()
-mtext('A', cex=2,side=3, at = 0, line=2)
-pbarplot()
-mtext('B', cex=2,side=3, at = -0.1, line=2)
-dev.off()
+test = make_enrichment_fig('LMAD26', 2, 0.05, droughtsig, droughtnot)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+
+test = make_enrichment_fig('LMAD26', 1, 0.05, droughtsig, droughtnot)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+
+
 ```
 

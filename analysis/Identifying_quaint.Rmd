@@ -112,7 +112,7 @@ length(unique(siggenes)) ##number of unique genes
 
 
 ###save output for other analyses
-save(alltissueresults, file = "../data/quaint-results.rda")
+save(alltissueresults, sigTable, sigLong, file = "../data/quaint-results.rda")
 
 ```
 
