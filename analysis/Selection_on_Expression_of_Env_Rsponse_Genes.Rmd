@@ -118,7 +118,16 @@ dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal
 
 
 dresults
+dresults*15
 
+## robust to pvalues?
+dresults = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, droughtsig, droughtnot, 0.01)
+  })
+})
+dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults
 
 
 ```
@@ -126,7 +135,6 @@ dresults
 ## Figure  
   
 ```{r}
-myp = 0.05
 make_enrichment_fig <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
 quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
 quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
@@ -196,6 +204,14 @@ bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", 
 axis(2, las=2)
 axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 
+test = make_enrichment_fig('LMAN26', 5, 0.05, droughtsig, droughtnot)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 
+test = make_enrichment_fig('Kern', 4, 0.05, droughtsig, droughtnot)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 ```
 
