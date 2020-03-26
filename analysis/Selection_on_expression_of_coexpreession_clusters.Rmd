@@ -1,0 +1,109 @@
+---
+title: "Selection_on_expression_of_coexpression_clusters"
+author: "Jennifer Blanc"
+date: "3/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reshape2)
+library(ggplot2)
+library(ggpubr)
+library(quaint)
+```
+
+
+## Intro  
+
+Here is the code to reproduce figure 4 and figure 5.  
+
+## Code 
+
+For this analysis we want to test for selection within specific coexpression modules. We used coexpression modules from Walley et al. (2016) who used weight gene coexpression network analysis (WGCNA) to to group together genes that were similarly expressed in at least 4 tissues in one maize inbred line. Their analysis resulted in 66 co-expression networks. Below we will load their co-expression networks and select all the clusters that have at least 100 genes in them.  
+
+```{r}
+modules <- read.delim("../data/Modules.txt",na.strings=c("","NA"), stringsAsFactors = F)
+num_genes <- apply(modules, 2, function(x) length(which(!is.na(x))))
+num_genes_100 <- which(num_genes >= 100)
+modules  <- modules[,num_genes_100]
+```
+
+We now have 51 modules that have at least 100 genes. We now need to the the names of the genes that we have in out RNA-seq data set. To do this we will read in the header for each of the mean centered expression matrices.  
+
+```{r}
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
+
+
+#function starts here
+#mytissue = 'LMAD26'
+
+alltissuemodules = lapply(alltissues, function(mytissue){
+
+##get the names of genes we have expression data for in each tissue
+exp <- read.table(paste("../data/Raw_expression/",mytissue,".txt", sep="")) #  read in expression level
+geneNames = names(exp)
+
+#get the median expression level for each module in this tissue
+moduleExpression = apply(modules, 2, function(x){
+  olap = x[x %in% geneNames] #get genes in the module tha we have expression data for
+  moduleExp = dplyr::select(exp, all_of(olap)) #pull out the expression data for these genes
+  medianExp = apply(moduleExp, 1, median)
+  return(medianExp)
+})
+
+####identify selection in each of these modules
+
+# Read in tissue specific kinship matrix 
+myF <- read.table(paste('../data/Kinship_matrices/F_',mytissue,'.txt',sep=""))
+
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+## Testing for selection on first 5 PCs
+myM = 1:5
+
+## Using the last 1/2 of PCs to estimate Va
+myL = 6:dim(myF)[1]
+
+### test for selection on all modules
+moduleSelection <- apply(moduleExpression, 2, function(x){
+meanCenteredX = x[-length(x)] - mean(x)
+myQpc = calcQpc(myZ = meanCenteredX, myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
+return(myQpc$pvals)
+})
+
+##make a dataframe with info to return
+mydf = data.frame(t(moduleSelection))
+names(mydf) = c('PC1','PC2','PC3','PC4','PC5')
+mydf$module = row.names(mydf)
+row.names(mydf) <- NULL
+
+mydflong = tidyr::gather(mydf, 'PC','pval', PC1:PC5)
+mydflong$tissue = mytissue
+return(mydflong)})
+
+#combine all into one list
+bigdf <- do.call('rbind', alltissuemodules)
+
+### we only care about PC/tissue combos that had selection before
+#load('../data/quaint-results.rda')
+#nameconvert = data.frame(nicename = c('Germinating root', 'Kernel','Adult Leaf Day', 'Adult Leaf Night', '3rd leaf tip', 'Germinating shoot','3rd leaf base'), tissue = alltissues,stringsAsFactors = F)
+#sigLong = dplyr::left_join(sigLong, nameconvert, by = 'nicename')
+#names(sigLong)[2] <- 'PC'
+#allmerge <- dplyr::left_join(bigdf, sigLong)
+#sigcombos = dplyr::filter(allmerge, value != 'NA')## remove anything without significant selection on at least one gene
+
+#sigcombos$fdr <- p.adjust(sigcombos$pval, method='fdr')
+
+
+bigdf$fdr <- p.adjust(bigdf$pval, method='fdr') ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant
+
+
+
+
+```
+
