@@ -102,8 +102,10 @@ bigdf <- do.call('rbind', alltissuemodules)
 bigdf$fdr <- p.adjust(bigdf$pval, method='fdr') ##calculate an FDR
 summary(bigdf$fdr) ##nothing is significant
 
+### what's the most significant thing?
+dplyr::filter(bigdf, pval<0.01)
+
 
 
 
 ```
-

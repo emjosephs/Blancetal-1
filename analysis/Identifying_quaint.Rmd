@@ -168,7 +168,7 @@ if(tissue=="LMAD26"){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff sta
 col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=15), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
 
-return(c(pl1))
+return(pl1)
 }
 
 
@@ -293,3 +293,57 @@ pl <- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) +
 
 pl
 ```
+
+Additional plots
+```{r}
+mygene = "GRMZM2G093574"
+#get gene index for kernel
+kerngenes = unlist(alltissueresults[[2]][1,])
+myindex = match(mygene, kerngenes)
+
+#make a plot
+explot = makeGenePlot('Kern',myindex, 2)
+explot
+
+
+##is this actually significant?
+myps = matrix(unlist(alltissueresults[['Kern']][5,]), ncol=5, byrow=TRUE) #each row corresponds to 
+myps[myindex,]
+pfdr = data.frame(apply(myps,2, function(x){p.adjust(x, method='fdr')}))
+pfdr[myindex,]
+```
+
+Look for interesting genes
+```{r}
+allGenes = lapply(alltissues, function(mytissue){
+myresults = alltissueresults[[match(mytissue, alltissues)]]
+mygenes = unlist(myresults[1,])
+myps = do.call(rbind,myresults[5,])
+outdf = data.frame(mygenes, myps, stringsAsFactors = F)
+names(outdf) = c('gene','PC1','PC2','PC3','PC4','PC5')
+outdflong = tidyr::gather(outdf, 'PC','pval', PC1:PC5)
+myfdrs = apply(myps, 2, p.adjust, method='fdr') ##get the fdrs
+outdf2 = data.frame(mygenes, myfdrs, stringsAsFactors = F)
+names(outdf2) = c('gene','PC1','PC2','PC3','PC4','PC5')
+outdflong2 = tidyr::gather(outdf2, 'PC','fdr', PC1:PC5)
+finaldf = dplyr::left_join(outdflong, outdflong2)
+finaldf$tissue = mytissue
+return(finaldf)
+})
+
+allgenes = do.call(rbind, allGenes)
+
+siggenes = dplyr::filter(allgenes, fdr < 0.1)
+
+##any with more than one association?
+siggenes[duplicated(siggenes$gene),]
+
+
+
+```
+
+
+https://www.maizegdb.org/gene_center/gene/GRMZM2G152686
+https://www.maizegdb.org/gene_center/gene/GRMZM2G391936
+
+Deought tolerance!! https://www.maizegdb.org/gene_center/gene/GRMZM5G800586
