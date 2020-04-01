@@ -83,13 +83,12 @@ newresults
 
 ### note that we don't know what direction this goes in.
 
-
-
 ```
 
 ## Drought response genes
 We use drought response genes from Forestan et al. (https://onlinelibrary-wiley-com.proxy2.cl.msu.edu/doi/full/10.1111/pce.13660)
 Only looking at NST0 vs WST0 because that shows comparison of expression changes in drought and control.
+NSTO is control, WSTO is stressed
 
 
 ```{r}
@@ -130,7 +129,110 @@ dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal
 dresults
 
 
+##compare up and down regulated genes
+drought_up = dplyr::filter(dgmerge, value_1 < value_2 & q_value < 0.1)$v3_gene_model
+drought_down = dplyr::filter(dgmerge, value_1 > value_2 & q_value < 0.1)$v3_gene_model
+length(drought_up)
+length(drought_down)
+
+##test for enrichment
+dresults_up = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, drought_up, droughtnot, 0.05)
+  })
+})
+
+dresults_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_up
+
+
+dresults_down = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, drought_down, droughtnot, 0.05)
+  })
+})
+
+dresults_down[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_down
 ```
+
+```{r}
+##comparing overall expression level in the Kremling data between categories (look at LMAD26 for now)
+
+mytissue = 'LMAD26'
+
+exp = read.table(paste('../data/Raw_expression/',mytissue,'.txt', sep=''), stringsAsFactors = F)
+exp_means = data.frame(gene = colnames(exp), expr = colMeans(exp), stringsAsFactors = F, row.names=NULL)
+
+quaint_results = alltissueresults[[mytissue]]
+quaint_ps = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[5,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_ps) =c('gene','PC1','PC2','PC3','PC4','PC5')
+quaint_mer = dplyr::inner_join(exp_means, quaint_ps, by = 'gene') #merge with expression data
+
+mydflong = tidyr::gather(quaint_mer, 'PC','pval', PC1:PC5)
+
+##compare expression levels
+mysig = dplyr::filter(mydflong, pval < 0.05)
+mynot = dplyr::filter(mydflong, pval >= 0.05)
+
+median(mysig$expr)
+median(mynot$expr)
+
+## compare expression levels of diff expressed genes
+droughtmer = dplyr::inner_join(dgmerge, exp_means, by=c('v3_gene_model' = 'gene'))
+dsig = dplyr::filter(droughtmer, q_value < 0.1)
+dnot = dplyr::filter(droughtmer, q_value >=0.1)
+
+median(dsig$expr)
+median(dnot$expr)
+
+
+##how to get around this....
+```
+
+```{r}
+##pick a sample of 'nots' that are high expression
+summary(dnot$expr)
+summary(dsig$expr)
+
+## pick the top  expressed genes in dnot (there are 888 sig genes)
+dnot_high = dnot[order(-dnot$expr),][1:3000,]
+summary(dnot_high$expr)
+
+##do the test with only things that have leaf expression
+dresults_leaf = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot$v3_gene_model, 0.05)
+  })
+})
+dresults_leaf[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_leaf
+
+###now test for enrichment
+dresults_high = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_high
+
+dsig_down = dplyr::filter(dsig, value_1 > value_2)
+summary(dsig_down$expr)
+
+dresults_high_down = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig_down$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high_down[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_high_down
+
+
+```
+
+```
+
 
 ## Figure  
   
