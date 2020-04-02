@@ -79,7 +79,7 @@ myresults = sapply(alltissues, function(mytissue){
 
 newresults = myresults
 newresults[t(sigTable[,1:5]) ==0] <- NA
-newresults
+newresults*15
 
 ### note that we don't know what direction this goes in.
 
@@ -252,7 +252,7 @@ dresults_high_up*15
 
 ## Figure  
   
-```{r, eval=F}
+```{r, eval=T}
 make_enrichment_fig <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
 quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
 quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
@@ -276,60 +276,42 @@ axis(2, las=2)
 axis(1, at = bp, lab = c('Cold Response','Other'), cex.axis=1.5)
 
 
-
-
-
-
-##p value histogram
-#diffhist = hist(sigOver$pval, plot=FALSE)
-#nothist = hist(notsigOver$pval, plot=FALSE)
-#combinedHist = rbind(diffhist$density, nothist$density)
-
-
-#pbarplot = function(){bp2 = barplot(combinedHist/10, beside=T, col = c("#0072B2","#CC79A7"), border="white", xaxt="n", yaxt="n")
-#axis(2, las=2)
-#mtext("Proportion",side=2, cex=1.5, line=4)
-#axis(1, at=c(0.5,bp2[1,]+2), lab = c(0,nothist$mids+0.05))
-#mtext("P values", side=1, cex=1.5, line=4)}
-
-#pbarplot()
-
-
-#postscript("../figures/coldgenes.eps",height=6,width=9,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
-#par(mfrow=c(1,2), mar=c(6,6,2,2))
-#contplot()
-#mtext('A', cex=2,side=3, at = 0, line=2)
-#pbarplot()
-#mtext('B', cex=2,side=3, at = -0.1, line=2)
-#dev.off()
-
-
-
 #### drought figure
-test = make_enrichment_fig('LMAD26', 5, 0.05, droughtsig, droughtnot)
+test = make_enrichment_fig('LMAD26', 5, 0.05, dsig_down$v3_gene_model, dnot_high$v3_gene_model)
+bp = barplot(test, ylim=c(0,0.15), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+
+
+test = make_enrichment_fig('LMAN26', 2, 0.05, dsig_down$v3_gene_model, dnot_high$v3_gene_model)
 bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
 axis(2, las=2)
 axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 
 
-test = make_enrichment_fig('LMAD26', 2, 0.05, droughtsig, droughtnot)
-bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
-axis(2, las=2)
-axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 
-test = make_enrichment_fig('LMAD26', 1, 0.05, droughtsig, droughtnot)
-bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
-axis(2, las=2)
-axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+get_enrichment <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
+quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+##make the chisq table
+bothsig = nrow(dplyr::filter(sigOver, pval < myp))
+diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
+selonly = nrow(dplyr::filter(notsigOver, pval < myp))
+nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
+return(c(bothsig, diffexponly))
+}
 
-test = make_enrichment_fig('LMAN26', 5, 0.05, droughtsig, droughtnot)
-bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
-axis(2, las=2)
-axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
 
-test = make_enrichment_fig('Kern', 4, 0.05, droughtsig, droughtnot)
-bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
-axis(2, las=2)
-axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+
+sigcounts = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    get_enrichment(mytissue, myPC, 0.05,dsig_down$v3_gene_model, dnot_high$v3_gene_model)
+  })
+})
+
+
+
 ```
 
