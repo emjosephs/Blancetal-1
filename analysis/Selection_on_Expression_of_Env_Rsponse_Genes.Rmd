@@ -63,7 +63,7 @@ run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
   selonly = nrow(dplyr::filter(notsigOver, pval < myp))
   nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
   chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
-  chitest = chisq.test(chitbl) ##run the test
+  chitest = chisq.test(chitbl, simulate.p.value = TRUE) ##run the test
   return(chitest$p.value)
 }
 
@@ -104,6 +104,10 @@ droughtsig = dplyr::filter(dgmerge, q_value < 0.1)$v3_gene_model ##filter out si
 length(droughtsig)
 droughtnot = dplyr::filter(dgmerge, q_value > 0.1)$v3_gene_model ##filter out sig genes
 length(droughtnot)
+```
+
+```{r, eval=F, echo=F}
+###not controlling for expression
 
 dresults = run_chi_sq(mytissue = 'LMAD26', myPC=5, sigGenes = droughtsig, notsigGenes = droughtnot, myp = 0.05)
 
@@ -120,13 +124,13 @@ dresults
 dresults*15
 
 ## robust to pvalues?
-dresults = sapply(alltissues, function(mytissue){
-  sapply(1:5,function(myPC){
-    run_chi_sq(mytissue, myPC, droughtsig, droughtnot, 0.01)
-  })
-})
-dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
-dresults
+#dresults = sapply(alltissues, function(mytissue){
+#  sapply(1:5,function(myPC){
+#    run_chi_sq(mytissue, myPC, droughtsig, droughtnot, 0.01)
+#  })
+#})
+#dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+#dresults
 
 
 ##compare up and down regulated genes
@@ -175,68 +179,80 @@ mydflong = tidyr::gather(quaint_mer, 'PC','pval', PC1:PC5)
 mysig = dplyr::filter(mydflong, pval < 0.05)
 mynot = dplyr::filter(mydflong, pval >= 0.05)
 
-median(mysig$expr)
-median(mynot$expr)
-
 ## compare expression levels of diff expressed genes
 droughtmer = dplyr::inner_join(dgmerge, exp_means, by=c('v3_gene_model' = 'gene'))
 dsig = dplyr::filter(droughtmer, q_value < 0.1)
 dnot = dplyr::filter(droughtmer, q_value >=0.1)
 
-median(dsig$expr)
-median(dnot$expr)
-
-
-##how to get around this....
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5), c(median(mysig$expr), median(mynot$expr), median(dsig$expr), median(dnot$expr)),
+     bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", xlim = c(0,6))
+axis(1, at=c(1,2,4,5), lab = c('selection','not selection','drought response','no response'), las=2)
+axis(2,las=2)
+###
 ```
 
 ```{r}
-##pick a sample of 'nots' that are high expression
-summary(dnot$expr)
-summary(dsig$expr)
+## pick the top  expressed genes in dnot 
+dnot_high = dnot[order(-dnot$expr),][1:3500,]
 
-## pick the top  expressed genes in dnot (there are 888 sig genes)
-dnot_high = dnot[order(-dnot$expr),][1:3000,]
-summary(dnot_high$expr)
+#down regulated genes
+dsig_down = dplyr::filter(dsig, value_1 > value_2)
+dsig_up = dplyr::filter(dsig, value_2 > value_1)
+nrow(dsig_down)
+nrow(dsig_up)
 
-##do the test with only things that have leaf expression
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5,6,7), c(median(mysig$expr), median(mynot$expr), median(dsig$expr), median(dsig_down$expr), median(dnot$expr), median(dnot_high$expr)),
+     bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", 
+     xlim = c(0,8)) 
+axis(1, at=c(1,2,4,5,6,7), 
+    lab = c('selection','not selection','drought response','drought down','no response','no, high'), las=2)
+axis(2,las=2)
+
+##do the test with only things that have leaf expression in Kremling et al
 dresults_leaf = sapply(alltissues, function(mytissue){
   sapply(1:5,function(myPC){
     run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot$v3_gene_model, 0.05)
   })
 })
 dresults_leaf[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
-dresults_leaf
+dresults_leaf*15
 
-###now test for enrichment
+###now test for enrichment compared to the high expression sample
 dresults_high = sapply(alltissues, function(mytissue){
   sapply(1:5,function(myPC){
     run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot_high$v3_gene_model, 0.05)
   })
 })
 dresults_high[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
-dresults_high
+dresults_high*15
 
-dsig_down = dplyr::filter(dsig, value_1 > value_2)
-summary(dsig_down$expr)
-
+##just down reg responses
 dresults_high_down = sapply(alltissues, function(mytissue){
   sapply(1:5,function(myPC){
     run_chi_sq(mytissue, myPC, dsig_down$v3_gene_model, dnot_high$v3_gene_model, 0.05)
   })
 })
 dresults_high_down[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
-dresults_high_down
+dresults_high_down*15
 
-
+##up responses
+dresults_high_up = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig_up$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_high_up*15
 ```
 
-```
+
 
 
 ## Figure  
   
-```{r}
+```{r, eval=F}
 make_enrichment_fig <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
 quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
 quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
