@@ -300,18 +300,39 @@ bothsig = nrow(dplyr::filter(sigOver, pval < myp))
 diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
 selonly = nrow(dplyr::filter(notsigOver, pval < myp))
 nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
-return(c(bothsig, diffexponly))
+return(c(bothsig, bothsig/diffexponly, selonly/nothingsig))
 }
 
 
 
-sigcounts = sapply(alltissues, function(mytissue){
-  sapply(1:5,function(myPC){
+sigcounts_down = sapply(alltissues, function(mytissue){
+  lapply(1:5,function(myPC){
     get_enrichment(mytissue, myPC, 0.05,dsig_down$v3_gene_model, dnot_high$v3_gene_model)
   })
 })
 
+sigcounts_down[5,3]
+sigcounts_down[5,4]
+
+sigcounts_up = sapply(alltissues, function(mytissue){
+  lapply(1:5,function(myPC){
+    get_enrichment(mytissue, myPC, 0.05,dsig_up$v3_gene_model, dnot_high$v3_gene_model)
+  })
+})
 
 
+par(mar=c(5,5,3,3))
+
+makeplot = function(x){myplot = c(sigcounts_down[5,3][[1]][2], sigcounts_down[5,4][[1]][2], sigcounts_up[5,3][[1]][2], sigcounts_up[5,4][[1]][2], sigcounts_down[5,3][[1]][3], sigcounts_down[5,4][[1]][3])
+bp = barplot(myplot, ylim=c(0,0.2), col = c("#E69F00", "#0072B2"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp[c(1,3,5),]+0.6, lab = c('Down','Up','No change'), cex.axis=1.5)
+legend('topright', c('Day','Night'), bty="n", fill = c("#E69F00", "#0072B2"), border="white", cex=1.5)}
+
+makeplot()
+
+postscript("../figures/drought.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+makeplot()
+dev.off()
 ```
 
