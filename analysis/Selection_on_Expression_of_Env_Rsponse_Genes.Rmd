@@ -52,6 +52,37 @@ coldnotsigGenes = dplyr::filter(coldsum, sig > 0.1)$V3_Gene_Name
 length(coldnotsigGenes)
 
 
+### are coldsig genes higher expression (in LMAD26) than not sig genes?
+mytissue = 'LMAD26'
+
+exp = read.table(paste('../data/Raw_expression/',mytissue,'.txt', sep=''), stringsAsFactors = F)
+exp_means = data.frame(gene = colnames(exp), expr = colMeans(exp), stringsAsFactors = F, row.names=NULL)
+
+quaint_results = alltissueresults[[mytissue]]
+quaint_ps = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[5,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_ps) =c('gene','PC1','PC2','PC3','PC4','PC5')
+quaint_mer = dplyr::inner_join(exp_means, quaint_ps, by = 'gene') #merge with expression data
+
+mydflong = tidyr::gather(quaint_mer, 'PC','pval', PC1:PC5)
+
+##compare expression levels of genes that are sig and not sig for selection
+mysig = dplyr::filter(mydflong, pval < 0.05)
+mynot = dplyr::filter(mydflong, pval >= 0.05)
+
+
+## compare expression levels of diff expressed genes
+coldmer = dplyr::inner_join(coldsum, exp_means, by=c('V3_Gene_Name' = 'gene'))
+csig = dplyr::filter(coldmer, sig < 0.1)
+cnot = dplyr::filter(coldmer, sig >=0.1)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5), c(median(mysig$expr), median(mynot$expr), median(csig$expr), median(cnot$expr)),
+     bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", xlim = c(0,6))
+axis(1, at=c(1,2,4,5), lab = c('selection','not selection','cold response','no response'), las=2)
+axis(2,las=2)
+### gene expression of cold-response genes is not higher than expression of genes that don't respond to cold. 
+
+
 ##function for running the chisq test on a specific pc/tissue combination
 run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
   quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
@@ -248,6 +279,52 @@ dresults_high_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significan
 dresults_high_up*15
 ```
 
+
+
+```{r, eval=F, echo=F}
+##supp plot with expression for different categories
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5, 7,8), c(median(mysig$expr), median(mynot$expr), median(csig$expr), median(cnot$expr), median(dsig$expr), median(dnot$expr)), bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", xlim = c(0,9))
+axis(1, at=c(1,2,4,5, 7, 8), lab = c('selection','not selection','cold response','no response', 'drought response','no response'), las=2)
+axis(2,las=2)
+### gene expression of cold-response genes is not higher than expression of genes that don't respond to cold. 
+
+myout = list(mysig$expr, mynot$expr, dsig$expr, dnot$expr, csig$expr, cnot$expr)
+
+
+makeplot = function(x){
+  #hist(x, col = 'darkgrey', breaks = seq(0,1000000, by=20), main="", border="white", xlim= c(0,500), freq=F, axes= F, ylab = '')
+  d <- density(x)
+  plot(d,main = "", axes=F, bty="n", xlim = c(0,500), ylab = "", ylim = c(0,0.018))
+  axis(2, las=2)
+  axis(1)
+  abline(v=median(x), lwd=2)
+}
+
+par(mfrow=c(6,1), mar=c(3,5,1,1))
+test = lapply(myout, makeplot)
+
+
+##boxplot
+mysig1 = data.frame(expr = mysig$expr, type = 'selection')
+mynot1 = data.frame(expr = mynot$expr, type = 'no selection')
+csig1 = data.frame(expr = csig$expr, type = 'cold response')
+cnot1 = data.frame(expr = cnot$expr, type = 'no cold response')
+dsig1 = data.frame(expr = dsig$expr, type = 'drought response')
+dnot1 = data.frame(expr = dnot$expr, type = 'no drought response')
+dhigh1 = data.frame(expr=dnot_high$expr, type = 'no drought response (high)')
+
+boxplotfd = rbind(mysig1, mynot1, csig1, cnot1, dsig1, dnot1, dhigh1)
+
+par(mfrow=c(1,1), mar=c(10,6,3,3))
+boxplot(log10(expr) ~ type, data=boxplotfd, notch=T, bty='n', ylab = "log10 of expression", xaxt="n", xlab = "")
+axis(1, las=2, at=1:7,labels = levels(boxplotfd$type))
+
+
+
+```
+
+
 Is there a relationship between the direction of the slope of selection and the response? The slope is cm and it should be comparable across genes (not across PCs yet)
 ```{r}
 
@@ -335,20 +412,20 @@ explot
 ###plot Pc5 with names of the lines
 pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F)
 exp <- read.table(paste("../data/Mean_centered_expression/",mytissue,".txt", sep=""), stringsAsFactors = F)
-expgene = data.frame(Inbred = row.names(exp), geneexp = exp[,myIndex], stringsAsFactors = F)
-
-
-
+expgene = data.frame(Inbred = row.names(exp), geneexp = exp[,myindex], stringsAsFactors = F)
 pop_dat <- dplyr::inner_join(pop, expgene, by= "Inbred")
 
 #get the eigenvalues
-myF <- read.table(paste('../data/Kinship_matrices/F_',tissue,'.txt', sep=""))
+myF <- read.table(paste('../data/Kinship_matrices/F_',mytissue,'.txt', sep=""))
 myE = eigen(myF)
-myPC = data.frame(pc = myE$vectors[,pc], stringsAsFactors = F)
+myPC = data.frame(pc = myE$vectors[,5], stringsAsFactors = F)
 pop_dat <- dplyr::bind_cols(pop_dat, myPC)
 
-
-
+###make the plot
+plot(pop_dat$pc, pop_dat$geneexp, bty="n", xlab = "PC 5", ylab = "expression", col = "white" )
+text(pop_dat$pc, pop_dat$geneexp, labels = pop_dat$Inbred)
+b73 = dplyr::filter(pop_dat, Inbred=="B73")
+text(b73$pc, b73$geneexp, labels = 'B73',col="red", cex=2)
 ```
 
 
