@@ -116,6 +116,20 @@ save(alltissueresults, sigTable, sigLong, file = "../data/quaint-results.rda")
 
 ```
 
+Make a table of the sample sizes
+```{r}
+mySampleTable = sapply(alltissues, function(myTissue){
+df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+numGenes = dim(df1)[2]
+numInds = dim(df1)[1]
+return(c(numGenes,numInds))
+})
+mySampleTable
+
+```
+
+
+
 Make some individual gene plots for leaf expression 26
 ```{r}
 
