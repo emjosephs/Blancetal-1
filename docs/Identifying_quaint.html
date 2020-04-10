@@ -411,7 +411,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-03-30
+<strong>Last updated:</strong> 2020-04-10
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 5 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 2
@@ -526,16 +526,16 @@ relative
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree6b00f4790b7b9dc03222e98662c234e496d5b6a1targetblank6b00f47a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/emjosephs/Blancetal-1/tree/6b00f4790b7b9dc03222e98662c234e496d5b6a1" target="_blank">6b00f47</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree94badb22ff8970c4e944a2ececbb29e7013d10e7targetblank94badb2a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/emjosephs/Blancetal-1/tree/94badb22ff8970c4e944a2ececbb29e7013d10e7" target="_blank">94badb2</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree6b00f4790b7b9dc03222e98662c234e496d5b6a1targetblank6b00f47a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomemjosephsBlancetal1tree94badb22ff8970c4e944a2ececbb29e7013d10e7targetblank94badb2a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/emjosephs/Blancetal-1/tree/6b00f4790b7b9dc03222e98662c234e496d5b6a1" target="_blank">6b00f47</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/emjosephs/Blancetal-1/tree/94badb22ff8970c4e944a2ececbb29e7013d10e7" target="_blank">94badb2</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -547,7 +547,6 @@ Ignored files:
 Untracked files:
     Untracked:  data/.~lock.gene_model_xref_v3.csv#
     Untracked:  data/quaint-results.rda
-    Untracked:  data/siggenes.txt
 
 Unstaged changes:
     Modified:   analysis/Identifying_quaint.Rmd
@@ -589,6 +588,74 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/emjosephs/Blancetal-1/blob/94badb22ff8970c4e944a2ececbb29e7013d10e7/analysis/Identifying_quaint.Rmd" target="_blank">94badb2</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-09
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/emjosephs/Blancetal-1/blob/cf43de2aa936d78c781909968dfb3fc465662281/analysis/Identifying_quaint.Rmd" target="_blank">cf43de2</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/emjosephs/Blancetal-1/blob/fa0c86ffc4a2f73f34600f2ae707b3f466c34a03/analysis/Identifying_quaint.Rmd" target="_blank">fa0c86f</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/emjosephs/Blancetal-1/fa0c86ffc4a2f73f34600f2ae707b3f466c34a03/docs/Identifying_quaint.html" target="_blank">fa0c86f</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-30
+</td>
+<td>
+stuff
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -972,8 +1039,8 @@ stuff
 </div>
 <div id="intro" class="section level2">
 <h2>Intro</h2>
-<p>I’m rerunning the code to identify selected genes with the Quaint package</p>
-<pre class="r"><code>### function for testing all genes
+<p>Identifying genes under selection.</p>
+<pre class="r"><code>############ function for testing all genes
 testAllGenes &lt;- function(myTissue){
 # Read in mean-centered expression values
 df1 &lt;- read.table(paste(&quot;../data/Mean_centered_expression/&quot;,myTissue,&quot;.txt&quot;,sep=&quot;&quot;))
@@ -1046,10 +1113,7 @@ pl &lt;- ggplot(data=sigLong,aes(x=variable,y=nicename)) +
 pl</code></pre>
 <pre><code>Warning: Removed 20 rows containing missing values (geom_text).</code></pre>
 <p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>###how many genes total?
-sum(sigLong$value, na.rm=T) ##number of genes, but could have same gene for multiple tissues or PCs.</code></pre>
-<pre><code>[1] 67</code></pre>
-<pre class="r"><code>#unique genes
+<pre class="r"><code>#how many unique genes???
 siggenes = unlist(lapply(1:length(alltissues), function(i){
 # extract the pvalues
 pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
@@ -1063,6 +1127,19 @@ length(unique(siggenes)) ##number of unique genes</code></pre>
 <pre><code>[1] 60</code></pre>
 <pre class="r"><code>###save output for other analyses
 save(alltissueresults, sigTable, sigLong, file = &quot;../data/quaint-results.rda&quot;)</code></pre>
+<p>Make a table of the sample sizes</p>
+<pre class="r"><code>mySampleTable = sapply(alltissues, function(myTissue){
+df1 &lt;- read.table(paste(&quot;../data/Mean_centered_expression/&quot;,myTissue,&quot;.txt&quot;,sep=&quot;&quot;))
+numGenes = dim(df1)[2]
+numInds = dim(df1)[1]
+return(c(numGenes,numInds))
+})
+rownames(mySampleTable) = c(&#39;genes&#39;,&#39;individuals&#39;)
+
+mySampleTable</code></pre>
+<pre><code>            GRoot Kern LMAD26 LMAN26 L3Tip GShoot L3Base
+genes       10500 9814   8879   8435  8489  10195  11555
+individuals   232  207    109    110   237    239    236</code></pre>
 <p>Make some individual gene plots for leaf expression 26</p>
 <pre class="r"><code>##what gene to plot
 pvals = matrix(unlist(alltissueresults[[&#39;LMAD26&#39;]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
@@ -1120,7 +1197,7 @@ return(pl1)
 myplot = makeGenePlot(tissue = &#39;LMAD26&#39;,geneIndex = sigPC1$index, pc = 1)
 
 myplot</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>alltissueresults[[&#39;LMAD26&#39;]][1,sigPC1$index]##get gene name</code></pre>
 <pre><code>[[1]]
 [1] &quot;GRMZM2G152686&quot;</code></pre>
@@ -1128,12 +1205,12 @@ myplot</code></pre>
 sigPC2 = dplyr::filter(pfdr, X2 &lt; 0.1)
 pc2plot = makeGenePlot(tissue=&quot;LMAD26&quot;,geneIndex = sigPC2$index[2], pc=2)
 pc2plot</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-3-2.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>##make a plot for PC3
 sigPC3 = dplyr::filter(pfdr, X3 &lt; 0.1)
 pc3plot = makeGenePlot(tissue=&quot;LMAD26&quot;,geneIndex = sigPC3$index[3], pc=3)
 pc3plot</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-3-3.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>###make a plot for PC5
 sigPC5 = dplyr::filter(pfdr, X5 &lt; 0.1)
 #sigPC5$gene = geneNames[sigPC5$index]
@@ -1144,7 +1221,7 @@ alltissueresults[[&#39;LMAD26&#39;]][1,mgi]##get gene name</code></pre>
 <pre class="r"><code>pc5Plot = makeGenePlot(tissue=&#39;LMAD26&#39;,geneIndex=mgi, pc=5)
 
 pc5Plot</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-4.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-3-4.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>##kernel tissue on PC 4
 pvals = matrix(unlist(alltissueresults[[&#39;Kern&#39;]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
 pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method=&#39;fdr&#39;)}))
@@ -1153,7 +1230,7 @@ sigPC4 = dplyr::filter(pfdr, X4&lt;0.1)
 
 pc4Plot = makeGenePlot(tissue=&#39;Kern&#39;,geneIndex=sigPC4$index[1], pc=4)
 pc4Plot</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-2-5.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-3-5.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>postscript(&quot;../figures/heatmap.eps&quot;,height=10,width=10,paper=&quot;special&quot;,horizontal=FALSE,colormodel=&quot;cymk&quot;, onefile=FALSE)
 
 final &lt;- ggarrange(pl,                                                 
@@ -1176,7 +1253,7 @@ myindex = match(mygene, kerngenes)
 #make a plot
 explot = makeGenePlot(&#39;Kern&#39;,myindex, 2)
 explot</code></pre>
-<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/Identifying_quaint.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>##is this actually significant?
 myps = matrix(unlist(alltissueresults[[&#39;Kern&#39;]][5,]), ncol=5, byrow=TRUE) #each row corresponds to 
 myps[myindex,]</code></pre>
@@ -1222,7 +1299,7 @@ siggenes[duplicated(siggenes$gene),]</code></pre>
 61 GRMZM5G800586 PC5 6.661297e-05 0.0936467291 LMAN26
 64 GRMZM2G053801 PC2 1.469630e-06 0.0149828809 GShoot
 66 GRMZM2G093574 PC2 2.717956e-06 0.0314059793 L3Base</code></pre>
-<pre class="r"><code>write.table(allgenes, file = &#39;../data/siggenes.txt&#39;, quote=F, row.names=F, col.names=F)</code></pre>
+<pre class="r"><code>write.table(siggenes, file = &#39;../data/siggenes.txt&#39;, quote=F, row.names=F, col.names=F)</code></pre>
 <p><a href="https://www.maizegdb.org/gene_center/gene/GRMZM2G152686" class="uri">https://www.maizegdb.org/gene_center/gene/GRMZM2G152686</a> <a href="https://www.maizegdb.org/gene_center/gene/GRMZM2G391936" class="uri">https://www.maizegdb.org/gene_center/gene/GRMZM2G391936</a></p>
 <p>Deought tolerance!! <a href="https://www.maizegdb.org/gene_center/gene/GRMZM5G800586" class="uri">https://www.maizegdb.org/gene_center/gene/GRMZM5G800586</a></p>
 <br>

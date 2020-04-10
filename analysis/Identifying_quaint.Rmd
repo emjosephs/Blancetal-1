@@ -18,12 +18,11 @@ library(tidyr)
 
 ## Intro 
 
-I'm rerunning the code to identify selected genes with the Quaint package
-
+Identifying genes under selection.
 
 ```{r}
 
-### function for testing all genes
+############ function for testing all genes
 testAllGenes <- function(myTissue){
 # Read in mean-centered expression values
 df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
@@ -95,10 +94,9 @@ pl <- ggplot(data=sigLong,aes(x=variable,y=nicename)) +
 
 pl
 
-###how many genes total?
-sum(sigLong$value, na.rm=T) ##number of genes, but could have same gene for multiple tissues or PCs.
 
-#unique genes
+
+#how many unique genes???
 siggenes = unlist(lapply(1:length(alltissues), function(i){
 # extract the pvalues
 pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
@@ -124,8 +122,9 @@ numGenes = dim(df1)[2]
 numInds = dim(df1)[1]
 return(c(numGenes,numInds))
 })
-mySampleTable
+rownames(mySampleTable) = c('genes','individuals')
 
+mySampleTable
 ```
 
 
