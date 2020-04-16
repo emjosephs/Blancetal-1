@@ -12,22 +12,22 @@ library(ggplot2)
 
 ## Intro   
 
-Here is the code to create figure 1. 
+This markdown file contains the code necessary to recreate figure 1 from the main text. This figure is a PCA plot of all of the lines in our dataset for which we have expression data in the Kernel tissue. From the plot we can see that PC 1 is primarily separating tropical lines from the other subpopulations and PC is separating stiff stalk vs non stiff stalk lines. We code below can be used to generate PCA plots of any of the PCs and any of the 9 tissue types used in the data.  
 
 ## Code 
 
 First we need to read in the file containing the 302 Maize lines in the data set and the mean centered expression values for the 207 lines that had expression data for the Kernel tissue. In this matrix each row corresponds to a line and each column is a gene. We then merge the tables by line name. 
 ```{r}
 pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv")
-kern_all <- read.table("../data/Mean_centered_expression/Kern.txt")
-rows <- row.names(kern_all)
-kern_all$lines <- rows
-pop_dat <- merge(pop, kern_all, by.x = "Inbred", by.y = "lines" )
+exp <- read.table("../data/Mean_centered_expression/Kern.txt") # Can change to different tissue
+rows <- row.names(exp)
+exp$lines <- rows
+pop_dat <- merge(pop, exp, by.x = "Inbred", by.y = "lines" )
 ```
 
 Next we read in the Kinship matrix for the 207 kernel lines and get the Eigen vectors and values. 
 ```{r}
-## Kinship Matrix for all 207 Kern lines
+## Kinship Matrix for all 207 Kern lines - can cahnge to different tissue
 myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
 
 ## Get Eigen Values and Vectors 
@@ -37,7 +37,7 @@ E_values <- myE$values
 ```
 
 
-Finally we add the first and second eigen vectors to the dataframe that has the population and expression information.
+Finally we add the first and second eigen vectors to the dataframe that has the population and expression information. We could add more eigenvectors to plot different PCs.  
 ```{r}
 pop_dat$one <- E_vectors[,1]
 pop_dat$two <- E_vectors[,2]

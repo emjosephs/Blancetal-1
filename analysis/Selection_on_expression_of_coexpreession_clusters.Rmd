@@ -32,6 +32,7 @@ modules  <- modules[,num_genes_100]
 We now have 51 modules that have at least 100 genes. We now need to the the names of the genes that we have in out RNA-seq data set. To do this we will read in the header for each of the mean centered expression matrices.  
 
 ```{r}
+
 alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
 
 
@@ -56,11 +57,77 @@ moduleExpression = apply(modules, 2, function(x){
 
 # Read in tissue specific kinship matrix 
 myF <- read.table(paste('../data/Kinship_matrices/F_',mytissue,'.txt',sep=""))
+=======
+kern_inds <- t(read.table("../data/Mean_centered_expression/Kern.txt", nrows = 1))
+gshoot_inds <- t(read.table("../data/Mean_centered_expression/GShoot.txt", nrows = 1))
+groot_inds <- t(read.table("../data/Mean_centered_expression/GRoot.txt", nrows = 1))
+base_inds <- t(read.table("../data/Mean_centered_expression/L3Base.txt", nrows = 1))
+tip_inds <- t(read.table("../data/Mean_centered_expression/L3Tip.txt", nrows = 1))
+lmad8_inds <- t(read.table("../data/Mean_centered_expression/LMAD8.txt", nrows = 1))
+lman8_inds <- t(read.table("../data/Mean_centered_expression/LMAN8.txt", nrows = 1))
+lmad26_inds <- t(read.table("../data/Mean_centered_expression/LMAD26.txt", nrows = 1))
+lman26_inds <- t(read.table("../data/Mean_centered_expression/LMAN26.txt", nrows = 1))
+```
+
+Now we have the list of gene names in each of the 51 coexpression modules and the name of the genes we have RNA seq data from in each of our nine tissue types. Now we need to find the overlap between our data and the genes in the sub modules. The chuck of code below can be used to get the overlap for any tissue, you just need to change "kern_inds" to be the tissue from above that you are interested in. 
+
+```{r}
+tissue_list <- list()
+tissue_list_length <- list()
+for (i in 1:ncol(modules)) {
+  lis <- modules[,i]
+  olap <- Reduce(intersect, list(kern_inds[,1], lis)) # Change tissue 
+  tissue_list[[i]] <- olap
+  tissue_list_length[[i]] <- length(olap)
+}
+```
+
+Now the we have the overlap of gene name between our data and the coexpression modules, we now need find the median expression of all the overlap genes in each coexpression cluster. We also only want to keep clusters where the overlap number of genes is at least 50. The code below can be modified for all the tissues, the resulting tables for all nine tissues with the median expression of each coexpression clusters are save in "output/Selection_on_expression_of_coexpression_clusters/".  
+
+```{r}
+exp <- read.table("../data/Raw_expression/Kern.txt") # Change tissue
+median_exp <- as.data.frame(matrix(ncol=51, nrow=nrow(exp)))
+for (i in 1:ncol(modules)) {
+  gene <- tissue_list[[i]] # Make sure you ran correct tissue above 
+  avg_exp <- as.data.frame(matrix(nrow=nrow(exp), ncol = length(gene)))
+    for (k in 1:length(gene)) {
+      nam <- gene[k]
+      avg_exp[,k] <- as.numeric(exp[,nam])}
+    for (j in 1:nrow(exp)){
+      if (ncol(avg_exp) >= 50){
+        e <- t(avg_exp[j,])
+        median_exp[j,i] <- as.numeric(median(e[,1]))}
+      else {
+        median_exp[j,i] <- NA}
+    }
+}
+
+#write.table(median_exp,"../output/Selection_on_expression_of_coexpression_clusters/Median_Kern.txt")
+```
+
+Great, now we have the median expression value for each cluster. We now want to test for selection on the median values in each cluster. Below is the same code used to identify selected genes, we are simply conducting the test on median expression values in each line instead of a single gene expression in each line. For the test we are combining PC's 1-5 for the numerator of the selection test first (saved as output/Selection_on_expression_of_coexpression_clusters/tissuename_pvals.txt) and each PC individually next (saved as output/Selection_on_expression_of_coexpression_clusters/tissuename_pvals_ind.txt) 
+
+```{r}
+#df1 <- median_exp
+df1 <- read.table("../output/Selection_on_expression_of_coexpression_clusters/Median_Kern.txt") #Change tissue 
+
+## Mean center the data 
+for (i in 1:ncol(df1)){
+  df1[,i] <- scale(df1[,i], scale = FALSE)
+}
+
+## Remove last row
+df1 <- df1[-nrow(df1),]
+
+## Kinship Matrix for all 207 Kern lines - Change for different tissue
+myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
+
 
 ## Get Eigen Values and Vectors 
 myE <- eigen(myF)
 E_vectors <- myE$vectors
 E_values <- myE$values
+
 
 ## Testing for selection on first 5 PCs
 myM = 1:5
@@ -104,8 +171,4 @@ summary(bigdf$fdr) ##nothing is significant
 
 ### what's the most significant thing?
 dplyr::filter(bigdf, pval<0.01)
-
-
-
-
 ```
