@@ -224,6 +224,47 @@ pc4Plot
 ```
 
 ```{r}
+makePCPlot <- function(tissue, pca, pcb){
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F) ##pop data
+myF <- read.table(paste('../data/Kinship_matrices/F_',tissue,'.txt', sep="")) ##kinship matrix
+expnames <- read.table(paste("../data/Ind_Tissue_Lists/",tissue,".txt", sep=""), stringsAsFactors = F) ##names of individuals in the expression set
+#expnames2 = data.frame(Inbred=expnames[-nrow(expnames),], stringsAsFactors=F) ##minus the last name
+
+myE = eigen(myF) #calculate the PCs
+myPCs = data.frame(pca = myE$vectors[,pca], pcb = myE$vectors[,pcb]) ##pull out the PCs we'll plot
+#myPCs_labeled <- dplyr::bind_cols(expnames2, myPCs)
+#pop_dat <- dplyr::inner_join(pop, myPCs_labeled, by= 'Inbred')
+
+pop_dat <- dplyr::inner_join(pop, expnames, by= c("Inbred"='V1')) ##get the pop data for only inds in this tissue
+pop_dat <- dplyr::bind_cols(pop_dat,myPCs) ##bind the pop dat info with the PCs
+
+if(tissue %in% c('LMAD26','LMAN26')){mycol <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442","#D55E00")} else{mycol <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00")} 
+if(tissue %in% c('LMAD26','LMAN26')){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")} else{mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")} ##no sweets in LMAD26
+
+palette(mycol)
+
+pcplot = plot(pop_dat$pca, pop_dat$pcb, col=as.factor(pop_dat$Subpopulation), xlab = paste('PC',pca), ylab = paste('PC',pcb), bty="n",lwd=3, main=tissue)
+#legend('topright', levels(as.factor(pop_dat$Subpopulation)),col = mycol, pt.lwd=3,bty="n", pch=1)
+
+
+#pcplot <- ggplot(data=pop_dat, aes(x = pca, y= pcb , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pca)) +  ylab(paste('PC',pcb)) + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=15), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5)
+
+
+return(pcplot)
+}
+
+
+par(mar=c(5,5,2,2), mfrow=c(4,2))
+sapply(alltissues, function(x){makePCPlot(x, 1, 2)})
+
+legend('center', levels(as.factor(pop_dat$Subpopulation)),col = mycol, pt.lwd=3,bty="n", pch=1)
+
+
+
+```
+
+
+```{r}
 postscript("../figures/heatmap.eps",height=10,width=10,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
 
 final <- ggarrange(pl,                                                 
