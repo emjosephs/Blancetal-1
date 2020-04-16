@@ -1,0 +1,533 @@
+---
+title: "Selection on Expression of Cold Response Genes"
+author: "Jennifer Blanc"
+date: "2/17/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(reshape2)
+library(quaint)
+```
+
+## Intro  
+
+The goal of this analysis is to determine if genes that have been shown to be differentially expressed in response to cold treatment are enriched for genes whose expression is under selection. 
+
+
+## Code 
+
+First, read in the Avila et al. differential expression data and get the names of the genes used in their analysis. 
+```{r}
+cold <- read.csv("../data/Cold.csv", header = F, stringsAsFactors = F)
+cold <-cold[,2:19] 
+colnames(cold) <- c("V3_Gene_Name","V4_Gene_Name","Arabidopsis_Ortholog","Rice_Ortholog","Cold_1D_CG60_Means","Cold_1D_CG102_Means","Control_1D_CG60_Means","Control_1D_CG102_Means","FDR_1D_Genotype","FDR_1D_Treatment","FDR_\
+1D_Interaction","Cold_4D_CG60_Means","Cold_4D_CG102_Means","Control_4D_CG60_Means","Control_4D_CG102_Means","FDR_4D_Genotype","FDR_4D_Treatment","FDR_4D_Interaction")
+
+cold_names <- cold$V3_Gene_Name
+```
+
+We need to pick only the genes for which we have expression data for. To do this we will load the names for the genes we have for each tissue and take the overlap with the Avila data.  
+```{r}
+
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
+
+load('../data/quaint-results.rda')
+
+```
+
+The next step is to determine if differentially expressed genes are more likely to be under selection in every PC/Tissue combination. To do this we will use a chi-squared test.  
+
+```{r, warning=FALSE, message=FALSE}
+coldsum <- cold %>% select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment) ## pull out important columns
+
+coldsum$sig = apply(coldsum[,3:4], 1, min, na.rm=T)
+coldsigGenes = dplyr::filter(coldsum, sig < 0.1)$V3_Gene_Name
+length(coldsigGenes)
+coldnotsigGenes = dplyr::filter(coldsum, sig > 0.1)$V3_Gene_Name
+length(coldnotsigGenes)
+
+
+### are coldsig genes higher expression (in LMAD26) than not sig genes?
+mytissue = 'LMAD26'
+
+exp = read.table(paste('../data/Raw_expression/',mytissue,'.txt', sep=''), stringsAsFactors = F)
+exp_means = data.frame(gene = colnames(exp), expr = colMeans(exp), stringsAsFactors = F, row.names=NULL)
+
+quaint_results = alltissueresults[[mytissue]]
+quaint_ps = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[5,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_ps) =c('gene','PC1','PC2','PC3','PC4','PC5')
+quaint_mer = dplyr::inner_join(exp_means, quaint_ps, by = 'gene') #merge with expression data
+
+mydflong = tidyr::gather(quaint_mer, 'PC','pval', PC1:PC5)
+
+##compare expression levels of genes that are sig and not sig for selection
+mysig = dplyr::filter(mydflong, pval < 0.05)
+mynot = dplyr::filter(mydflong, pval >= 0.05)
+
+
+## compare expression levels of diff expressed genes
+coldmer = dplyr::inner_join(coldsum, exp_means, by=c('V3_Gene_Name' = 'gene'))
+csig = dplyr::filter(coldmer, sig < 0.1)
+cnot = dplyr::filter(coldmer, sig >=0.1)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5), c(median(mysig$expr), median(mynot$expr), median(csig$expr), median(cnot$expr)),
+     bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", xlim = c(0,6))
+axis(1, at=c(1,2,4,5), lab = c('selection','not selection','cold response','no response'), las=2)
+axis(2,las=2)
+### gene expression of cold-response genes is not higher than expression of genes that don't respond to cold. 
+
+
+##function for running the chisq test on a specific pc/tissue combination
+run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
+  quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+  quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+  sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+  notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+  ##make the chisq table
+  bothsig = nrow(dplyr::filter(sigOver, pval < myp))
+  diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
+  selonly = nrow(dplyr::filter(notsigOver, pval < myp))
+  nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
+  chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
+  chitest = chisq.test(chitbl, simulate.p.value = TRUE) ##run the test
+  return(chitest$p.value)
+}
+
+##run on all PCs and all tissues for the cold genes
+myresults = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, coldsigGenes, coldnotsigGenes, 0.05)
+  })
+})
+
+
+##we really just care about combos with significant evidence of selection in at least one gene
+
+newresults = myresults
+newresults[t(sigTable[,1:5]) ==0] <- NA
+newresults*15
+
+### note that we don't know what direction this goes in.
+
+```
+
+## Drought response genes
+We use drought response genes from Forestan et al. (https://onlinelibrary-wiley-com.proxy2.cl.msu.edu/doi/full/10.1111/pce.13660)
+Only looking at NST0 vs WST0 because that shows comparison of expression changes in drought and control.
+NSTO is control, WSTO is stressed
+
+
+```{r}
+droughtgenes = read.csv('../data/pce13660-supp-0004-supplementalfile3_cuffdiff.csv', stringsAsFactors = F)
+droughtgenes$v4_gene_model = sapply(droughtgenes$gene_id, function(x){strsplit(x, split=':')[[1]][2]}) #make a column for gene names
+
+#convert gene names from v4 to v3
+genemodel = read.csv('../data/gene_model_xref_v3.csv', stringsAsFactors = F)[,1:2]
+dgmerge = dplyr::inner_join(droughtgenes, genemodel, by = "v4_gene_model")
+dim(dgmerge)
+
+droughtsig = dplyr::filter(dgmerge, q_value < 0.1)$v3_gene_model ##filter out sig genes
+length(droughtsig)
+droughtnot = dplyr::filter(dgmerge, q_value > 0.1)$v3_gene_model ##filter out sig genes
+length(droughtnot)
+```
+
+```{r, eval=F, echo=F}
+###not controlling for expression
+
+dresults = run_chi_sq(mytissue = 'LMAD26', myPC=5, sigGenes = droughtsig, notsigGenes = droughtnot, myp = 0.05)
+
+dresults = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, droughtsig, droughtnot, 0.05)
+  })
+})
+
+dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+
+
+dresults
+dresults*15
+
+## robust to pvalues?
+#dresults = sapply(alltissues, function(mytissue){
+#  sapply(1:5,function(myPC){
+#    run_chi_sq(mytissue, myPC, droughtsig, droughtnot, 0.01)
+#  })
+#})
+#dresults[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+#dresults
+
+
+##compare up and down regulated genes
+drought_up = dplyr::filter(dgmerge, value_1 < value_2 & q_value < 0.1)$v3_gene_model
+drought_down = dplyr::filter(dgmerge, value_1 > value_2 & q_value < 0.1)$v3_gene_model
+length(drought_up)
+length(drought_down)
+
+##test for enrichment
+dresults_up = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, drought_up, droughtnot, 0.05)
+  })
+})
+
+dresults_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_up
+
+
+dresults_down = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, drought_down, droughtnot, 0.05)
+  })
+})
+
+dresults_down[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_down
+```
+
+```{r}
+##comparing overall expression level in the Kremling data between categories (look at LMAD26 for now)
+
+mytissue = 'LMAD26'
+
+exp = read.table(paste('../data/Raw_expression/',mytissue,'.txt', sep=''), stringsAsFactors = F)
+exp_means = data.frame(gene = colnames(exp), expr = colMeans(exp), stringsAsFactors = F, row.names=NULL)
+
+quaint_results = alltissueresults[[mytissue]]
+quaint_ps = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[5,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_ps) =c('gene','PC1','PC2','PC3','PC4','PC5')
+quaint_mer = dplyr::inner_join(exp_means, quaint_ps, by = 'gene') #merge with expression data
+
+mydflong = tidyr::gather(quaint_mer, 'PC','pval', PC1:PC5)
+
+##compare expression levels
+mysig = dplyr::filter(mydflong, pval < 0.05)
+mynot = dplyr::filter(mydflong, pval >= 0.05)
+
+## compare expression levels of diff expressed genes
+droughtmer = dplyr::inner_join(dgmerge, exp_means, by=c('v3_gene_model' = 'gene'))
+dsig = dplyr::filter(droughtmer, q_value < 0.1)
+dnot = dplyr::filter(droughtmer, q_value >=0.1)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5), c(median(mysig$expr), median(mynot$expr), median(dsig$expr), median(dnot$expr)),
+     bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", xlim = c(0,6))
+axis(1, at=c(1,2,4,5), lab = c('selection','not selection','drought response','no response'), las=2)
+axis(2,las=2)
+###
+```
+
+```{r}
+## pick the top  expressed genes in dnot 
+dnot_high = dnot[order(-dnot$expr),][1:3500,]
+
+#down regulated genes
+dsig_down = dplyr::filter(dsig, value_1 > value_2)
+dsig_up = dplyr::filter(dsig, value_2 > value_1)
+nrow(dsig_down)
+nrow(dsig_up)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5,6,7), c(median(mysig$expr), median(mynot$expr), median(dsig$expr), median(dsig_down$expr), median(dnot$expr), median(dnot_high$expr)),
+     bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", 
+     xlim = c(0,8)) 
+axis(1, at=c(1,2,4,5,6,7), 
+    lab = c('selection','not selection','drought response','drought down','no response','no, high'), las=2)
+axis(2,las=2)
+
+##do the test with only things that have leaf expression in Kremling et al
+dresults_leaf = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot$v3_gene_model, 0.05)
+  })
+})
+dresults_leaf[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_leaf*15
+
+###now test for enrichment compared to the high expression sample
+dresults_high = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_high*15
+
+##just down reg responses
+dresults_high_down = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig_down$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high_down[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_high_down*15
+
+##up responses
+dresults_high_up = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig_up$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+dresults_high_up*15
+```
+
+
+
+```{r, eval=F, echo=F}
+##supp plot with expression for different categories
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5, 7,8), c(median(mysig$expr), median(mynot$expr), median(csig$expr), median(cnot$expr), median(dsig$expr), median(dnot$expr)), bty="n", ylim=c(0,180), xaxt="n", yaxt="n",ylab = "median expression in leaves", xlab="", xlim = c(0,9))
+axis(1, at=c(1,2,4,5, 7, 8), lab = c('selection','not selection','cold response','no response', 'drought response','no response'), las=2)
+axis(2,las=2)
+### gene expression of cold-response genes is not higher than expression of genes that don't respond to cold. 
+
+myout = list(mysig$expr, mynot$expr, dsig$expr, dnot$expr, csig$expr, cnot$expr)
+
+
+makeplot = function(x){
+  #hist(x, col = 'darkgrey', breaks = seq(0,1000000, by=20), main="", border="white", xlim= c(0,500), freq=F, axes= F, ylab = '')
+  d <- density(x)
+  plot(d,main = "", axes=F, bty="n", xlim = c(0,500), ylab = "", ylim = c(0,0.018))
+  axis(2, las=2)
+  axis(1)
+  abline(v=median(x), lwd=2)
+}
+
+par(mfrow=c(6,1), mar=c(3,5,1,1))
+test = lapply(myout, makeplot)
+
+
+##boxplot
+mysig1 = data.frame(expr = mysig$expr, type = 'selection')
+mynot1 = data.frame(expr = mynot$expr, type = 'no selection')
+csig1 = data.frame(expr = csig$expr, type = 'cold response')
+cnot1 = data.frame(expr = cnot$expr, type = 'no cold response')
+dsig1 = data.frame(expr = dsig$expr, type = 'drought response')
+dnot1 = data.frame(expr = dnot$expr, type = 'no drought response')
+dhigh1 = data.frame(expr=dnot_high$expr, type = 'no drought response (high)')
+
+boxplotfd = rbind(mysig1, mynot1, csig1, cnot1, dsig1, dnot1, dhigh1)
+
+par(mfrow=c(1,1), mar=c(10,6,3,3))
+boxplot(log10(expr) ~ type, data=boxplotfd, notch=T, bty='n', ylab = "log10 of expression", xaxt="n", xlab = "")
+axis(1, las=2, at=1:7,labels = levels(boxplotfd$type))
+
+
+
+```
+
+
+Is there a relationship between the direction of the slope of selection and the response? The slope is cm and it should be comparable across genes (not across PCs yet)
+```{r}
+
+##pull out qm for genes that show selection in LMAD26 and LMAN26 along PC 5.
+mytissue = 'LMAD26'
+quaint_results = alltissueresults[[mytissue]]
+quaint_cms = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[2,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_cms) = c('gene','PC1','PC2','PC3','PC4','PC5')
+mycms_long = tidyr::gather(quaint_cms, 'PC','Cm', PC1:PC5) ##gather into a long data frame
+
+
+mypcm_long = dplyr::inner_join(mycms_long, mydflong)##merge with pvalues
+mysig05 = dplyr::filter(mypcm_long, pval < 0.05 & PC == 'PC5') ##look at sig along PC5
+summary(mysig05$Cm)
+nrow(dplyr::filter(mysig05, Cm < 0))
+nrow(mysig05)
+
+test = hist(mysig05$Cm, col = 'darkgreen', border='white', xlim = c(-26000,26000), main="all genes with p < 0.05")
+
+## look at cms in the overlap with drought down regulation genes
+mysigdown = dplyr::filter(mysig05, gene %in% dsig_down$v3_gene_model)
+test = hist(mysigdown$Cm, col = 'darkgreen', border='white', xlim = c(-26000,26000), main = "p<0.05, down reg in drought")
+
+nrow(dplyr::filter(mysigdown, Cm > 0))
+nrow(mysigdown)
+
+```
+
+
+```{r}
+makeGenePlot <- function(tissue, geneIndex, pc){
+
+## read in population data
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F)
+
+## read in expression data
+exp <- read.table(paste("../data/Mean_centered_expression/",tissue,".txt", sep=""), stringsAsFactors = F)
+expgene = data.frame(Inbred = row.names(exp), geneexp = exp[,geneIndex], stringsAsFactors = F)
+
+## merge data together
+pop_dat <- dplyr::inner_join(pop, expgene, by= "Inbred")
+
+#get the eigenvalues
+myF <- read.table(paste('../data/Kinship_matrices/F_',tissue,'.txt', sep=""))
+myE = eigen(myF)
+myPC = data.frame(pc = myE$vectors[,pc], stringsAsFactors = F)
+pop_dat <- dplyr::bind_cols(pop_dat, myPC)
+
+lambda <- myE$values[pc]
+
+
+##calculate the CIs
+generesults = alltissueresults[[tissue]][,geneIndex]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+##gene name
+geneName = names(exp)[geneIndex]
+
+lR <- lm(pop_dat$geneexp ~ pop_dat$pc) 
+coeff <- lR$coefficients[[2]]
+
+if(tissue=="LMAD26"){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")} else{mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")} ##no sweets in LMAD26
+
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=15), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+
+return(pl1)
+}
+```
+
+```{r}
+
+###make a plot of what's on PC5 (and to sanity check)
+mygene = 'GRMZM2G113340'
+mytissue = 'LMAD26'
+#get gene index for kernel
+lmad26genes = unlist(alltissueresults[[3]][1,])
+myindex = match(mygene, lmad26genes)
+
+#make a plot
+explot = makeGenePlot('LMAD26',myindex, 5)
+explot
+
+###plot Pc5 with names of the lines
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F)
+exp <- read.table(paste("../data/Mean_centered_expression/",mytissue,".txt", sep=""), stringsAsFactors = F)
+expgene = data.frame(Inbred = row.names(exp), geneexp = exp[,myindex], stringsAsFactors = F)
+pop_dat <- dplyr::inner_join(pop, expgene, by= "Inbred")
+
+#get the eigenvalues
+myF <- read.table(paste('../data/Kinship_matrices/F_',mytissue,'.txt', sep=""))
+myE = eigen(myF)
+myPC = data.frame(pc = myE$vectors[,5], stringsAsFactors = F)
+pop_dat <- dplyr::bind_cols(pop_dat, myPC)
+
+###make the plot
+plot(pop_dat$pc, pop_dat$geneexp, bty="n", xlab = "PC 5", ylab = "expression", col = "white" )
+text(pop_dat$pc, pop_dat$geneexp, labels = pop_dat$Inbred)
+b73 = dplyr::filter(pop_dat, Inbred=="B73")
+text(b73$pc, b73$geneexp, labels = 'B73',col="red", cex=2)
+```
+
+
+## Figure  
+  
+```{r, eval=T}
+make_enrichment_fig <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
+quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+##make the chisq table
+bothsig = nrow(dplyr::filter(sigOver, pval < myp))
+diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
+selonly = nrow(dplyr::filter(notsigOver, pval < myp))
+nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
+  
+propDiffSel = bothsig/(bothsig+diffexponly)
+propNotDiffSel = selonly/(selonly+nothingsig)
+
+return(c(propDiffSel, propNotDiffSel))
+}
+
+test = make_enrichment_fig('LMAD26', 5, 0.05, coldsigGenes, coldnotsigGenes)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Cold Response','Other'), cex.axis=1.5)
+
+
+#### drought figure
+test = make_enrichment_fig('LMAD26', 5, 0.05, dsig_down$v3_gene_model, dnot_high$v3_gene_model)
+bp = barplot(test, ylim=c(0,0.15), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+
+
+test = make_enrichment_fig('LMAN26', 2, 0.05, dsig_down$v3_gene_model, dnot_high$v3_gene_model)
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Drought Response','Other'), cex.axis=1.5)
+
+
+
+get_enrichment <- function(mytissue, myPC, myp, sigGenes, notsigGenes){
+quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+##make the chisq table
+bothsig = nrow(dplyr::filter(sigOver, pval < myp))
+diffexponly = nrow(dplyr::filter(sigOver, pval >= myp))
+selonly = nrow(dplyr::filter(notsigOver, pval < myp))
+nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
+return(c(bothsig, bothsig/diffexponly, selonly/nothingsig))
+}
+
+
+
+sigcounts_down = sapply(alltissues, function(mytissue){
+  lapply(1:5,function(myPC){
+    get_enrichment(mytissue, myPC, 0.05,dsig_down$v3_gene_model, dnot_high$v3_gene_model)
+  })
+})
+
+sigcounts_down[5,3]
+sigcounts_down[5,4]
+
+sigcounts_up = sapply(alltissues, function(mytissue){
+  lapply(1:5,function(myPC){
+    get_enrichment(mytissue, myPC, 0.05,dsig_up$v3_gene_model, dnot_high$v3_gene_model)
+  })
+})
+
+
+par(mar=c(5,5,3,3))
+
+makeplot = function(x){myplot = c(sigcounts_down[5,3][[1]][2], sigcounts_down[5,4][[1]][2], sigcounts_up[5,3][[1]][2], sigcounts_up[5,4][[1]][2], sigcounts_down[5,3][[1]][3], sigcounts_down[5,4][[1]][3])
+bp = barplot(myplot, ylim=c(0,0.2), col = c("#E69F00", "#0072B2"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp[c(1,3,5),]+0.6, lab = c('Down','Up','No change'), cex.axis=1.5)
+legend('topright', c('Day','Night'), bty="n", fill = c("#E69F00", "#0072B2"), border="white", cex=1.5)}
+
+makeplot()
+
+postscript("../figures/drought.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+makeplot()
+dev.off()
+```
+
+Make a supplemental plot for cold tolerance genes for LMAD 26 on PC5
+```{r}
+
+test = make_enrichment_fig('LMAD26', 5, 0.05, coldsigGenes, coldnotsigGenes)
+coldplot = function(){
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Cold Response','Other'), cex.axis=1.5)}
+
+coldplot()
+
+postscript("../figures/cold.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+coldplot()
+dev.off()
+
+```

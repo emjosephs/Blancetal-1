@@ -17,17 +17,15 @@ library(tidyr)
 
 ## Intro 
 
-I'm rerunning the code to identify selected genes with the Quaint package
-
-
-
+Identifying genes under selection.
 
 ```{r}
 
-### function for testing all genes
+############ function for testing all genes
 testAllGenes <- function(myTissue){
 # Read in mean-centered expression values
 df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+geneNames = names(df1)
 # Read in tissue specific kinship matrix 
 myF <- read.table(paste('../data/Kinship_matrices/F_',myTissue,'.txt',sep=""))
 
@@ -45,14 +43,14 @@ myL = 6:dim(myF)[1]
 ## test for selection on each gene
 allGeneOutput <- sapply(1:ncol(df1), function(x){
 myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
-return(myQpc)
+return(c(geneNames[x],myQpc))
 })
 
 return(allGeneOutput)
 }
 
 ###run on all genes
-alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base","LMAD8","LMAN8")
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
 alltissueresults = lapply(alltissues, testAllGenes)
 names(alltissueresults) <- alltissues
 
@@ -61,39 +59,238 @@ names(alltissueresults) <- alltissues
 ##look at sig results
 sigresults = lapply(1:length(alltissues), function(i){
 # extract the pvalues
-pvals = matrix(unlist(alltissueresults[[i]][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
 
 ##look at pvalue distributions
-par(mfrow=c(3,2), mar=c(4,4,1,1))
-sapply(1:5, function(x){
-hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
-})
+#par(mfrow=c(3,2), mar=c(4,4,1,1))
+#sapply(1:5, function(x){
+#hist(pvals[,x], border="white", col = "darkgray", main="", breaks = 20, xlab = paste('PC ',x,' ',alltissues[i],sep=""))
+#})
 
-## test fpr sogmofocamce
-pbonf = data.frame(apply(pvals,2, function(x){p.adjust(x, method='bonferroni')}))
+## test fpr significance with the fdr
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
 
 ## how many are significant?
-numsig <- apply(pbonf, 2, function(x){sum(x<0.25)})
+numsig <- apply(pfdr, 2, function(x){sum(x<0.1)})
 numsig
 })
 
 ###make a big image of how many sig results we have
 sigTable = as.data.frame(matrix(unlist(sigresults), ncol=5, byrow=T))
+
+
+
 names(sigTable) = c('PC1','PC2','PC3','PC4','PC5')
-sigTable$tissue = alltissues
-sigLong = tidyr::gather(sigTable, 'variable','value', -tissue)
+sigTable$nicename = c('Germinating root', 'Kernel','Adult Leaf Day', 'Adult Leaf Night', '3rd leaf tip', 'Germinating shoot','3rd leaf base')
 
 
-pl <- ggplot(data=sigLong,aes(x=variable,y=tissue)) + 
+sigLong = tidyr::gather(sigTable, 'variable','value', -nicename)
+sigLong[sigLong == 0] <- NA
+
+pl <- ggplot(data=sigLong,aes(x=variable,y=nicename)) + 
   geom_tile(aes(fill=value),color='black') + scale_fill_gradient(low = 'lightyellow', high = "#CC79A7", guide = FALSE, na.value = "white") + theme_bw() + xlab("\n") + ylab("Tissue") + 
-  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=3.5)
+  theme(axis.ticks=element_blank(),panel.border=element_blank(),panel.grid.major = element_blank(), axis.text.y = element_text(size=10,angle=0), axis.title.y = element_text(size=16),axis.title.x  = element_text(size=16),axis.text.x = element_text(angle = 0, hjust = 0.5,size=14)) + geom_text(aes(label=value),colour="grey15",size=5.5)
 
+pl
+
+
+
+#how many unique genes???
+siggenes = unlist(lapply(1:length(alltissues), function(i){
+# extract the pvalues
+pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')})) ## test fpr significance with the fdr
+pfdr$numsig <- apply(pfdr, 1, function(x){sum(x<0.1)})
+pfdr$genes = unlist(alltissueresults[[i]][1,])
+return(dplyr::filter(pfdr, numsig>0)$genes)
+}))
+
+length(unique(siggenes)) ##number of unique genes
+
+
+###save output for other analyses
+save(alltissueresults, sigTable, sigLong, file = "../data/quaint-results.rda")
 
 ```
 
-I think the main difference is the PCs that I'm using to estimate Va are different from Jennifer's (she uses 11:20). Let's check.
+Make a table of the sample sizes
+```{r}
+mySampleTable = sapply(alltissues, function(myTissue){
+df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+numGenes = dim(df1)[2]
+numInds = dim(df1)[1]
+return(c(numGenes,numInds))
+})
+rownames(mySampleTable) = c('genes','individuals')
+
+mySampleTable
+```
+
+
+
+Make some individual gene plots for leaf expression 26
+```{r}
+
+##what gene to plot
+pvals = matrix(unlist(alltissueresults[['LMAD26']][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
+pfdr$index = 1:nrow(pfdr)
+
+##the sig LMAD26 one on PC 1
+sigPC1 = dplyr::filter(pfdr, X1 < 0.1)
+
+
+
+
+### function for making plots
+makeGenePlot <- function(tissue, geneIndex, pc){
+
+## read in population data
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F)
+
+## read in expression data
+exp <- read.table(paste("../data/Mean_centered_expression/",tissue,".txt", sep=""), stringsAsFactors = F)
+expgene = data.frame(Inbred = row.names(exp), geneexp = exp[,geneIndex], stringsAsFactors = F)
+
+## merge data together
+pop_dat <- dplyr::inner_join(pop, expgene, by= "Inbred")
+
+#get the eigenvalues
+myF <- read.table(paste('../data/Kinship_matrices/F_',tissue,'.txt', sep=""))
+myE = eigen(myF)
+myPC = data.frame(pc = myE$vectors[,pc], stringsAsFactors = F)
+pop_dat <- dplyr::bind_cols(pop_dat, myPC)
+
+lambda <- myE$values[pc]
+
+
+##calculate the CIs
+generesults = alltissueresults[[tissue]][,geneIndex]
+myVaest = var0(generesults$cml)
+myCI = 1.96*sqrt(myVaest*lambda)
+
+##gene name
+geneName = names(exp)[geneIndex]
+
+lR <- lm(pop_dat$geneexp ~ pop_dat$pc) 
+coeff <- lR$coefficients[[2]]
+
+if(tissue=="LMAD26"){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")} else{mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")} ##no sweets in LMAD26
+
+col <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+pl1 <- ggplot(data=pop_dat, aes(x = pc, y= geneexp , color=Subpopulation)) + scale_colour_manual(values = col, labels=mylab) + xlab(paste("PC",pc)) +  ylab("Expression") + theme_bw() + theme(panel.grid.major = element_blank(), text = element_text(size=15), panel.grid.minor = element_blank(), axis.title.y = element_text(size=18), axis.title.x  = element_text(size=18), legend.position = "right", legend.title = element_text(size = 12), legend.text = element_text(size = 20), plot.title = element_text(hjust = 0.5)) + geom_point(size = 3.5) + geom_abline(slope = myCI, linetype = 2, col = '#56B4E9', size=1.2) + geom_abline(slope = coeff, size = 1.5)+  geom_abline(slope = -myCI, linetype = 2, col = '#56B4E9', size=1.2)
+
+return(pl1)
+}
+
+
+myplot = makeGenePlot(tissue = 'LMAD26',geneIndex = sigPC1$index, pc = 1)
+
+myplot
+alltissueresults[['LMAD26']][1,sigPC1$index]##get gene name
+
+#make a plot for PC2
+sigPC2 = dplyr::filter(pfdr, X2 < 0.1)
+pc2plot = makeGenePlot(tissue="LMAD26",geneIndex = sigPC2$index[2], pc=2)
+pc2plot
+
+##make a plot for PC3
+sigPC3 = dplyr::filter(pfdr, X3 < 0.1)
+pc3plot = makeGenePlot(tissue="LMAD26",geneIndex = sigPC3$index[3], pc=3)
+pc3plot
+
+
+###make a plot for PC5
+sigPC5 = dplyr::filter(pfdr, X5 < 0.1)
+#sigPC5$gene = geneNames[sigPC5$index]
+mgi = sigPC5$index[6]
+alltissueresults[['LMAD26']][1,mgi]##get gene name
+
+pc5Plot = makeGenePlot(tissue='LMAD26',geneIndex=mgi, pc=5)
+
+pc5Plot
+
+
+##kernel tissue on PC 4
+pvals = matrix(unlist(alltissueresults[['Kern']][4,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to 
+pfdr = data.frame(apply(pvals,2, function(x){p.adjust(x, method='fdr')}))
+pfdr$index = 1:nrow(pfdr)
+sigPC4 = dplyr::filter(pfdr, X4<0.1)
+
+pc4Plot = makeGenePlot(tissue='Kern',geneIndex=sigPC4$index[1], pc=4)
+pc4Plot
+
+```
 
 ```{r}
+makePCPlot <- function(tissue, pca, pcb){
+pop <- read.csv("../data/FlintGarciaTableS1_fixednew.csv", stringsAsFactors = F) ##pop data
+myF <- read.table(paste('../data/Kinship_matrices/F_',tissue,'.txt', sep="")) ##kinship matrix
+expnames <- read.table(paste("../data/Ind_Tissue_Lists/",tissue,".txt", sep=""), stringsAsFactors = F) ##names of individuals in the expression set
+#expnames2 = data.frame(Inbred=expnames[-nrow(expnames),], stringsAsFactors=F) ##minus the last name
+
+myE = eigen(myF) #calculate the PCs
+myPCs = data.frame(pca = myE$vectors[,pca], pcb = myE$vectors[,pcb]) ##pull out the PCs we'll plot
+#myPCs_labeled <- dplyr::bind_cols(expnames2, myPCs)
+#pop_dat <- dplyr::inner_join(pop, myPCs_labeled, by= 'Inbred')
+
+pop_dat <- dplyr::inner_join(pop, expnames, by= c("Inbred"='V1')) ##get the pop data for only inds in this tissue
+pop_dat <- dplyr::bind_cols(pop_dat,myPCs) ##bind the pop dat info with the PCs
+
+if(tissue %in% c('LMAD26','LMAN26')){mycol <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442","#D55E00")} else{mycol <- c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00")} 
+if(tissue %in% c('LMAD26','LMAN26')){mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "tropical")} else{mylab = c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical")} ##no sweets in LMAD26
+
+palette(mycol)
+
+pcplot = plot(pop_dat$pca, pop_dat$pcb, col=as.factor(pop_dat$Subpopulation), xlab = paste('PC',pca), ylab = paste('PC',pcb), bty="n",lwd=3, main=tissue)
+#legend('topright', levels(as.factor(pop_dat$Subpopulation)),col = mycol, pt.lwd=3,bty="n", pch=1)
+
+
+return(pcplot)
+}
+
+postscript("../figures/pcs.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+par(mar=c(5,5,2,2), mfrow=c(2,4))
+sapply(alltissues, function(x){makePCPlot(x, 1, 2)})
+
+plot.new()
+legend('center', c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical"),col = c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00"), pt.lwd=3,bty="n", pch=1, cex=1)
+dev.off()
+
+postscript("../figures/pcs34.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+par(mar=c(5,5,2,2), mfrow=c(2,4))
+sapply(alltissues, function(x){makePCPlot(x, 3, 4)})
+plot.new()
+legend('center', c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical"),col = c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00"), pt.lwd=3,bty="n", pch=1, cex=1)
+dev.off()
+
+
+postscript("../figures/pcs15.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+par(mar=c(5,5,2,2), mfrow=c(2,4))
+sapply(alltissues, function(x){makePCPlot(x, 5, 1)})
+plot.new()
+legend('center', c("mixed", "non-stiff stalk", "popcorn", "stiff stalk", "sweet", "tropical"),col = c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00"), pt.lwd=3,bty="n", pch=1, cex=1)
+dev.off()
+
+```
+
+
+```{r}
+postscript("../figures/heatmap.eps",height=10,width=10,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+
+final <- ggarrange(pl,                                                 
+          ggarrange(myplot, pc5Plot, ncol = 2, labels = c("B", "C"),common.legend = T, legend = "bottom"), 
+          nrow = 2, 
+          labels = "A"                                       
+          )
+final
+
+dev.off()
+
+```
+
+
+```{r, eval=F, echo=F}
 
 ### function for testing all genes
 testAllGenes1120 <- function(myTissue){
@@ -161,3 +358,59 @@ p2 <- ggplot(data=sigLong1120,aes(x=variable,y=tissue)) +
 
 p2
 ```
+
+Additional plots
+```{r}
+mygene = "GRMZM2G093574"
+#get gene index for kernel
+kerngenes = unlist(alltissueresults[[2]][1,])
+myindex = match(mygene, kerngenes)
+
+#make a plot
+explot = makeGenePlot('Kern',myindex, 2)
+explot
+
+
+##is this actually significant?
+myps = matrix(unlist(alltissueresults[['Kern']][5,]), ncol=5, byrow=TRUE) #each row corresponds to 
+myps[myindex,]
+pfdr = data.frame(apply(myps,2, function(x){p.adjust(x, method='fdr')}))
+pfdr[myindex,]
+```
+
+Look for interesting genes
+```{r}
+allGenes = lapply(alltissues, function(mytissue){
+myresults = alltissueresults[[match(mytissue, alltissues)]]
+mygenes = unlist(myresults[1,])
+myps = do.call(rbind,myresults[5,])
+outdf = data.frame(mygenes, myps, stringsAsFactors = F)
+names(outdf) = c('gene','PC1','PC2','PC3','PC4','PC5')
+outdflong = tidyr::gather(outdf, 'PC','pval', PC1:PC5)
+myfdrs = apply(myps, 2, p.adjust, method='fdr') ##get the fdrs
+outdf2 = data.frame(mygenes, myfdrs, stringsAsFactors = F)
+names(outdf2) = c('gene','PC1','PC2','PC3','PC4','PC5')
+outdflong2 = tidyr::gather(outdf2, 'PC','fdr', PC1:PC5)
+finaldf = dplyr::left_join(outdflong, outdflong2)
+finaldf$tissue = mytissue
+return(finaldf)
+})
+
+allgenes = do.call(rbind, allGenes)
+
+siggenes = dplyr::filter(allgenes, fdr < 0.1)
+
+##any with more than one association?
+siggenes[duplicated(siggenes$gene),]
+
+write.table(siggenes, file = '../data/siggenes.txt', quote=F, row.names=F, col.names=F)
+
+
+
+```
+
+
+https://www.maizegdb.org/gene_center/gene/GRMZM2G152686
+https://www.maizegdb.org/gene_center/gene/GRMZM2G391936
+
+Deought tolerance!! https://www.maizegdb.org/gene_center/gene/GRMZM5G800586

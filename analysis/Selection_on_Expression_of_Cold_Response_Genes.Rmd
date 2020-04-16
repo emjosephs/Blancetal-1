@@ -22,7 +22,7 @@ The goal of this analysis is to determine if genes that have been shown to be di
 
 First, read in the Avila et al. differential expression data and get the names of the genes used in their analysis. 
 ```{r}
-cold <- read.csv("../data/Cold.csv", header = F)
+cold <- read.csv("../data/Cold.csv", header = F, stringsAsFactors = F)
 cold <-cold[,2:19] 
 colnames(cold) <- c("V3_Gene_Name","V4_Gene_Name","Arabidopsis_Ortholog","Rice_Ortholog","Cold_1D_CG60_Means","Cold_1D_CG102_Means","Control_1D_CG60_Means","Control_1D_CG102_Means","FDR_1D_Genotype","FDR_1D_Treatment","FDR_\
 1D_Interaction","Cold_4D_CG60_Means","Cold_4D_CG102_Means","Control_4D_CG60_Means","Control_4D_CG102_Means","FDR_4D_Genotype","FDR_4D_Treatment","FDR_4D_Interaction")
@@ -32,163 +32,46 @@ cold_names <- cold$V3_Gene_Name
 
 We need to pick only the genes for which we have expression data for. To do this we will load the names for the genes we have for each tissue and take the overlap with the Avila data.  
 ```{r}
-kern_genes <- read.table("../data/Mean_centered_expression/Kern.txt", nrows = 1)
-gshoot_genes <- read.table("../data/Mean_centered_expression/GShoot.txt", nrows = 1)
-groot_genes <- read.table("../data/Mean_centered_expression/GRoot.txt", nrows = 1)
-base_genes <- read.table("../data/Mean_centered_expression/L3Base.txt", nrows = 1)
-tip_genes <- read.table("../data/Mean_centered_expression/L3Tip.txt", nrows = 1)
-lmad8_genes <- read.table("../data/Mean_centered_expression/LMAD8.txt", nrows = 1)
-lman8_genes <- read.table("../data/Mean_centered_expression/LMAN8.txt", nrows = 1)
-lmad26_genes <- read.table("../data/Mean_centered_expression/LMAD26.txt", nrows = 1)
-lman26_genes <- read.table("../data/Mean_centered_expression/LMAN26.txt", nrows = 1)
+
+alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
+
+load('../data/quaint-results.rda')
+
 ```
 
-```{r}
-olap_kern <- Reduce(intersect, list(unname(unlist(kern_genes[1,])), cold_names))
-olap_gshoot <- Reduce(intersect, list(unname(unlist(gshoot_genes[1,])), cold_names ))
-olap_groot <- Reduce(intersect, list(unname(unlist(groot_genes[1,])), cold_names ))
-olap_base <- Reduce(intersect, list(unname(unlist(base_genes[1,])), cold_names))
-olap_tip <- Reduce(intersect, list(unname(unlist(tip_genes[1,])), cold_names ))
-olap_lmad8 <-Reduce(intersect, list(unname(unlist(lmad8_genes[1,])), cold_names ))
-olap_lman8 <- Reduce(intersect, list(unname(unlist(lman8_genes[1,])), cold_names))
-olap_lmad26 <- Reduce(intersect, list(unname(unlist(lmad26_genes[1,])), cold_names))
-olap_lman26 <- Reduce(intersect, list(unname(unlist(lman26_genes[1,])), cold_names ))
-```
-
-Now we will select select the expression values for the Avila genes from our data set and run our test for selection on all of them (including both differentially and non-differentially expressed ones). Below I am only showing the code for Kernel tissue - by loading the expression for a different tissue and changing the "olap_tissue" variable to the correct tissue name you can run this analysis for all tissues. To save time during the knitting process, I commented out this slow step and pre-loaded the file.   
-
-```{r}
-# Select tissue and genes 
-exp <- read.table("../data/Mean_centered_expression/Kern.txt") # Change for different tissue 
-df1 <- exp %>%
-  select(olap_kern) # Change for differnt tissue 
-```
-
-Test for selection
-```{r}
-## Pick Correct Kinship Matrix 
-myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
-
-## Get Eigen Values and Vectors 
-myE <- eigen(myF)
-E_vectors <- myE$vectors
-E_values <- myE$values
-
-## Make new matrix to collect Z values
-df2 <- data.frame(matrix(ncol=ncol(df1), nrow=nrow(df1)))
-colnames(df2) <- colnames(df1[1:ncol(df1)])
-rownames(df2) <- rownames(df1)
-
-## Calculate Q values by multiplying the mean-centered expression value by each eigen vector 
-#for (i in 1:ncol(df2)) {
-#  mean_centered_data <- t(as.matrix(as.numeric(df1[,i])))
-#  for (k in 1:nrow(df2)){
-#    u <- as.matrix(as.numeric(E_vectors[,k]))
-#    value <- mean_centered_data %*% u
-#    df2[k,i] <- value
-#  }
-#}
-df2 <- read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/intermediate.txt")
-
-## Get the square root of the Eigen values   
-de <- data.frame(matrix(nrow = nrow(df1),ncol = 2))
-de$Egien_values <- E_values 
-de$Sqrt_EV <- sqrt(de$Egien_values)
-
-## Calculate C-values by dividing Q values by the square root of the eigen values
-df4 <- data.frame(matrix(ncol=ncol(df2),nrow=nrow(df2)))
-for (i in 1:ncol(df2)){
-  df4[,i] <- (df2[,i] / de$Sqrt_EV)
-}
-
-## Calculate F-values by dividing variances - for each PC individually 
-F_values <- data.frame(matrix(ncol=ncol(df2), nrow = 5))
-for (j in 1:ncol(df2)){
-  for (i in 1:5){
-    q <- df4[i,j] 
-    t <- df4[11:20,j]
-    var_q <- (q^2)
-    var_t <- mean(t^2)
-    F_value <- var_q / var_t
-    F_values[i,j] <- F_value
-  }
-}
-
-## Calculate P-values from recorded F values 
-P_values_ind <- data.frame(matrix(ncol=ncol(df2), nrow =1))
-for (j in 1:ncol(F_values)){
-  for (r in 1:5) {
-    f_stat <- F_values[r, j]
-    p_value <- pf(q=f_stat, df1=1, df2=10, lower.tail=FALSE) 
-    P_values_ind[r, j] <- p_value
-  }
-}
-```
-
-Now we have the p-values for all of the genes that overlap between our dataset and Avila et al. The p-value results for all of the tissus are in the "../output/Selection_on_Expression_of_Cold_Response_Genes/" folder.The next step is to determine if differentially expressed genes are more likely to be under selection in every PC/Tissue combination. To do this we will use a chi-squared test.  
-
-Again, the code below is specific to the Kernel tissue but can be modified to work for each tissue type.  
+The next step is to determine if differentially expressed genes are more likely to be under selection in every PC/Tissue combination. To do this we will use a chi-squared test.  
 
 ```{r, warning=FALSE, message=FALSE}
-Cold <- cold %>%
-  select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment)
-names <- as.data.frame(colnames(exp)) # Here exp is expression of Kern 
-colnames(names) <- "V3_Gene_Name"
-Cold <- inner_join(names, Cold)
-```
+coldsum <- cold %>% select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment) ## pull out important columns
 
-Now will will add a column to our dataframe that indicates if the gene is differentially expressed in cold and then divide into two dataframes.  
-```{r}
-sig_DE <- function(Cold) {
-  Cold$Sig <- FALSE
-  Cold[is.na(Cold)] <- NA
-  for (i in 1:nrow(Cold)) {
-    a <- Cold[i,3]
-    b <- Cold[i,4]
-    if (is.na(a)) {a <- 1}
-    if (is.na(b)) {b <- 1}
-    if (a  < 0.05) {Cold[i,5] <- TRUE }
-    if (b < 0.05) {Cold[i,5] <- TRUE}
-  }
-  return(Cold)
-}
-Cold <- sig_DE(Cold)
-```
+coldsum$sig = apply(coldsum[,3:4], 1, min, na.rm=T)
+sigGenes = dplyr::filter(coldsum, sig < 0.1)$V3_Gene_Name
+length(sigGenes)
+notsigGenes = dplyr::filter(coldsum, sig > 0.1)$V3_Gene_Name
+length(notsigGenes)
 
-Finally, we can do the Chi-squared test  
-```{r}
-P_vals <- as.data.frame(t(P_values_ind)) 
 
-# Fo other tissues uncomment next line and change tissue name
-#P_vals<- as.data.frame(t(read.table("../output/Selection_on_Expression_of_Cold_Response_Genes/Kern.txt")))
-
-## Chi-squared test 
-run_chi_sq <- function(Cold, P_vals) {
-  chi_pvals <- as.data.frame(matrix(ncol=5,nrow = 1))
-  cont_tables <- list()
-  dat <- Cold %>% 
-    select(Sig)
-  for (i in 1:ncol(chi_pvals)) {
-    x <- P_vals[,i]
-    dat$Pvals <- as.data.frame(x)
-    dat$Cutoff <- FALSE
-    for (j in 1:nrow(dat)) {
-      p <- dat[j,2]
-      if (p  < 0.05) {dat[j,3] <- TRUE }
-      }
-    tbl <- table(dat$Sig, dat$Cutoff)
-    cont_tables[[i]] <- tbl
-    chi <- chisq.test(tbl)
-    chi_pvals[1,i] <- chi$p.value
-  }
-  return(list(cont_tables,chi_pvals))
+##function for running the chisq test on a specific pc/tissue combination
+run_chi_sq <- function(mytissue, sigGenes, notsigGenes, myPC) {
+  quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+  quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
+  sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+  notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+  ##make the chisq table
+  bothsig = nrow(dplyr::filter(sigOver, pval < 0.05))
+  diffexponly = nrow(dplyr::filter(sigOver, pval >= 0.05))
+  selonly = nrow(dplyr::filter(notsigOver, pval < 0.05))
+  nothingsig = nrow(dplyr::filter(notsigOver, pval > 0.05))
+  chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2)
+  chitest = chisq.test(chitbl)
+  return(chisq.test$p.value)
 }
 
-out <- run_chi_sq(Cold,P_vals)
-chi_pvals <- out[[2]]
-colnames(chi_pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
-kable(chi_pvals)
+##run on all PCs and all tissues for the cold genes
+
+
 ```
+
 
 These are the undjusted p-values for our chi-square test for independence between the two categorical variables (Genes under selection and DE cold genes). From the p-value alone we don't know what direction the enrichment is in (Are DE genes more or less likely to be under selection). Below is the results of the chi-square test for the 5 PC's in each of the 9 tissues (Table S3) - this table can be generated my running the code above for each tissue type.  
 

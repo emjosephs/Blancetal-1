@@ -1,0 +1,9 @@
+#A list of the individuals in the expression data files
+
+awk '{print $1}' ../Mean_centered_expression/GRoot.txt > GRoot.txt
+awk '{print $1}' ../Mean_centered_expression/GShoot.txt > GShoot.txt
+awk '{print $1}' ../Mean_centered_expression/LMAD26.txt > LMAD26.txt
+awk '{print $1}' ../Mean_centered_expression/LMAN26.txt > LMAN26.txt
+awk '{print $1}' ../Mean_centered_expression/L3Tip.txt > L3Tip.txt
+awk '{print $1}' ../Mean_centered_expression/L3Base.txt > L3Base.txt
+awk '{print $1}' ../Mean_centered_expression/Kern.txt > Kern.txt
