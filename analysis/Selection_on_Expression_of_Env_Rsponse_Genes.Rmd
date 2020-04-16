@@ -515,4 +515,19 @@ makeplot()
 dev.off()
 ```
 
+Make a supplemental plot for cold tolerance genes for LMAD 26 on PC5
+```{r}
 
+test = make_enrichment_fig('LMAD26', 5, 0.05, coldsigGenes, coldnotsigGenes)
+coldplot = function(){
+bp = barplot(test, ylim=c(0,0.1), col = c("#0072B2","#CC79A7"), border="white", yaxt = "n", ylab = "Proportion under selection", cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c('Cold Response','Other'), cex.axis=1.5)}
+
+coldplot()
+
+postscript("../figures/cold.eps",height=6,width=8,paper="special",horizontal=FALSE,colormodel="cymk", onefile=FALSE)
+coldplot()
+dev.off()
+
+```
