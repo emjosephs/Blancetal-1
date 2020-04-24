@@ -10,6 +10,8 @@ editor_options:
 
 This website contains the code used to do the analysis in the main text of Detecting Local Adaptation in Gene Expression in Maize. Click the link to each section to look at the code used to generate the figures in each section of the paper.   
 
+Detecting selection on expression of individual genes (Figure 1 and Table S1) [link](Identifying_quaint.html)
+
 Population Structure [link](Population_Structure.html)   
 Identifying Selected Genes [link](Identifying_Selected_Genes.html)  
 Selection on Expression of Cold Response Genes [link](Selection_on_Expression_of_Cold_Response_Genes.html)  
