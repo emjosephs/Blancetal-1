@@ -14,10 +14,7 @@ Detecting selection on expression of individual genes (Figure 1 and Table S1) [l
 Selection on expression of coexpression clusters [link](Selection_on_expression_of_coexpreession_clusters.html)  
 Selection on expression of environmental response genes [link](Selection_on_Expression_of_Env_Rsponse_Genes.html)  
 
-Population Structure [link](Population_Structure.html)   
-Identifying Selected Genes [link](Identifying_Selected_Genes.html)  
-Selection on Expression of Cold Response Genes [link](Selection_on_Expression_of_Cold_Response_Genes.html)  
-Selection on Expression of Coexpression Clusters [link](Selection_on_expression_of_coexpreession_clusters.html)  
-Expression Plots [link](Expression_plots.html)  
-
+Suplemental pages:  
+Role of environmetal variance [link](Environmental_variance.html)  
+GO anaylsis [G]
 

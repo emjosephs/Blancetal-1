@@ -1,0 +1,39 @@
+---
+title: "GO_analysis"
+author: "Jennifer Blanc"
+date: "4/24/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(dplyr)
+```
+
+Get correct gene sets 
+```{r, warning=FALSE}
+all_sig <- fread("../output/all_sigenes_annotate.txt")[,-1]
+convert <- fread("~/Documents/Coop_Lab/Maize/New_Clusters/Conversion.txt")
+
+PC5_day <- subset(all_sig, all_sig$PC == "PC5" & all_sig$Tissue == "LMAD26")
+PC5_day_name <- left_join(PC5_day, convert, by=c("Gene_name"= "V3_Gene_Name")) 
+PC5_day_names <- PC5_day_name$V4_Gene_Name
+PC5_day_names <- as.data.frame(PC5_day_names) %>% na.omit()
+
+
+write.table(PC5_day_names ,file = "../output/PC5_day.txt", quote = F, row.names = F)
+```
+
+```{r,warning=FALSE}
+all_day <- as.data.frame(colnames(fread("../data/Mean_centered_expression/LMAD26.txt"))[-1])
+colnames(all_day) <- "Gene_name"
+all_day_name <- left_join(all_day, convert, by=c("Gene_name"= "V3_Gene_Name")) 
+all_day_names <- all_day_name$V4_Gene_Name
+all_day_names <- as.data.frame(all_day_names) %>% na.omit()
+
+write.table(all_day_names ,file = "../output/all_day.txt", quote = F, row.names = F)
+```
+
+Results are in "output/GO_analysis.txt"
+

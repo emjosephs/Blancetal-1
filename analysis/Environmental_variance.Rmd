@@ -1,0 +1,219 @@
+---
+title: "Environmental Variance"
+author: "Jennifer Blanc"
+date: "1/30/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(MASS)
+library(reshape2)
+library(ggplot2)
+library(dplyr)
+library(quaint)
+```
+
+```{r}
+get_cm <- function(Ve) {
+## Kinship Matrix for all LMAD lines 
+myF <- read.table('../data/Kinship_matrices/F_Kern.txt')
+
+## Set Parameters for Simulated data 
+means <- rep(0,nrow(myF))
+Va <- 1 
+Ve <- Ve
+I <- diag(nrow(myF))
+sig <- as.matrix((myF * 2 * Va) + (Ve * I))
+
+## Simulate n number of random draws 
+dat1 <- mvrnorm(n = 500, mu = means, Sigma = sig)
+## Transpose simulated data to get in the correct form 
+df1 <- t(dat1)
+
+## Mean center the data 
+for (i in 1:ncol(df1)){
+  df1[,i] <- scale(df1[,i], scale = FALSE)
+}
+
+## Get Eigen Values and Vectors 
+myE <- eigen(myF)
+E_vectors <- myE$vectors
+E_values <- myE$values
+
+## Make new matrix to collect Z values
+df2 <- data.frame(matrix(ncol=ncol(df1), nrow=nrow(df1)))
+colnames(df2) <- colnames(df1[1:ncol(df1)])
+rownames(df2) <- rownames(df1)
+
+## Calculate Q values by multiplying the mean-centered expression value by each eigen vector 
+for (i in 1:ncol(df2)) {
+  #print(i)
+  mean_centered_data <- t(as.matrix(as.numeric(df1[,i])))
+  for (k in 1:nrow(df2)){
+    u <- as.matrix(as.numeric(E_vectors[,k]))
+    value <- mean_centered_data %*% u
+    df2[k,i] <- value
+  }
+}
+
+
+## Get the square root of the Eigen values   
+de <- data.frame(matrix(nrow = nrow(myF),ncol = 2))
+de$Egien_values <- E_values 
+de$Sqrt_EV <- sqrt((de$Egien_values))
+
+## Calculate C-values by dividing Q values by the square root of the eigen values
+df4 <- data.frame(matrix(ncol=ncol(df2),nrow=nrow(df2)))
+for (i in 1:ncol(df2)){
+  df4[,i] <- (df2[,i] / de$Sqrt_EV)
+}
+
+for (i in 1:ncol(df4)) {
+  df4[,i] <- scale(df4[,i])
+}
+
+cvar_sim <- data.frame(matrix(ncol=1, nrow = nrow(myF)))
+for (i in 1:nrow(myF)) {
+  val <- t(df4[i,])
+  val <- var(val[,1])
+  cvar_sim[i,1] <- val 
+}
+return(cvar_sim)
+}
+```
+
+
+```{r}
+zero <- get_cm(Ve = 0)
+one <- get_cm(Ve = 0.25)
+two <- get_cm(Ve = 0.5)
+
+dat <- cbind(zero, one, two)
+colnames(dat) <- c("zero", "one", "two")
+dat$PC <- seq(from = 1, to= 207, by =1)
+
+dat2 <- dat[1:200,]
+
+dat3 <- melt(dat2, id.vars = "PC")
+
+
+col <- c("darkblue", "darkgreen", "deeppink")
+
+pl1 <- ggplot(dat3, aes(x = PC, y = value, color = variable)) + geom_point(alpha = 0.5) + scale_color_manual(values = col, labels = c("Ve = 0", "Ve = Va/4", "Ve = Va/2")) + theme_classic() +  theme(legend.position=c(0.1,0.85)) + theme(legend.title=element_blank()) + ylab("Var(Cm)") + ggtitle("Variance in Cm: Neutral Simulations") + theme(plot.title = element_text(hjust = 0.5)) + theme(legend.background = element_rect(size=0.5, linetype="solid", fill = "lightgray",
+                                  colour ="black"))
+
+pl1
+```
+
+
+```{r}
+get_cm_real <- function(myTissue){
+  print(myTissue)
+  # Read in mean-centered expression values
+  df1 <- read.table(paste("../data/Mean_centered_expression/",myTissue,".txt",sep=""))
+  geneNames = names(df1)
+  # Read in tissue specific kinship matrix 
+  myF <- read.table(paste('../data/Kinship_matrices/F_',myTissue,'.txt',sep=""))
+
+  ## Get Eigen Values and Vectors 
+  myE <- eigen(myF)
+  E_vectors <- myE$vectors
+  E_values <- myE$values
+
+  ## Testing for selection on first 5 PCs
+  myM = 1:nrow(myF)
+
+  ## Using the last 1/2 of PCs to estimate Va
+  myL = 6:dim(myF)[1]
+
+  # # test for selection on each gene
+  allGeneOutput <- matrix(nrow=nrow(myF), ncol=ncol(df1))
+  for (i in 1:ncol(df1)) {
+    myQpc = calcQpc(myZ = df1[,i], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
+    allGeneOutput[,i] <- myQpc$cm[1,]
+  }
+
+  return(allGeneOutput)
+}
+```
+
+```{r}
+C_kern <- get_cm_real("Kern")
+
+for (i in 1:ncol(C_kern)) {
+  C_kern[,i] <- scale(C_kern[,i])
+}
+
+cvar_kern <- data.frame(matrix(ncol=1, nrow = 207))
+for (i in 1:207) {
+  val <- C_kern[i,]
+  val <- var(val)
+  cvar_kern[i,1] <- val 
+}
+
+plot(cvar_kern[,1])
+```
+
+```{r}
+C_gshoot <- get_cm_real("Gshoot")
+
+for (i in 1:ncol(C_gshoot)) {
+  C_gshoot[,i] <- scale(C_gshoot[,i])
+}
+
+cvar_gshoot <- data.frame(matrix(ncol=1, nrow = 239))
+for (i in 1:239) {
+  val <- C_gshoot[i,]
+  val <- var(val, na.rm = T)
+  cvar_gshoot[i,1] <- val 
+}
+
+plot(cvar_gshoot[,1])
+```
+
+```{r}
+C_groot <- get_cm_real("GRoot")
+
+for (i in 1:ncol(C_groot)) {
+  C_groot[,i] <- scale(C_groot[,i])
+}
+
+cvar_groot <- data.frame(matrix(ncol=1, nrow = 232))
+for (i in 1:232) {
+  val <- C_groot[i,]
+  val <- var(val, na.rm = T)
+  cvar_groot[i,1] <- val 
+}
+
+plot(cvar_groot[,1])
+```
+
+```{r}
+cvar_kern2 <- cvar_kern[1:200,]
+cvar_gshoot2 <- cvar_gshoot[1:200,]
+cvar_groot2 <- cvar_groot[1:200,]
+PC <- seq(1,200)
+data_plot <- cbind(PC, cvar_kern2, cvar_gshoot2, cvar_groot2)
+colnames(data_plot) <- c("PC", "Kern", "GShoot", "GRoot")
+
+
+data_plot2 <- melt(data_plot, id.vars = "PC")
+data_plot2 <- data_plot2[-c(1:200), ]
+
+col <- c("darkblue", "darkgreen", "deeppink")
+
+pl2 <- ggplot(dat = data_plot2, aes(x = Var1, y = value, color = Var2)) + geom_point(alpha = 0.5) +  ylab("Var(Cm)") + ggtitle("Kernel Data") + scale_color_manual(values = col) + theme_classic() + theme(plot.title = element_text(hjust = 0.5))  +  theme(legend.position=c(0.1,0.85)) + theme(legend.title=element_blank()) + ylab("Var(Cm)") + ggtitle("Variance in Cm: Real Data") +  theme(legend.background = element_rect(size=0.5, linetype="solid", fill = "lightgray",colour ="black")) + geom_rect(mapping=aes(xmin=101, xmax=200, ymin=-Inf, ymax=Inf),fill = "lightyellow", inherit.aes= F, alpha = 0.0138)
+pl2
+```
+
+
+
+```{r}
+library(ggpubr)
+pl <- ggarrange(pl1, pl2,  labels = c("A", "B"))
+
+pl
+
+ggsave("../figures/Supplement_Ve.png", pl, width = 13, height = 6)
+```
