@@ -16,5 +16,5 @@ Selection on expression of environmental response genes [link](Selection_on_Expr
 
 Suplemental pages:  
 Role of environmetal variance [link](Environmental_variance.html)  
-GO anaylsis [G]
+GO anaylsis [link](GO_analysis.html)
 
