@@ -5,13 +5,14 @@ date: "2/17/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
 library(dplyr)
 library(knitr)
 library(reshape2)
 library(quaint)
+library(data.table)
 ```
 
 ## Intro  
@@ -98,8 +99,8 @@ run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
   selonly = nrow(dplyr::filter(notsigOver, pval < myp))
   nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
   chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
-  chitest = chisq.test(chitbl, simulate.p.value = TRUE) ##run the test
-  
+  #chitest = chisq.test(chitbl, simulate.p.value = TRUE, B=10000) ##run the test
+  chitest = fisher.test(chitbl)
   return(chitest$p.value)
 }
 
@@ -117,6 +118,11 @@ newresults[t(sigTable[,1:5]) ==0] <- NA
 
 newresults
 ```
+
+```{r}
+#test <- fread("../output/cold-chisq-table.txt")
+```
+
 
 Make bonferroni correction 
 ```{r}
@@ -409,4 +415,14 @@ colnames(df) <- c("Number Sel Genes", "Proportion Down-regulated", "Proportion U
 row.names(df) <- c("Day", "Night")
 kable(df)
 ```
+
+
+```{r, eval=FALSE}
+sig_ind <- fread("../data/siggenes.txt")
+sig_cold <- left_join(sig_ind, coldsum, by = c("V1" = "V3_Gene_Name")) %>% mutate("Cold_Sig" = sig < 0.1) %>% select("V1", "V2", "V3", "V4","V5", "Cold_Sig")
+sig_drought <- left_join(sig_cold, dgmerge, by = c("V1" = "v3_gene_model")) %>% mutate("Drought_down-regulated" = value_1 > value_2 & significant == "yes") %>% mutate("Drought_up-regulated" = value_2 > value_1 & significant == "yes") %>% select("V1", "V2", "V3", "V4", "V5","Cold_Sig", "significant", "Drought_down-regulated", "Drought_up-regulated")
+colnames(sig_drought) <- c("Gene_name", "PC", "P-value", "FDR", "Tissue", "Cold_response", "Drought_response", "Drought_down-regulated","Drought_up-regulated")
+write.csv(sig_drought, "../output/all_sigenes_annotate.csv")
+```
+
 
