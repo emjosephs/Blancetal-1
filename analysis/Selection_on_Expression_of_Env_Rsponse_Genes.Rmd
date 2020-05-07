@@ -101,7 +101,7 @@ run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05, returnt
   chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
   if(returntable==T){return(chitbl)
     }else{
-  chitest = chisq.test(chitbl, simulate.p.value = FALSE) ##run the test
+  chitest = fisher.test(chitbl) ##run the test
   return(chitest$p.value)}
 }
 
