@@ -1,0 +1,31 @@
+
+
+
+
+
+Analysis Type:	PANTHER Overrepresentation Test (Released 20200407)
+Annotation Version and Release Date:	GO Ontology database  Released 2020-02-21
+Analyzed List:	upload_1 (Zea mays)
+Reference List:	all_day.txt (Zea mays)	There are duplicate IDs in the file. The unique set of IDs will be used.
+Test Type:	FISHER
+Correction:	FDR
+GO biological process complete	all_day.txt - REFLIST (7737)	upload_1 (26)	upload_1 (expected)	upload_1 (over/under)	upload_1 (fold Enrichment)	upload_1 (raw P-value)	upload_1 (FDR)
+beta-glucan catabolic process (GO:0051275)	4	2	.01	+	 > 100	1.60E-04	3.41E-02
+cellulose catabolic process (GO:0030245)	4	2	.01	+	 > 100	1.60E-04	3.23E-02
+cellulose metabolic process (GO:0030243)	11	4	.04	+	 > 100	1.32E-07	1.68E-04
+beta-glucan metabolic process (GO:0051273)	15	4	.05	+	79.35	3.70E-07	3.55E-04
+plant-type cell wall organization or biogenesis (GO:0071669)	16	3	.05	+	55.80	3.12E-05	9.19E-03
+plant-type cell wall biogenesis (GO:0009832)	16	3	.05	+	55.80	3.12E-05	8.53E-03
+cell wall biogenesis (GO:0042546)	20	3	.07	+	44.64	5.65E-05	1.44E-02
+cell wall organization or biogenesis (GO:0071554)	29	4	.10	+	41.05	3.79E-06	1.81E-03
+cellular polysaccharide biosynthetic process (GO:0033692)	34	4	.11	+	35.01	6.76E-06	2.87E-03
+cellular polysaccharide metabolic process (GO:0044264)	53	6	.18	+	33.69	3.04E-08	1.16E-04
+glucan biosynthetic process (GO:0009250)	27	3	.09	+	33.06	1.28E-04	2.87E-02
+polysaccharide biosynthetic process (GO:0000271)	37	4	.12	+	32.17	9.21E-06	3.53E-03
+cellular glucan metabolic process (GO:0006073)	47	5	.16	+	31.66	6.55E-07	5.02E-04
+glucan metabolic process (GO:0044042)	48	5	.16	+	31.00	7.22E-07	4.61E-04
+polysaccharide metabolic process (GO:0005976)	62	6	.21	+	28.80	7.24E-08	1.39E-04
+cellular carbohydrate biosynthetic process (GO:0034637)	47	4	.16	+	25.33	2.22E-05	7.09E-03
+carbohydrate biosynthetic process (GO:0016051)	63	4	.21	+	18.89	6.57E-05	1.57E-02
+cellular carbohydrate metabolic process (GO:0044262)	97	6	.33	+	18.41	8.75E-07	4.79E-04
+carbohydrate metabolic process (GO:0005975)	234	7	.79	+	8.90	1.01E-05	3.52E-03
