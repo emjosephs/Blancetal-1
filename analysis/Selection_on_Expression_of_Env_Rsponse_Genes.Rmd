@@ -50,7 +50,7 @@ coldnotsigGenes = dplyr::filter(coldsum, sig > 0.1)$V3_Gene_Name
 length(coldnotsigGenes)
 ```
 
-Before moving onto the chi-squared test, we will first check that the overlaps between cold response genes and selected genes were not due to both datasets being biased towards high expression genes.   
+Before moving onto Fisher's exact test, we will first check that the overlaps between cold response genes and selected genes were not due to both datasets being biased towards high expression genes.   
 ```{r}
 ### are coldsig genes higher expression (in LMAD26) than not sig genes?
 mytissue = 'LMAD26'
@@ -82,11 +82,11 @@ axis(1, at=c(1,2,4,5), lab = c('selection','not selection','cold response','no r
 axis(2,las=2)
 ```
 
-Gene expression of cold-response genes is not higher than expression of genes that don't respond to cold. Now we will conduct a chi-squared test to compare the proportion of genes that show evidence of selection (un-adjusted p value less than 0.05) in cold-response genes compared with other genes.
+Gene expression of cold-response genes is not higher than expression of genes that don't respond to cold. Now we will conduct Fisher's exact test to compare the proportion of genes that show evidence of selection (un-adjusted p value less than 0.05) in cold-response genes compared with other genes.
 
 ```{r, warning=FALSE, message=FALSE}
 ##function for running the chisq test on a specific pc/tissue combination
-run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
+run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05, returntable=F){
   
   quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
   quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC's pvalue
@@ -99,10 +99,12 @@ run_chi_sq <- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05) {
   selonly = nrow(dplyr::filter(notsigOver, pval < myp))
   nothingsig = nrow(dplyr::filter(notsigOver, pval > myp))
   chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
-  #chitest = chisq.test(chitbl, simulate.p.value = TRUE, B=10000) ##run the test
-  chitest = fisher.test(chitbl)
-  return(chitest$p.value)
+  if(returntable==T){return(chitbl)
+    }else{
+  chitest = chisq.test(chitbl, simulate.p.value = FALSE) ##run the test
+  return(chitest$p.value)}
 }
+
 
 ##run on all PCs and all tissues for the cold genes
 myresults = sapply(alltissues, function(mytissue){
@@ -116,17 +118,24 @@ myresults = sapply(alltissues, function(mytissue){
 newresults = myresults
 newresults[t(sigTable[,1:5]) ==0] <- NA
 
-newresults
-```
+### make a table of the data for the supplement
+coldTable = lapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    mytable = run_chi_sq(mytissue, myPC, coldsigGenes, coldnotsigGenes, 0.05, returntable=T)
+    return(data.frame(tissue = mytissue, pc = myPC, bothsig = mytable[1,1], selonly = mytable[2,1], diffexponly = mytable[1,2], nothingsig = mytable[2,2], stringsAsFactors = F))
+    
+    })
+})
 
-```{r}
-#test <- fread("../output/cold-chisq-table.txt")
-```
+coldTableOut = t(do.call(cbind, coldTable))
+write.table(coldTableOut, row.names=F, col.names=T, file = "../data/cold-contingency-table.txt", quote=F)
 
+kable(newresults)
+```
 
 Make bonferroni correction 
 ```{r}
-apply(newresults, 2, method="bonferroni",p.adjust) 
+kable(apply(newresults, 2, method="bonferroni",p.adjust)) 
 ```
 
 The strongest signal for enrichment is for daytime expression in adult leaf tissue along PC5.  
@@ -286,6 +295,9 @@ dresults_high_up = sapply(alltissues, function(mytissue){
   })
 })
 dresults_high_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
+
+droughtTableOut = t(do.call(cbind, coldTable))
+write.table(droughtTableOut, row.names=F, col.names=T, file = "../data/drought-contingency-table.txt", quote=F)
 ```
 
 Here are the results that we reported in the results section of the paper. Specifically we report the bonferroni corrected p-values for PC 5 for the genes down-regulated in response to drought and the absence of significant enrichment in genes upregulated in response to drought on PC 5.  
