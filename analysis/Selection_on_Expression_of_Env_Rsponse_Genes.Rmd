@@ -296,6 +296,17 @@ dresults_high_up = sapply(alltissues, function(mytissue){
 })
 dresults_high_up[t(sigTable[,1:5]) ==0] <- NA #remove thiings with no significant signal of selection
 
+### make a table of the data for the supplement for drought genes
+droughtTable = lapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    mytable = run_chi_sq(mytissue, myPC, dsig_down$v3_gene_model, dnot_high$v3_gene_model, 0.05, returntable=T)
+    return(data.frame(tissue = mytissue, pc = myPC, bothsig = mytable[1,1], selonly = mytable[2,1], diffexponly = mytable[1,2], nothingsig = mytable[2,2], stringsAsFactors = F))
+    
+    })
+})
+
+droughtTableOut = t(do.call(cbind, droughtTable))
+
 droughtTableOut = t(do.call(cbind, coldTable))
 write.table(droughtTableOut, row.names=F, col.names=T, file = "../data/drought-contingency-table.txt", quote=F)
 ```
