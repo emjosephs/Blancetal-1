@@ -1,0 +1,2000 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Jennifer Blanc" />
+
+
+<title>Selection on expression of environmental response genes</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Blancetal</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/jgblanc/Blancetal">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Selection on expression of environmental response genes</h1>
+<h4 class="author">Jennifer Blanc</h4>
+<h4 class="date">2/17/2020</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-05-08
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>Blancetal/analysis/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200217code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200217)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200217code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200217)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree8242d1862fe724d642f4ce6c987d0312ddeecf4ctargetblank8242d18a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jgblanc/Blancetal/tree/8242d1862fe724d642f4ce6c987d0312ddeecf4c" target="_blank">8242d18</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree8242d1862fe724d642f4ce6c987d0312ddeecf4ctargetblank8242d18a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+
+Untracked files:
+    Untracked:  data/cold-contingency-table.txt
+    Untracked:  data/quaint-results.rda
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the R Markdown and HTML files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view them.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/8242d1862fe724d642f4ce6c987d0312ddeecf4c/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">8242d18</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-08
+</td>
+<td>
+fixed drought table
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jgblanc/Blancetal/0f6b00c4cba2f45101ea47a58eedccf7c3228dd3/docs/Selection_on_Expression_of_Env_Rsponse_Genes.html" target="_blank">0f6b00c</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/5141f306e6fc35a225f6865b3cc55616488e9601/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">5141f30</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+added saving contingency table
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jgblanc/Blancetal/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/Selection_on_Expression_of_Env_Rsponse_Genes.html" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/7cd9c7010da7aac424396e52c9d736216b36c235/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">7cd9c70</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+added saving contingency table
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jgblanc/Blancetal/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/Selection_on_Expression_of_Env_Rsponse_Genes.html" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/6478bf298c39b3fe267a29b7da1ad2f3112cc7c1/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">6478bf2</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+<td>
+change to fisher test
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jgblanc/Blancetal/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/Selection_on_Expression_of_Env_Rsponse_Genes.html" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/29bfe0ed687787c029a165cc7b1d9e0e0746ba85/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">29bfe0e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+<td>
+prepping to publish env
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/9c21090f7bbbb834a4c9a69bff3df180ee3b5b1f/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">9c21090</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-16
+</td>
+<td>
+tsuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/2b8f0852a29f05f194f2cc4763e8d9b4df433fdd/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">2b8f085</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-07
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/dbf34fa4f71fa8b8248232e4ba33fbfd968cfb8b/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">dbf34fa</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/a128c454a44e9478ef06a764db54366bf1fc28b9/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">a128c45</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-03
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/b2881a53895cdfd5e3abc627ca9ce8f1f2b98ce9/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">b2881a5</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/d6a523b0dd57e5a7c65e73eb77b50ab02fdb1a35/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">d6a523b</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-02
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/cf43de2aa936d78c781909968dfb3fc465662281/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">cf43de2</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-04-01
+</td>
+<td>
+stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/e0d8afc2bea7461b5eb3acf0301cdeb320b41398/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">e0d8afc</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-25
+</td>
+<td>
+more stuff
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/640b45a58d91ebf04d0ac79b82c655451eb05267/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">640b45a</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-24
+</td>
+<td>
+drought genes
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/02b87d29a08c3c37fa26b2c677c034d16f3f6f75/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">02b87d2</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+stuf
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/682f50edbd4c9ff5d9af98bf003298b0fd4a0444/analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd" target="_blank">682f50e</a>
+</td>
+<td>
+em
+</td>
+<td>
+2020-03-23
+</td>
+<td>
+stuff
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="intro" class="section level2">
+<h2>Intro</h2>
+<p>The goal of this analysis is to determine if genes that have been shown to be differentially expressed in response to cold (Avila et al., 2018) or drought treatment (Forestan et al., 2020) are enriched for genes whose expression is under selection.</p>
+</div>
+<div id="cold-response-genes" class="section level2">
+<h2>Cold Response Genes</h2>
+<p>First, read in the Avila et al. differential expression data and get the names of the genes used in their analysis.</p>
+<pre class="r"><code>cold &lt;- read.csv(&quot;../data/Cold.csv&quot;, header = F, stringsAsFactors = F)
+cold &lt;-cold[,2:19] 
+colnames(cold) &lt;- c(&quot;V3_Gene_Name&quot;,&quot;V4_Gene_Name&quot;,&quot;Arabidopsis_Ortholog&quot;,&quot;Rice_Ortholog&quot;,&quot;Cold_1D_CG60_Means&quot;,&quot;Cold_1D_CG102_Means&quot;,&quot;Control_1D_CG60_Means&quot;,&quot;Control_1D_CG102_Means&quot;,&quot;FDR_1D_Genotype&quot;,&quot;FDR_1D_Treatment&quot;,&quot;FDR_\
+1D_Interaction&quot;,&quot;Cold_4D_CG60_Means&quot;,&quot;Cold_4D_CG102_Means&quot;,&quot;Control_4D_CG60_Means&quot;,&quot;Control_4D_CG102_Means&quot;,&quot;FDR_4D_Genotype&quot;,&quot;FDR_4D_Treatment&quot;,&quot;FDR_4D_Interaction&quot;)
+
+cold_names &lt;- cold$V3_Gene_Name</code></pre>
+<p>Let’s now load our results from using QUAINT to identify selected genes. See the “Detecting selection on expression of individual genes” page for details.</p>
+<pre class="r"><code>alltissues = c(&#39;GRoot&#39;,&quot;Kern&quot;,&quot;LMAD26&quot;,&quot;LMAN26&quot;, &quot;L3Tip&quot;,&quot;GShoot&quot;,&quot;L3Base&quot;)
+load(&#39;../data/quaint-results.rda&#39;)</code></pre>
+<p>The next step is to determine if differentially expressed genes are more likely to be under selection in every PC/Tissue combination. To do this we will use a chi-squared test.</p>
+<p>First, separate genes that are differentially expressed in response to cold treatment and those that aren’t.</p>
+<pre class="r"><code>coldsum &lt;- cold %&gt;% select(V3_Gene_Name, V4_Gene_Name, FDR_1D_Treatment, FDR_4D_Treatment) ## pull out important columns
+
+coldsum$sig = apply(coldsum[,3:4], 1, min, na.rm=T)
+coldsigGenes = dplyr::filter(coldsum, sig &lt; 0.1)$V3_Gene_Name
+length(coldsigGenes)</code></pre>
+<pre><code>[1] 12239</code></pre>
+<pre class="r"><code>coldnotsigGenes = dplyr::filter(coldsum, sig &gt; 0.1)$V3_Gene_Name
+length(coldnotsigGenes)</code></pre>
+<pre><code>[1] 11379</code></pre>
+<p>Before moving onto Fisher’s exact test, we will first check that the overlaps between cold response genes and selected genes were not due to both datasets being biased towards high expression genes.</p>
+<pre class="r"><code>### are coldsig genes higher expression (in LMAD26) than not sig genes?
+mytissue = &#39;LMAD26&#39;
+
+exp = read.table(paste(&#39;../data/Raw_expression/&#39;,mytissue,&#39;.txt&#39;, sep=&#39;&#39;), stringsAsFactors = F)
+exp_means = data.frame(gene = colnames(exp), expr = colMeans(exp), stringsAsFactors = F, row.names=NULL)
+
+quaint_results = alltissueresults[[mytissue]]
+quaint_ps = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[5,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_ps) =c(&#39;gene&#39;,&#39;PC1&#39;,&#39;PC2&#39;,&#39;PC3&#39;,&#39;PC4&#39;,&#39;PC5&#39;)
+quaint_mer = dplyr::inner_join(exp_means, quaint_ps, by = &#39;gene&#39;) #merge with expression data
+
+mydflong = tidyr::gather(quaint_mer, &#39;PC&#39;,&#39;pval&#39;, PC1:PC5)
+
+##compare expression levels of genes that are sig and not sig for selection
+mysig = dplyr::filter(mydflong, pval &lt; 0.05)
+mynot = dplyr::filter(mydflong, pval &gt;= 0.05)
+
+
+## compare expression levels of diff expressed genes
+coldmer = dplyr::inner_join(coldsum, exp_means, by=c(&#39;V3_Gene_Name&#39; = &#39;gene&#39;))
+csig = dplyr::filter(coldmer, sig &lt; 0.1)
+cnot = dplyr::filter(coldmer, sig &gt;=0.1)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5), c(median(mysig$expr), median(mynot$expr), median(csig$expr), median(cnot$expr)),
+     bty=&quot;n&quot;, ylim=c(0,180), xaxt=&quot;n&quot;, yaxt=&quot;n&quot;,ylab = &quot;median expression in leaves&quot;, xlab=&quot;&quot;, xlim = c(0,6))
+axis(1, at=c(1,2,4,5), lab = c(&#39;selection&#39;,&#39;not selection&#39;,&#39;cold response&#39;,&#39;no response&#39;), las=2)
+axis(2,las=2)</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-4-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Gene expression of cold-response genes is not higher than expression of genes that don’t respond to cold. Now we will conduct Fisher’s exact test to compare the proportion of genes that show evidence of selection (un-adjusted p value less than 0.05) in cold-response genes compared with other genes.</p>
+<pre class="r"><code>##function for running the chisq test on a specific pc/tissue combination
+run_chi_sq &lt;- function(mytissue, myPC,sigGenes, notsigGenes, myp = 0.05, returntable=F){
+  
+  quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+  quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC&#39;s pvalue
+  sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+  notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+  
+  ##make the chisq table
+  bothsig = nrow(dplyr::filter(sigOver, pval &lt; myp))
+  diffexponly = nrow(dplyr::filter(sigOver, pval &gt;= myp))
+  selonly = nrow(dplyr::filter(notsigOver, pval &lt; myp))
+  nothingsig = nrow(dplyr::filter(notsigOver, pval &gt; myp))
+  chitbl = matrix(c(bothsig, selonly, diffexponly, nothingsig), nrow=2) ##make the chisq table
+  if(returntable==T){return(chitbl)
+    }else{
+  chitest = fisher.test(chitbl) ##run the test
+  return(chitest$p.value)}
+}
+
+
+##run on all PCs and all tissues for the cold genes
+myresults = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, coldsigGenes, coldnotsigGenes, 0.05)
+  })
+})
+### note that we don&#39;t know what direction this goes in.
+
+##we really just care about combos with significant evidence of selection in at least one gene
+newresults = myresults
+newresults[t(sigTable[,1:5]) ==0] &lt;- NA
+
+### make a table of the data for the supplement
+coldTable = lapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    mytable = run_chi_sq(mytissue, myPC, coldsigGenes, coldnotsigGenes, 0.05, returntable=T)
+    return(data.frame(tissue = mytissue, pc = myPC, bothsig = mytable[1,1], selonly = mytable[2,1], diffexponly = mytable[1,2], nothingsig = mytable[2,2], stringsAsFactors = F))
+    
+    })
+})
+
+coldTableOut = t(do.call(cbind, coldTable))
+write.table(coldTableOut, row.names=F, col.names=T, file = &quot;../data/cold-contingency-table.txt&quot;, quote=F)
+
+kable(newresults)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">GRoot</th>
+<th align="center">Kern</th>
+<th align="center">LMAD26</th>
+<th align="center">LMAN26</th>
+<th align="center">L3Tip</th>
+<th align="center">GShoot</th>
+<th align="center">L3Base</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="center">0.7777273</td>
+<td align="center">0.6994290</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="center">0.7761694</td>
+<td align="center">0.7563795</td>
+<td align="center">NA</td>
+<td align="center">0.7709694</td>
+<td align="center">0.8824207</td>
+<td align="center">0.7851742</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">0.3622327</td>
+<td align="center">1.0000000</td>
+<td align="center">0.0313280</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">0.8169160</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">0.8071866</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="center">0.0043836</td>
+<td align="center">0.0832287</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+<p>Make bonferroni correction</p>
+<pre class="r"><code>kable(apply(newresults, 2, method=&quot;bonferroni&quot;,p.adjust)) </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">GRoot</th>
+<th align="left">Kern</th>
+<th align="center">LMAD26</th>
+<th align="center">LMAN26</th>
+<th align="left">L3Tip</th>
+<th align="center">GShoot</th>
+<th align="left">L3Base</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">1.0000000</td>
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="left">1</td>
+<td align="center">1.0000000</td>
+<td align="center">NA</td>
+<td align="left">1</td>
+<td align="center">0.8824207</td>
+<td align="left">1</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">1</td>
+<td align="center">1.0000000</td>
+<td align="center">0.0939840</td>
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="left">1</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="left">1</td>
+<td align="center">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="left">NA</td>
+<td align="center">0.0175345</td>
+<td align="center">0.2496862</td>
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+<p>The strongest signal for enrichment is for daytime expression in adult leaf tissue along PC5.</p>
+<p>Finally, we will make a Figure S2 for showing the proportion of cold-response genes under selection along PC 5 in adult leaf tissue.</p>
+<pre class="r"><code>make_enrichment_fig &lt;- function(mytissue, myPC, myp, sigGenes, notsigGenes){
+quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC&#39;s pvalue
+sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+##make the chisq table
+bothsig = nrow(dplyr::filter(sigOver, pval &lt; myp))
+diffexponly = nrow(dplyr::filter(sigOver, pval &gt;= myp))
+selonly = nrow(dplyr::filter(notsigOver, pval &lt; myp))
+nothingsig = nrow(dplyr::filter(notsigOver, pval &gt; myp))
+  
+propDiffSel = bothsig/(bothsig+diffexponly)
+propNotDiffSel = selonly/(selonly+nothingsig)
+
+return(c(propDiffSel, propNotDiffSel))
+}
+
+test = make_enrichment_fig(&#39;LMAD26&#39;, 5, 0.05, coldsigGenes, coldnotsigGenes)
+coldplot = function(){
+bp = barplot(test, ylim=c(0,0.1), col = c(&quot;#0072B2&quot;,&quot;#CC79A7&quot;), border=&quot;white&quot;, yaxt = &quot;n&quot;, ylab = &quot;Proportion under selection&quot;, cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp, lab = c(&#39;Cold Response&#39;,&#39;Other&#39;), cex.axis=1.5)}
+coldplot()</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-7-1">
+Past versions of unnamed-chunk-7-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-7-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-7-1.png" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-7-1.png" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-7-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="drought-response-genes" class="section level2">
+<h2>Drought response genes</h2>
+<p>We use drought response genes from Forestan et al. (<a href="https://onlinelibrary-wiley-com.proxy2.cl.msu.edu/doi/full/10.1111/pce.13660" class="uri">https://onlinelibrary-wiley-com.proxy2.cl.msu.edu/doi/full/10.1111/pce.13660</a>) Only looking at NST0 vs WST0 because that shows comparison of expression changes in drought and control. NSTO is control, WSTO is stressed</p>
+<p>First, we will separated the drought response genes from the non drought response genes.</p>
+<pre class="r"><code>droughtgenes = read.csv(&#39;../data/pce13660-supp-0004-supplementalfile3_cuffdiff.csv&#39;, stringsAsFactors = F)
+droughtgenes$v4_gene_model = sapply(droughtgenes$gene_id, function(x){strsplit(x, split=&#39;:&#39;)[[1]][2]}) #make a column for gene names
+
+#convert gene names from v4 to v3
+genemodel = read.csv(&#39;../data/gene_model_xref_v3.csv&#39;, stringsAsFactors = F)[,1:2]
+dgmerge = dplyr::inner_join(droughtgenes, genemodel, by = &quot;v4_gene_model&quot;)
+
+droughtsig = dplyr::filter(dgmerge, q_value &lt; 0.1)$v3_gene_model ##filter out sig genes
+droughtnot = dplyr::filter(dgmerge, q_value &gt; 0.1)$v3_gene_model ##filter out sig genes</code></pre>
+<p>Next, we want to check the overall expression differences between different categories of genes in adult leaf tissue.</p>
+<pre class="r"><code>##comparing overall expression level in the Kremling data between categories (look at LMAD26 for now)
+
+mytissue = &#39;LMAD26&#39;
+
+exp = read.table(paste(&#39;../data/Raw_expression/&#39;,mytissue,&#39;.txt&#39;, sep=&#39;&#39;), stringsAsFactors = F)
+exp_means = data.frame(gene = colnames(exp), expr = colMeans(exp), stringsAsFactors = F, row.names=NULL)
+
+quaint_results = alltissueresults[[mytissue]]
+quaint_ps = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[5,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_ps) =c(&#39;gene&#39;,&#39;PC1&#39;,&#39;PC2&#39;,&#39;PC3&#39;,&#39;PC4&#39;,&#39;PC5&#39;)
+quaint_mer = dplyr::inner_join(exp_means, quaint_ps, by = &#39;gene&#39;) #merge with expression data
+
+mydflong = tidyr::gather(quaint_mer, &#39;PC&#39;,&#39;pval&#39;, PC1:PC5)
+
+##compare expression levels
+mysig = dplyr::filter(mydflong, pval &lt; 0.05)
+mynot = dplyr::filter(mydflong, pval &gt;= 0.05)
+
+## compare expression levels of diff expressed genes
+droughtmer = dplyr::inner_join(dgmerge, exp_means, by=c(&#39;v3_gene_model&#39; = &#39;gene&#39;))
+dsig = dplyr::filter(droughtmer, q_value &lt; 0.1)
+dnot = dplyr::filter(droughtmer, q_value &gt;=0.1)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5), c(median(mysig$expr), median(mynot$expr), median(dsig$expr), median(dnot$expr)),
+     bty=&quot;n&quot;, ylim=c(0,180), xaxt=&quot;n&quot;, yaxt=&quot;n&quot;,ylab = &quot;median expression in leaves&quot;, xlab=&quot;&quot;, xlim = c(0,6))
+axis(1, at=c(1,2,4,5), lab = c(&#39;selection&#39;,&#39;not selection&#39;,&#39;drought response&#39;,&#39;no response&#39;), las=2)
+axis(2,las=2)</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-9-1.png" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-9-1.png" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-9-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The drought response genes have higher expression compared to non-drought response genes. In order to do the chi-squared test we will use the 3500 most highly expressed non-drought genes as our non-drought to the proportion of selected genes to the proportion in drought genes. This will ensure that overlaps between drought response genes and selected genes were not due to both datasets being biased towards high expression genes.</p>
+<pre class="r"><code>## pick the top  expressed genes in dnot 
+dnot_high = dnot[order(-dnot$expr),][1:3500,]
+
+#down regulated genes
+dsig_down = dplyr::filter(dsig, value_1 &gt; value_2)
+dsig_up = dplyr::filter(dsig, value_2 &gt; value_1)
+
+par(mar=c(8,5,2,2))
+plot(c(1,2,4,5,6,7), c(median(mysig$expr), median(mynot$expr), median(dsig$expr), median(dsig_down$expr), median(dnot$expr), median(dnot_high$expr)),
+     bty=&quot;n&quot;, ylim=c(0,180), xaxt=&quot;n&quot;, yaxt=&quot;n&quot;,ylab = &quot;median expression in leaves&quot;, xlab=&quot;&quot;, 
+     xlim = c(0,8)) 
+axis(1, at=c(1,2,4,5,6,7), 
+    lab = c(&#39;selection&#39;,&#39;not selection&#39;,&#39;drought response&#39;,&#39;drought down&#39;,&#39;no response&#39;,&#39;no, high&#39;), las=2)
+axis(2,las=2)</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-10-1.png" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-10-1.png" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-10-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Above we can see that the no response high expression genes now match the median expression of the drought response genes. Below we will make Figure S1 which shows boxplots of expression values across response and non response genes for both drought and cold response genes.</p>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-11-1.png" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-11-1.png" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-11-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Finally we will do the chi-squared test for drought response. We will run 3 separate tests. The first test is using the high expression subsample. The next two are just looking at the drought response genes that are upregulated or downregulated in response to drought separately.</p>
+<pre class="r"><code>###now test for enrichment compared to the high expression sample
+dresults_high = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high[t(sigTable[,1:5]) ==0] &lt;- NA #remove thiings with no significant signal of selection
+
+##just down reg responses
+dresults_high_down = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig_down$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high_down[t(sigTable[,1:5]) ==0] &lt;- NA #remove thiings with no significant signal of selection
+
+##up responses
+dresults_high_up = sapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    run_chi_sq(mytissue, myPC, dsig_up$v3_gene_model, dnot_high$v3_gene_model, 0.05)
+  })
+})
+dresults_high_up[t(sigTable[,1:5]) ==0] &lt;- NA #remove thiings with no significant signal of selection
+
+### make a table of the data for the supplement for drought genes
+droughtTable = lapply(alltissues, function(mytissue){
+  sapply(1:5,function(myPC){
+    mytable = run_chi_sq(mytissue, myPC, dsig_down$v3_gene_model, dnot_high$v3_gene_model, 0.05, returntable=T)
+    return(data.frame(tissue = mytissue, pc = myPC, bothsig = mytable[1,1], selonly = mytable[2,1], diffexponly = mytable[1,2], nothingsig = mytable[2,2], stringsAsFactors = F))
+    
+    })
+})
+
+droughtTableOut = t(do.call(cbind, droughtTable))
+
+droughtTableOut = t(do.call(cbind, coldTable))
+write.table(droughtTableOut, row.names=F, col.names=T, file = &quot;../data/drought-contingency-table.txt&quot;, quote=F)</code></pre>
+<p>Here are the results that we reported in the results section of the paper. Specifically we report the bonferroni corrected p-values for PC 5 for the genes down-regulated in response to drought and the absence of significant enrichment in genes upregulated in response to drought on PC 5.</p>
+<pre class="r"><code>kable(apply(dresults_high_down, 2, method=&quot;bonferroni&quot;,p.adjust)) </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">GRoot</th>
+<th align="center">Kern</th>
+<th align="center">LMAD26</th>
+<th align="center">LMAN26</th>
+<th align="center">L3Tip</th>
+<th align="center">GShoot</th>
+<th align="center">L3Base</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="center">0.7933238</td>
+<td align="center">0.2495644</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">0.1264809</td>
+<td align="center">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">0.6962722</td>
+<td align="center">0.0676011</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">1.0000000</td>
+<td align="center">1.0000000</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">1.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="center">0.0683568</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">0.9012942</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="center">0.0009667</td>
+<td align="center">0.0000326</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>kable(apply(dresults_high_up, 2, method=&quot;bonferroni&quot;,p.adjust)) </code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">GRoot</th>
+<th align="center">Kern</th>
+<th align="center">LMAD26</th>
+<th align="center">LMAN26</th>
+<th align="center">L3Tip</th>
+<th align="center">GShoot</th>
+<th align="center">L3Base</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">1.0000000</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">1.0000000</td>
+<td align="center">NA</td>
+<td align="center">0.8676325</td>
+<td align="center">0.1813478</td>
+<td align="center">0.970032</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">0.1540548</td>
+<td align="center">0.4154579</td>
+<td align="center">1.0000000</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">1.000000</td>
+</tr>
+<tr class="even">
+<td align="left">NA</td>
+<td align="center">0.3733326</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">0.6107358</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">NA</td>
+<td align="center">NA</td>
+<td align="center">1.0000000</td>
+<td align="center">0.2312074</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+<td align="center">NA</td>
+</tr>
+</tbody>
+</table>
+<p>Finally we report that of the 69 genes that are selected and down regulated in response to drought, for 43 of them the slope of the relationship between PC 5 and gene expression was positive.</p>
+<pre class="r"><code>##pull out qm for genes that show selection in LMAD26 and LMAN26 along PC 5.
+mytissue = &#39;LMAD26&#39;
+quaint_results = alltissueresults[[mytissue]]
+quaint_cms = data.frame(gene = unlist(quaint_results[1,]),matrix(unlist(quaint_results[2,]), ncol=5, byrow=T), stringsAsFactors = F)
+names(quaint_cms) = c(&#39;gene&#39;,&#39;PC1&#39;,&#39;PC2&#39;,&#39;PC3&#39;,&#39;PC4&#39;,&#39;PC5&#39;)
+mycms_long = tidyr::gather(quaint_cms, &#39;PC&#39;,&#39;Cm&#39;, PC1:PC5) ##gather into a long data frame
+mypcm_long = dplyr::inner_join(mycms_long, mydflong)##merge with pvalues</code></pre>
+<pre><code>Joining, by = c(&quot;gene&quot;, &quot;PC&quot;)</code></pre>
+<pre class="r"><code>mysig05 = dplyr::filter(mypcm_long, pval &lt; 0.05 &amp; PC == &#39;PC5&#39;) ##look at sig along PC5
+
+## look at cms in the overlap with drought down regulation genes
+mysigdown = dplyr::filter(mysig05, gene %in% dsig_down$v3_gene_model)
+
+
+## number with positive slopes 
+nrow(dplyr::filter(mysigdown, Cm &gt; 0))</code></pre>
+<pre><code>[1] 43</code></pre>
+<p>As a sanity check let’s plot PC 5 vs expression for some of the 43 genes and make sure they have a postive slope.</p>
+<pre class="r"><code>###make a plot of what&#39;s on PC5 (and to sanity check)
+mygene = &#39;GRMZM2G351977&#39;
+mytissue = &#39;LMAD26&#39;
+#get gene index for kernel
+lmad26genes = unlist(alltissueresults[[3]][1,])
+myindex = match(mygene, lmad26genes)
+
+#make a plot
+explot = makeGenePlot(&#39;LMAD26&#39;,myindex, 5)
+explot</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-16-1.png" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-16-1.png" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-16-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now let’s make Figure 2 showing the proportion of genes under selection for down and upregulated drought genes.</p>
+<pre class="r"><code>get_enrichment &lt;- function(mytissue, myPC, myp, sigGenes, notsigGenes){
+  
+quaint_results = alltissueresults[[mytissue]] ##pull out tissue specific genes
+quaint_results_pc = data.frame(mygene = unlist(quaint_results[1,]), pval = unlist(lapply(quaint_results[5,], function(x){x[myPC]})), stringsAsFactors = F)  ## just need a table for the specific PC&#39;s pvalue
+sigOver = dplyr::filter(quaint_results_pc, mygene %in% sigGenes)
+notsigOver = dplyr::filter(quaint_results_pc, mygene %in% notsigGenes)
+##make the chisq table
+bothsig = nrow(dplyr::filter(sigOver, pval &lt; myp))
+diffexponly = nrow(dplyr::filter(sigOver, pval &gt;= myp))
+selonly = nrow(dplyr::filter(notsigOver, pval &lt; myp))
+nothingsig = nrow(dplyr::filter(notsigOver, pval &gt; myp))
+return(c(bothsig, bothsig/diffexponly, selonly/nothingsig))
+}
+
+sigcounts_down = sapply(alltissues, function(mytissue){
+  lapply(1:5,function(myPC){
+    get_enrichment(mytissue, myPC, 0.05,dsig_down$v3_gene_model, dnot_high$v3_gene_model)
+  })
+})
+
+sigcounts_up = sapply(alltissues, function(mytissue){
+  lapply(1:5,function(myPC){
+    get_enrichment(mytissue, myPC, 0.05,dsig_up$v3_gene_model, dnot_high$v3_gene_model)
+  })
+})
+
+makeplot = function(x){myplot = c(sigcounts_down[5,3][[1]][2], sigcounts_down[5,4][[1]][2], sigcounts_up[5,3][[1]][2], sigcounts_up[5,4][[1]][2], sigcounts_down[5,3][[1]][3], sigcounts_down[5,4][[1]][3])
+bp = barplot(myplot, ylim=c(0,0.2), col = c(&quot;#E69F00&quot;, &quot;#0072B2&quot;), border=&quot;white&quot;, yaxt = &quot;n&quot;, ylab = &quot;Proportion under selection&quot;, cex.lab=1.5)
+axis(2, las=2)
+axis(1, at = bp[c(1,3,5),]+0.6, lab = c(&#39;Down&#39;,&#39;Up&#39;,&#39;No change&#39;), cex.axis=1.5)
+legend(&#39;topright&#39;, c(&#39;Day&#39;,&#39;Night&#39;), bty=&quot;n&quot;, fill = c(&quot;#E69F00&quot;, &quot;#0072B2&quot;), border=&quot;white&quot;, cex=1.5)}
+
+makeplot()</code></pre>
+<p><img src="figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/1dfde4ef8ac90cf32d1e1871e1dacc91e6c1f1a1/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-17-1.png" target="_blank">1dfde4e</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/feb6b89702f03cc77cb32b7c763a59b7b07e6aee/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-17-1.png" target="_blank">feb6b89</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-05-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/409888bc8ff7c399f3ad28c16b6a5edfecc27cb0/docs/figure/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd/unnamed-chunk-17-1.png" target="_blank">409888b</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>We can also generate a table showing the number of significant drought response, the percent down-regulated and the percent up-regulated for both day and night.</p>
+<pre class="r"><code>df &lt;- rbind(unlist(sigcounts_down[5,3]), unlist(sigcounts_down[5,4]))
+colnames(df) &lt;- c(&quot;Number Sel Genes&quot;, &quot;Proportion Down-regulated&quot;, &quot;Proportion Up-regulated&quot;)
+row.names(df) &lt;- c(&quot;Day&quot;, &quot;Night&quot;)
+kable(df)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">N</th>
+<th>umber Sel Genes P</th>
+<th>roportion Down-regulated P</th>
+<th align="left">roportion Up-regulated</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">Day</td>
+<td>69</td>
+<td>0.1405295</td>
+<td align="left">0.0812732</td>
+</tr>
+<tr class="even">
+<td align="right">Night</td>
+<td>58</td>
+<td>0.1428571</td>
+<td align="left">0.0680041</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>sig_ind &lt;- fread(&quot;../data/siggenes.txt&quot;)
+sig_cold &lt;- left_join(sig_ind, coldsum, by = c(&quot;V1&quot; = &quot;V3_Gene_Name&quot;)) %&gt;% mutate(&quot;Cold_Sig&quot; = sig &lt; 0.1) %&gt;% select(&quot;V1&quot;, &quot;V2&quot;, &quot;V3&quot;, &quot;V4&quot;,&quot;V5&quot;, &quot;Cold_Sig&quot;)
+sig_drought &lt;- left_join(sig_cold, dgmerge, by = c(&quot;V1&quot; = &quot;v3_gene_model&quot;)) %&gt;% mutate(&quot;Drought_down-regulated&quot; = value_1 &gt; value_2 &amp; significant == &quot;yes&quot;) %&gt;% mutate(&quot;Drought_up-regulated&quot; = value_2 &gt; value_1 &amp; significant == &quot;yes&quot;) %&gt;% select(&quot;V1&quot;, &quot;V2&quot;, &quot;V3&quot;, &quot;V4&quot;, &quot;V5&quot;,&quot;Cold_Sig&quot;, &quot;significant&quot;, &quot;Drought_down-regulated&quot;, &quot;Drought_up-regulated&quot;)
+colnames(sig_drought) &lt;- c(&quot;Gene_name&quot;, &quot;PC&quot;, &quot;P-value&quot;, &quot;FDR&quot;, &quot;Tissue&quot;, &quot;Cold_response&quot;, &quot;Drought_response&quot;, &quot;Drought_down-regulated&quot;,&quot;Drought_up-regulated&quot;)
+write.csv(sig_drought, &quot;../output/all_sigenes_annotate.csv&quot;)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.2 (2019-12-12)
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+Running under: macOS High Sierra 10.13.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] data.table_1.12.8 quaint_0.0.0.9000 reshape2_1.4.3    knitr_1.28       
+[5] dplyr_0.8.4       ggplot2_3.2.1     workflowr_1.6.0  
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.3       highr_0.8        plyr_1.8.5       compiler_3.6.2  
+ [5] pillar_1.4.3     later_1.0.0      git2r_0.26.1     tools_3.6.2     
+ [9] digest_0.6.25    evaluate_0.14    lifecycle_0.1.0  tibble_2.1.3    
+[13] gtable_0.3.0     pkgconfig_2.0.3  rlang_0.4.4      yaml_2.2.1      
+[17] xfun_0.12        withr_2.1.2      stringr_1.4.0    vctrs_0.2.3     
+[21] fs_1.3.1         rprojroot_1.3-2  grid_3.6.2       tidyselect_1.0.0
+[25] glue_1.3.1       R6_2.4.1         rmarkdown_2.1    farver_2.0.3    
+[29] tidyr_1.0.2      purrr_0.3.3      magrittr_1.5     whisker_0.4     
+[33] ellipsis_0.3.0   backports_1.1.5  scales_1.1.0     promises_1.1.0  
+[37] htmltools_0.4.0  assertthat_0.2.1 colorspace_1.4-1 httpuv_1.5.2    
+[41] labeling_0.3     stringi_1.4.6    lazyeval_0.2.2   munsell_0.5.0   
+[45] crayon_1.3.4    </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
