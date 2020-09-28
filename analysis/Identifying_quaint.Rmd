@@ -42,6 +42,7 @@ myM = 1:5
 ## Using the last 1/2 of PCs to estimate Va
 myL = 6:dim(myF)[1]
 
+
 ## test for selection on each gene
 allGeneOutput <- sapply(1:ncol(df1), function(x){
 myQpc = calcQpc(myZ = df1[,x], myU = E_vectors, myLambdas = E_values, myL = myL, myM = myM)
@@ -58,6 +59,41 @@ Now we will run the test for selection on all of our tissue types.
 alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
 alltissueresults = lapply(alltissues, testAllGenes)
 names(alltissueresults) <- alltissues
+```
+
+First let's look at the number of genes with a raw p-value < 0.05.  
+```{r}
+##look at sig results
+sigresults = lapply(1:length(alltissues), function(i){
+# extract the pvalues
+pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+
+## how many are significant?
+numsig <- apply(pvals, 2, function(x){sum(x<0.05)})
+numsig
+})
+
+###make a big image of how many sig results we have
+sigTable_raw = as.data.frame(matrix(unlist(sigresults), ncol=5, byrow=T))
+names(sigTable_raw) = c('PC1','PC2','PC3','PC4','PC5')
+sigTable_raw$nicename = c('Germinating root', 'Kernel','Adult Leaf Day', 'Adult Leaf Night', '3rd leaf tip', 'Germinating shoot','3rd leaf base')
+sigTable_raw
+```
+
+We can get the names of all the genes with p-value < 0.05 in at least 1 pc/tissue combination. Here we have 4932 unique genes.    
+```{r}
+# Get names of genes w/ p-value < 0.05 
+siggenes = unlist(lapply(1:length(alltissues), function(i){
+# extract the pvalues
+pvals = matrix(unlist(alltissueresults[[i]][5,]), ncol=5, byrow=TRUE) #each row corresponds to a gene, columns are to PCs
+pdf = as.data.frame(pvals)
+pdf = pdf %>% mutate(sig = ifelse(V1 <= 0.05 | V2 <= 0.05 | V3 <= 0.05 | V4 <= 0.05 | V5 <= 0.05, T, F))
+pdf$genes = unlist(alltissueresults[[i]][1,])
+return(dplyr::filter(pdf, sig==T)$genes)
+}))
+unique_sig <- unique(siggenes) ##number of unique genes
+length(unique_sig)
+#write.table(unique_sig,"../output/names_0.05_all.txt", row.names = F, quote = F)
 ```
 
 Now lets look at the number of gene with FDR < 0.01 for each tissue
@@ -91,7 +127,7 @@ sigLong = tidyr::gather(sigTable, 'variable','value', -nicename)
 sigLong[sigLong == 0] <- NA
 
 ###save output for other analyses
-save(alltissueresults, sigTable, sigLong, file = "../data/quaint-results.rda")
+#save(alltissueresults, sigTable, sigLong, file = "../data/quaint-results.rda")
 ```
 
 We can also check how many of our significant genes are unique. Here 60 of 66 significant genes are unqiue to their tissue/PC combination.  
@@ -202,6 +238,53 @@ final <- ggarrange(pl,
 final
 ```
 
+Plot the p-value histrogram for all tissue/PC combinations 
+```{r}
+pvals = matrix(unlist(alltissueresults[[1]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+df <- melt(pvals)
+df$tissue <- "Germinating Root"
 
+pvals = matrix(unlist(alltissueresults[[2]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+dat <- melt(pvals)
+dat$tissue <- "Kernel"
+df <- rbind(df, dat)
+
+pvals = matrix(unlist(alltissueresults[[3]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+dat <- melt(pvals)
+dat$tissue <- "Adult Leaf Day"
+df <- rbind(df, dat)
+
+pvals = matrix(unlist(alltissueresults[[4]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+dat <- melt(pvals)
+dat$tissue <- "Adult Leaf Night"
+df <- rbind(df, dat)
+
+pvals = matrix(unlist(alltissueresults[[5]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+dat <- melt(pvals)
+dat$tissue <- "3rd Leaf Tip"
+df <- rbind(df, dat)
+
+pvals = matrix(unlist(alltissueresults[[6]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+dat <- melt(pvals)
+dat$tissue <- "Germinating Shoot"
+df <- rbind(df, dat)
+
+pvals = matrix(unlist(alltissueresults[[7]][5,]), ncol=5, byrow=TRUE)
+colnames(pvals) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+dat <- melt(pvals)
+dat$tissue <- "3rd Leaf Night"
+df <- rbind(df, dat)
+
+pl <- ggplot(data = df, aes(x=value, fill = tissue)) + geom_histogram(bins = 25) + facet_grid(Var2 ~ tissue)  + theme_bw() +  xlim(c(0,1)) + xlab("p-value") + ylab("Number of Genes") + 
+  scale_fill_manual(values=c('#E69F00', '#56B4E9', "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")) + theme(legend.position = "none", axis.text.x =element_text(size = 6), strip.text.x =  element_text(size = 7))
+
+#ggsave("~/Blancetal/figures/phist.png",pl, width = 10, height = 10)
+```
 
 
