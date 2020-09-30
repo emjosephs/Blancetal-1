@@ -11,6 +11,9 @@ library(reshape2)
 library(ggplot2)
 library(ggpubr)
 library(quaint)
+library(dplyr)
+library(data.table)
+library(knitr)
 ```
 
 
@@ -32,6 +35,8 @@ modules  <- modules[,num_genes_100]
 We now have 51 modules that have at least 100 genes. We will now get the median expression of all the genes that are present in our RNAseq dataset for each module and then test for selection on the median values in each cluster. The code below is similar code used to identify selected genes, we are simply conducting the test on median expression values in each line instead of a single gene expression in each line. Again we test for selection on the first 5 PCs and use the last half of PCs to estimate $V_a$. Th function will return the p-values from the $Q_{pc}$ test for all tissues.      
 
 ```{r}
+cluster_analysis_func <- function(modules) {
+
 alltissues = c('GRoot',"Kern","LMAD26","LMAN26", "L3Tip","GShoot","L3Base")
 
 alltissuemodules = lapply(alltissues, function(mytissue){
@@ -74,17 +79,143 @@ mydflong = tidyr::gather(mydf, 'PC','pval', PC1:PC5)
 mydflong$tissue = mytissue
 return(mydflong)})
 
+return(alltissuemodules)
+}
+
 ```
  
 We have the p-values, let's calculate the FDR and look for significant p-values. 
 ```{r}
+alltissuemodules = cluster_analysis_func(modules)
+
 #combine all into one list
 bigdf <- do.call('rbind', alltissuemodules)
 
 bigdf$fdr <- p.adjust(bigdf$pval, method='fdr') ##calculate an FDR
 summary(bigdf$fdr) ##nothing is significant
 
-bigdf[which.min(bigdf[,3]),]
+kable(bigdf[which.min(bigdf[,3]),])
 ```
 
-There is no significant selection on coexpression clusters. The lowest FDR is for the "RNA Root Meristem" cluster in adult leaf tissue on PC 5.   
+There is no significant selection on coexpression clusters. The lowest FDR is for the "RNA Root Meristem" cluster in adult leaf tissue on PC 5. We can also look at the clusters with with lowest bonferroni corrected p-values    
+
+```{r}
+t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, method='bonferroni')) %>% arrange(bonferroni)
+kable(head(t))
+```
+
+## Clusters from Schaefer et al. 
+
+ZmRoot Clusters - get clustes with >= 100 genes 
+```{r}
+clusters <- fread("../data/schaefer_clusters.csv")
+clusters <- clusters[,1:4]
+
+dat <- clusters %>% group_by(ZmRoot) %>% mutate(num_genes = n()) %>% filter(num_genes >= 100)
+names <- unique(dat$ZmRoot)
+
+gene_list <- list()
+max <- nrow(dat[dat$ZmRoot == 1,])
+for(i in 1:length(names)) {
+  df <- clusters %>% filter(ZmRoot == names[i])
+  genes <- c(df$V1, rep(NA, max-nrow(df)))
+  gene_list[[i]] <- genes
+}
+
+modules <- do.call(cbind, gene_list)
+```
+
+Run analysis and FDR correction
+```{r}
+alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
+bigdf <- do.call('rbind', alltissuemodules)
+
+bigdf$fdr <- p.adjust(bigdf$pval, method='fdr') ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant
+
+kable(bigdf[which.min(bigdf[,3]),])
+```
+
+Look at lowest p-value clusters 
+```{r}
+t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, method='bonferroni')) %>% arrange(bonferroni)
+kable(head(t))
+```
+
+ZmSAM Clusters - get clustes with >= 100 genes 
+```{r}
+dat <- clusters %>% group_by(ZmSAM) %>% mutate(num_genes = n()) %>% filter(num_genes >= 100)
+names <- unique(dat$ZmSAM)
+
+gene_list <- list()
+max <- nrow(dat[dat$ZmSAM == 0,])
+for(i in 1:length(names)) {
+  df <- clusters %>% filter(ZmSAM == names[i])
+  genes <- c(df$V1, rep(NA, max-nrow(df)))
+  gene_list[[i]] <- genes
+}
+
+modules <- do.call(cbind, gene_list)
+```
+
+Run analysis and FDR correction
+```{r}
+alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
+bigdf <- do.call('rbind', alltissuemodules)
+
+bigdf$fdr <- p.adjust(bigdf$pval, method='fdr') ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant
+
+kable(bigdf[which.min(bigdf[,3]),])
+```
+
+Look at lowest p-value clusters 
+```{r}
+t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, method='bonferroni')) %>% arrange(bonferroni)
+kable(head(t))
+```
+
+
+ZmPAN Clusters - get clustes with >= 100 genes 
+```{r}
+dat <- clusters %>% group_by(ZmPAN) %>% mutate(num_genes = n()) %>% filter(num_genes >= 100)
+names <- unique(dat$ZmPAN)
+
+gene_list <- list()
+max <- nrow(dat[dat$ZmPAN == 0,])
+for(i in 1:length(names)) {
+  df <- clusters %>% filter(ZmPAN == names[i])
+  genes <- c(df$V1, rep(NA, max-nrow(df)))
+  gene_list[[i]] <- genes
+}
+
+modules <- do.call(cbind, gene_list)
+```
+
+Run analysis and FDR correction
+```{r}
+alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
+bigdf <- do.call('rbind', alltissuemodules)
+
+bigdf$fdr <- p.adjust(bigdf$pval, method='fdr') ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant
+
+kable(bigdf[which.min(bigdf[,3]),])
+```
+
+Look at lowest p-value clusters 
+```{r}
+t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, method='bonferroni')) %>% arrange(bonferroni)
+kable(head(t))
+```
+
+
+
+
+
