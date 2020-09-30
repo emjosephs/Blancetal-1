@@ -29,6 +29,14 @@
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
   pre:not([class]) {
@@ -373,13 +381,6 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<!-- Add a small amount of space between sections. -->
-<style type="text/css">
-div.section {
-  padding-top: 12px;
-}
-</style>
-
 <div class="fluid-row" id="header">
 
 
@@ -411,7 +412,7 @@ div.section {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-04-24
+<strong>Last updated:</strong> 2020-09-30
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -421,7 +422,7 @@ div.section {
 </p>
 <p>
 This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -502,34 +503,37 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree69c5a296f43b756db20e5b6ff4bbfa95cebaa930targetblank69c5a29a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jgblanc/Blancetal/tree/69c5a296f43b756db20e5b6ff4bbfa95cebaa930" target="_blank">69c5a29</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree3294a81f9ac4df07e1236449b04b827bf1d80077targetblank3294a81a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jgblanc/Blancetal/tree/3294a81f9ac4df07e1236449b04b827bf1d80077" target="_blank">3294a81</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree69c5a296f43b756db20e5b6ff4bbfa95cebaa930targetblank69c5a29a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree3294a81f9ac4df07e1236449b04b827bf1d80077targetblank3294a81a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
-Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/jgblanc/Blancetal/tree/3294a81f9ac4df07e1236449b04b827bf1d80077" target="_blank">3294a81</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 </p>
 <pre><code>
 Ignored files:
     Ignored:    .DS_Store
-    Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    data/.DS_Store
-    Ignored:    data/df_STAR_HTSeq_counts_B73_match_based_on_genet_dist_DESeq2_normed_rounded.txt
+    Ignored:    data/quaint-results.rda
     Ignored:    output/.DS_Store
-    Ignored:    output/Identifying_Selected_Genes/.DS_Store
-    Ignored:    output/Selection_on_Expression_of_Cold_Response_Genes/.DS_Store
-    Ignored:    output/Selection_on_expression_of_coexpression_clusters/.DS_Store
 
 Untracked files:
-    Untracked:  analysis/scratch.Rmd
-    Untracked:  data/quaint-results.rda
+    Untracked:  data/schaefer_clusters.csv~
+    Untracked:  figures/Supplement_Ve.png
+    Untracked:  figures/phist.png
 
 Unstaged changes:
-    Modified:   analysis/Drought-genes.Rmd
-    Modified:   analysis/Expression_plots.Rmd
+    Modified:   analysis/Environmental_variance.Rmd
+    Modified:   analysis/Selection_on_Expression_of_Env_Rsponse_Genes.Rmd
 
 </code></pre>
 <p>
@@ -544,7 +548,7 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <div id="versions" class="tab-pane fade">
 
 <p>
-These are the previous versions of the R Markdown and HTML files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view them.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/Selection_on_expression_of_coexpreession_clusters.Rmd</code>) and HTML (<code>docs/Selection_on_expression_of_coexpreession_clusters.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -568,6 +572,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/3294a81f9ac4df07e1236449b04b827bf1d80077/analysis/Selection_on_expression_of_coexpreession_clusters.Rmd" target="_blank">3294a81</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-09-30
+</td>
+<td>
+new clusters
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jgblanc/Blancetal/9ede1d414a3847f17a17fcb9d80d2498d3638f7d/docs/Selection_on_expression_of_coexpreession_clusters.html" target="_blank">9ede1d4</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-04-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -740,7 +778,9 @@ num_genes &lt;- apply(modules, 2, function(x) length(which(!is.na(x))))
 num_genes_100 &lt;- which(num_genes &gt;= 100)
 modules  &lt;- modules[,num_genes_100]</code></pre>
 <p>We now have 51 modules that have at least 100 genes. We will now get the median expression of all the genes that are present in our RNAseq dataset for each module and then test for selection on the median values in each cluster. The code below is similar code used to identify selected genes, we are simply conducting the test on median expression values in each line instead of a single gene expression in each line. Again we test for selection on the first 5 PCs and use the last half of PCs to estimate <span class="math inline">\(V_a\)</span>. Th function will return the p-values from the <span class="math inline">\(Q_{pc}\)</span> test for all tissues.</p>
-<pre class="r"><code>alltissues = c(&#39;GRoot&#39;,&quot;Kern&quot;,&quot;LMAD26&quot;,&quot;LMAN26&quot;, &quot;L3Tip&quot;,&quot;GShoot&quot;,&quot;L3Base&quot;)
+<pre class="r"><code>cluster_analysis_func &lt;- function(modules) {
+
+alltissues = c(&#39;GRoot&#39;,&quot;Kern&quot;,&quot;LMAD26&quot;,&quot;LMAN26&quot;, &quot;L3Tip&quot;,&quot;GShoot&quot;,&quot;L3Base&quot;)
 
 alltissuemodules = lapply(alltissues, function(mytissue){
   
@@ -780,19 +820,447 @@ mydf$module = row.names(mydf)
 row.names(mydf) &lt;- NULL
 mydflong = tidyr::gather(mydf, &#39;PC&#39;,&#39;pval&#39;, PC1:PC5)
 mydflong$tissue = mytissue
-return(mydflong)})</code></pre>
+return(mydflong)})
+
+return(alltissuemodules)
+}</code></pre>
 <p>We have the p-values, let’s calculate the FDR and look for significant p-values.</p>
-<pre class="r"><code>#combine all into one list
+<pre class="r"><code>alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
 bigdf &lt;- do.call(&#39;rbind&#39;, alltissuemodules)
 
 bigdf$fdr &lt;- p.adjust(bigdf$pval, method=&#39;fdr&#39;) ##calculate an FDR
 summary(bigdf$fdr) ##nothing is significant</code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
  0.4299  0.9996  0.9996  0.9990  0.9996  0.9996 </code></pre>
-<pre class="r"><code>bigdf[which.min(bigdf[,3]),]</code></pre>
-<pre><code>               module  PC         pval tissue       fdr
-732 RNA_Root_Meristem PC5 0.0002408568 LMAD26 0.4299294</code></pre>
-<p>There is no significant selection on coexpression clusters. The lowest FDR is for the “RNA Root Meristem” cluster in adult leaf tissue on PC 5.</p>
+<pre class="r"><code>kable(bigdf[which.min(bigdf[,3]),])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">732</td>
+<td align="left">RNA_Root_Meristem</td>
+<td align="left">PC5</td>
+<td align="right">0.0002409</td>
+<td align="left">LMAD26</td>
+<td align="right">0.4299294</td>
+</tr>
+</tbody>
+</table>
+<p>There is no significant selection on coexpression clusters. The lowest FDR is for the “RNA Root Meristem” cluster in adult leaf tissue on PC 5. We can also look at the clusters with with lowest bonferroni corrected p-values</p>
+<pre class="r"><code>t &lt;- bigdf %&gt;% group_by(PC, tissue) %&gt;% mutate(bonferroni = p.adjust(pval, method=&#39;bonferroni&#39;)) %&gt;% arrange(bonferroni)
+kable(head(t))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+<th align="right">bonferroni</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">RNA_Root_Meristem</td>
+<td align="left">PC5</td>
+<td align="right">0.0002409</td>
+<td align="left">LMAD26</td>
+<td align="right">0.4299294</td>
+<td align="right">0.0122837</td>
+</tr>
+<tr class="even">
+<td align="left">RNA_FemaleSpikIt_._VegMeristem</td>
+<td align="left">PC1</td>
+<td align="right">0.0012924</td>
+<td align="left">Kern</td>
+<td align="right">0.7985099</td>
+<td align="right">0.0659101</td>
+</tr>
+<tr class="odd">
+<td align="left">Protein_Germinating_Kernals</td>
+<td align="left">PC1</td>
+<td align="right">0.0017164</td>
+<td align="left">Kern</td>
+<td align="right">0.7985099</td>
+<td align="right">0.0875356</td>
+</tr>
+<tr class="even">
+<td align="left">RNA_Root_Cortex_2</td>
+<td align="left">PC1</td>
+<td align="right">0.0017894</td>
+<td align="left">Kern</td>
+<td align="right">0.7985099</td>
+<td align="right">0.0912583</td>
+</tr>
+<tr class="odd">
+<td align="left">Protein_EndoCrown.PericarpAl</td>
+<td align="left">PC1</td>
+<td align="right">0.0039731</td>
+<td align="left">Kern</td>
+<td align="right">0.9996316</td>
+<td align="right">0.2026281</td>
+</tr>
+<tr class="even">
+<td align="left">RNA_Root_Cortex</td>
+<td align="left">PC1</td>
+<td align="right">0.0053132</td>
+<td align="left">Kern</td>
+<td align="right">0.9996316</td>
+<td align="right">0.2709719</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="clusters-from-schaefer-et-al." class="section level2">
+<h2>Clusters from Schaefer et al.</h2>
+<p>ZmRoot Clusters - get clustes with &gt;= 100 genes</p>
+<pre class="r"><code>clusters &lt;- fread(&quot;../data/schaefer_clusters.csv&quot;)
+clusters &lt;- clusters[,1:4]
+
+dat &lt;- clusters %&gt;% group_by(ZmRoot) %&gt;% mutate(num_genes = n()) %&gt;% filter(num_genes &gt;= 100)
+names &lt;- unique(dat$ZmRoot)
+
+gene_list &lt;- list()
+max &lt;- nrow(dat[dat$ZmRoot == 1,])
+for(i in 1:length(names)) {
+  df &lt;- clusters %&gt;% filter(ZmRoot == names[i])
+  genes &lt;- c(df$V1, rep(NA, max-nrow(df)))
+  gene_list[[i]] &lt;- genes
+}
+
+modules &lt;- do.call(cbind, gene_list)</code></pre>
+<p>Run analysis and FDR correction</p>
+<pre class="r"><code>alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
+bigdf &lt;- do.call(&#39;rbind&#39;, alltissuemodules)
+
+bigdf$fdr &lt;- p.adjust(bigdf$pval, method=&#39;fdr&#39;) ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.4377  0.9951  0.9951  0.9889  0.9951  0.9951 </code></pre>
+<pre class="r"><code>kable(bigdf[which.min(bigdf[,3]),])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">158</td>
+<td align="left">4</td>
+<td align="left">PC5</td>
+<td align="right">0.0011368</td>
+<td align="left">LMAD26</td>
+<td align="right">0.4376829</td>
+</tr>
+</tbody>
+</table>
+<p>Look at lowest p-value clusters</p>
+<pre class="r"><code>t &lt;- bigdf %&gt;% group_by(PC, tissue) %&gt;% mutate(bonferroni = p.adjust(pval, method=&#39;bonferroni&#39;)) %&gt;% arrange(bonferroni)
+kable(head(t))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+<th align="right">bonferroni</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">PC5</td>
+<td align="right">0.0011368</td>
+<td align="left">LMAD26</td>
+<td align="right">0.4376829</td>
+<td align="right">0.0125052</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">PC5</td>
+<td align="right">0.0023537</td>
+<td align="left">LMAD26</td>
+<td align="right">0.4530808</td>
+<td align="right">0.0258903</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">PC1</td>
+<td align="right">0.0053389</td>
+<td align="left">Kern</td>
+<td align="right">0.5741055</td>
+<td align="right">0.0587274</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">PC2</td>
+<td align="right">0.0063947</td>
+<td align="left">LMAD26</td>
+<td align="right">0.5741055</td>
+<td align="right">0.0703414</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">PC3</td>
+<td align="right">0.0074559</td>
+<td align="left">LMAN26</td>
+<td align="right">0.5741055</td>
+<td align="right">0.0820151</td>
+</tr>
+<tr class="even">
+<td align="left">11</td>
+<td align="left">PC1</td>
+<td align="right">0.0186208</td>
+<td align="left">Kern</td>
+<td align="right">0.9950821</td>
+<td align="right">0.2048286</td>
+</tr>
+</tbody>
+</table>
+<p>ZmSAM Clusters - get clustes with &gt;= 100 genes</p>
+<pre class="r"><code>dat &lt;- clusters %&gt;% group_by(ZmSAM) %&gt;% mutate(num_genes = n()) %&gt;% filter(num_genes &gt;= 100)
+names &lt;- unique(dat$ZmSAM)
+
+gene_list &lt;- list()
+max &lt;- nrow(dat[dat$ZmSAM == 0,])
+for(i in 1:length(names)) {
+  df &lt;- clusters %&gt;% filter(ZmSAM == names[i])
+  genes &lt;- c(df$V1, rep(NA, max-nrow(df)))
+  gene_list[[i]] &lt;- genes
+}
+
+modules &lt;- do.call(cbind, gene_list)</code></pre>
+<p>Run analysis and FDR correction</p>
+<pre class="r"><code>alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
+bigdf &lt;- do.call(&#39;rbind&#39;, alltissuemodules)
+
+bigdf$fdr &lt;- p.adjust(bigdf$pval, method=&#39;fdr&#39;) ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.9999  0.9999  0.9999  0.9999  0.9999  0.9999 </code></pre>
+<pre class="r"><code>kable(bigdf[which.min(bigdf[,3]),])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">184</td>
+<td align="left">2</td>
+<td align="left">PC5</td>
+<td align="right">0.0033344</td>
+<td align="left">LMAD26</td>
+<td align="right">0.9999109</td>
+</tr>
+</tbody>
+</table>
+<p>Look at lowest p-value clusters</p>
+<pre class="r"><code>t &lt;- bigdf %&gt;% group_by(PC, tissue) %&gt;% mutate(bonferroni = p.adjust(pval, method=&#39;bonferroni&#39;)) %&gt;% arrange(bonferroni)
+kable(head(t))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+<th align="right">bonferroni</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">PC5</td>
+<td align="right">0.0033344</td>
+<td align="left">LMAD26</td>
+<td align="right">0.9999109</td>
+<td align="right">0.0433477</td>
+</tr>
+<tr class="even">
+<td align="left">7</td>
+<td align="left">PC3</td>
+<td align="right">0.0315067</td>
+<td align="left">LMAN26</td>
+<td align="right">0.9999109</td>
+<td align="right">0.4095866</td>
+</tr>
+<tr class="odd">
+<td align="left">10</td>
+<td align="left">PC1</td>
+<td align="right">0.0320505</td>
+<td align="left">Kern</td>
+<td align="right">0.9999109</td>
+<td align="right">0.4166559</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">PC5</td>
+<td align="right">0.0436062</td>
+<td align="left">LMAD26</td>
+<td align="right">0.9999109</td>
+<td align="right">0.5668812</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">PC1</td>
+<td align="right">0.0536048</td>
+<td align="left">Kern</td>
+<td align="right">0.9999109</td>
+<td align="right">0.6968619</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">PC5</td>
+<td align="right">0.0560459</td>
+<td align="left">LMAN26</td>
+<td align="right">0.9999109</td>
+<td align="right">0.7285967</td>
+</tr>
+</tbody>
+</table>
+<p>ZmPAN Clusters - get clustes with &gt;= 100 genes</p>
+<pre class="r"><code>dat &lt;- clusters %&gt;% group_by(ZmPAN) %&gt;% mutate(num_genes = n()) %&gt;% filter(num_genes &gt;= 100)
+names &lt;- unique(dat$ZmPAN)
+
+gene_list &lt;- list()
+max &lt;- nrow(dat[dat$ZmPAN == 0,])
+for(i in 1:length(names)) {
+  df &lt;- clusters %&gt;% filter(ZmPAN == names[i])
+  genes &lt;- c(df$V1, rep(NA, max-nrow(df)))
+  gene_list[[i]] &lt;- genes
+}
+
+modules &lt;- do.call(cbind, gene_list)</code></pre>
+<p>Run analysis and FDR correction</p>
+<pre class="r"><code>alltissuemodules = cluster_analysis_func(modules)
+
+#combine all into one list
+bigdf &lt;- do.call(&#39;rbind&#39;, alltissuemodules)
+
+bigdf$fdr &lt;- p.adjust(bigdf$pval, method=&#39;fdr&#39;) ##calculate an FDR
+summary(bigdf$fdr) ##nothing is significant</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.9992  0.9992  0.9992  0.9992  0.9992  0.9992 </code></pre>
+<pre class="r"><code>kable(bigdf[which.min(bigdf[,3]),])</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">241</td>
+<td align="left">3</td>
+<td align="left">PC5</td>
+<td align="right">0.0045783</td>
+<td align="left">LMAD26</td>
+<td align="right">0.9991676</td>
+</tr>
+</tbody>
+</table>
+<p>Look at lowest p-value clusters</p>
+<pre class="r"><code>t &lt;- bigdf %&gt;% group_by(PC, tissue) %&gt;% mutate(bonferroni = p.adjust(pval, method=&#39;bonferroni&#39;)) %&gt;% arrange(bonferroni)
+kable(head(t))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">module</th>
+<th align="left">PC</th>
+<th align="right">pval</th>
+<th align="left">tissue</th>
+<th align="right">fdr</th>
+<th align="right">bonferroni</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">PC5</td>
+<td align="right">0.0045783</td>
+<td align="left">LMAD26</td>
+<td align="right">0.9991676</td>
+<td align="right">0.0778318</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">PC5</td>
+<td align="right">0.0090431</td>
+<td align="left">GShoot</td>
+<td align="right">0.9991676</td>
+<td align="right">0.1537334</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">PC5</td>
+<td align="right">0.0092036</td>
+<td align="left">LMAN26</td>
+<td align="right">0.9991676</td>
+<td align="right">0.1564620</td>
+</tr>
+<tr class="even">
+<td align="left">13</td>
+<td align="left">PC1</td>
+<td align="right">0.0129806</td>
+<td align="left">Kern</td>
+<td align="right">0.9991676</td>
+<td align="right">0.2206705</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="left">PC5</td>
+<td align="right">0.0142503</td>
+<td align="left">LMAD26</td>
+<td align="right">0.9991676</td>
+<td align="right">0.2422548</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">PC2</td>
+<td align="right">0.0157494</td>
+<td align="left">LMAN26</td>
+<td align="right">0.9991676</td>
+<td align="right">0.2677405</td>
+</tr>
+</tbody>
+</table>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -816,21 +1284,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] quaint_0.0.0.9000 ggpubr_0.2.5      magrittr_1.5      ggplot2_3.2.1    
-[5] reshape2_1.4.3    workflowr_1.6.0  
+[1] knitr_1.29        data.table_1.12.8 dplyr_1.0.0       quaint_0.0.0.9000
+[5] ggpubr_0.3.0      ggplot2_3.3.2     reshape2_1.4.4    workflowr_1.6.2  
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.3       compiler_3.6.2   pillar_1.4.3     later_1.0.0     
- [5] git2r_0.26.1     plyr_1.8.5       tools_3.6.2      digest_0.6.25   
- [9] evaluate_0.14    lifecycle_0.1.0  tibble_2.1.3     gtable_0.3.0    
-[13] pkgconfig_2.0.3  rlang_0.4.4      yaml_2.2.1       xfun_0.12       
-[17] withr_2.1.2      stringr_1.4.0    dplyr_0.8.4      knitr_1.28      
-[21] vctrs_0.2.3      fs_1.3.1         rprojroot_1.3-2  grid_3.6.2      
-[25] tidyselect_1.0.0 glue_1.3.1       R6_2.4.1         rmarkdown_2.1   
-[29] tidyr_1.0.2      purrr_0.3.3      whisker_0.4      ellipsis_0.3.0  
-[33] backports_1.1.5  scales_1.1.0     promises_1.1.0   htmltools_0.4.0 
-[37] assertthat_0.2.1 colorspace_1.4-1 ggsignif_0.6.0   httpuv_1.5.2    
-[41] stringi_1.4.6    lazyeval_0.2.2   munsell_0.5.0    crayon_1.3.4    </code></pre>
+ [1] tidyselect_1.1.0 xfun_0.15        purrr_0.3.4      haven_2.3.1     
+ [5] lattice_0.20-41  carData_3.0-4    colorspace_1.4-1 vctrs_0.3.1     
+ [9] generics_0.0.2   htmltools_0.5.0  yaml_2.2.1       rlang_0.4.6     
+[13] later_1.1.0.1    pillar_1.4.4     foreign_0.8-72   glue_1.4.1      
+[17] withr_2.2.0      readxl_1.3.1     lifecycle_0.2.0  plyr_1.8.6      
+[21] stringr_1.4.0    cellranger_1.1.0 munsell_0.5.0    ggsignif_0.6.0  
+[25] gtable_0.3.0     zip_2.0.4        evaluate_0.14    rio_0.5.16      
+[29] forcats_0.5.0    httpuv_1.5.4     curl_4.3         highr_0.8       
+[33] broom_0.5.6      Rcpp_1.0.4.6     promises_1.1.1   scales_1.1.1    
+[37] backports_1.1.8  abind_1.4-5      fs_1.4.1         hms_0.5.3       
+[41] digest_0.6.25    stringi_1.4.6    openxlsx_4.1.5   rstatix_0.6.0   
+[45] grid_3.6.2       rprojroot_1.3-2  tools_3.6.2      magrittr_1.5    
+[49] tibble_3.0.1     crayon_1.3.4     whisker_0.4      tidyr_1.1.0     
+[53] car_3.0-8        pkgconfig_2.0.3  ellipsis_0.3.1   rmarkdown_2.3   
+[57] R6_2.4.1         nlme_3.1-148     git2r_0.27.1     compiler_3.6.2  </code></pre>
 </div>
 </div>
 
@@ -896,7 +1368,7 @@ $(document).ready(function ()  {
       theme: "bootstrap3",
       context: '.toc-content',
       hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
       },
       ignoreSelector: ".toc-ignore",
       scrollTo: 0
