@@ -503,16 +503,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree6797660505006857455e76cdb02951b5af0a9a30targetblank6797660a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jgblanc/Blancetal/tree/6797660505006857455e76cdb02951b5af0a9a30" target="_blank">6797660</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree2c4fb3f20fd70bab9a93dea81dcd8f4c0670be0btargetblank2c4fb3fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/jgblanc/Blancetal/tree/2c4fb3f20fd70bab9a93dea81dcd8f4c0670be0b" target="_blank">2c4fb3f</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree6797660505006857455e76cdb02951b5af0a9a30targetblank6797660a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomjgblancBlancetaltree2c4fb3f20fd70bab9a93dea81dcd8f4c0670be0btargetblank2c4fb3fa" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/jgblanc/Blancetal/tree/6797660505006857455e76cdb02951b5af0a9a30" target="_blank">6797660</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/jgblanc/Blancetal/tree/2c4fb3f20fd70bab9a93dea81dcd8f4c0670be0b" target="_blank">2c4fb3f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -578,6 +578,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/jgblanc/Blancetal/blob/2c4fb3f20fd70bab9a93dea81dcd8f4c0670be0b/analysis/Selection_on_expression_of_coexpreession_clusters.Rmd" target="_blank">2c4fb3f</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-10-15
+</td>
+<td>
+Added GO terms
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/jgblanc/Blancetal/b371b775afe4e24e6dc6d3022746a63e41dd7067/docs/Selection_on_expression_of_coexpreession_clusters.html" target="_blank">b371b77</a>
+</td>
+<td>
+jgblanc
+</td>
+<td>
+2020-10-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1118,176 +1152,747 @@ kable(head(t))</code></pre>
 zmroot &lt;- info %&gt;% filter(Network == &quot;ZmRoot&quot;) %&gt;% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 4 
-zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL4&quot;)</code></pre>
-<pre><code>   Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
-1:  ZmRoot        MCL4 GO:0006558                4           18           745
-2:  ZmRoot        MCL4 GO:1902221                4           18           745
-3:  ZmRoot        MCL4 GO:0006559                3           10           745
-4:  ZmRoot        MCL4 GO:0009074                3           10           745
-5:  ZmRoot        MCL4 GO:1902222                3           10           745
-6:  ZmRoot        MCL4 GO:0016841                3           11           745
-      pval
-1: 0.00181
-2: 0.00181
-3: 0.00282
-4: 0.00282
-5: 0.00282
-6: 0.00379
-                                                                    GO Term Name
-1:                                             L-phenylalanine metabolic process
-2: erythrose 4-phosphate/phosphoenolpyruvate family amino acid metabolic process
-3:                                             L-phenylalanine catabolic process
-4:                                  aromatic amino acid family catabolic process
-5: erythrose 4-phosphate/phosphoenolpyruvate family amino acid catabolic process
-6:                                                        ammonia-lyase activity</code></pre>
+kable(zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL4&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="7%" />
+<col width="6%" />
+<col width="10%" />
+<col width="8%" />
+<col width="8%" />
+<col width="4%" />
+<col width="48%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Network</th>
+<th align="left">MCL Cluster</th>
+<th align="left">GO Term</th>
+<th align="right">Num Genes common</th>
+<th align="right">Num GO genes</th>
+<th align="right">Num MCL Genes</th>
+<th align="right">pval</th>
+<th align="left">GO Term Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL4</td>
+<td align="left"><a href="GO:0006558" class="uri">GO:0006558</a></td>
+<td align="right">4</td>
+<td align="right">18</td>
+<td align="right">745</td>
+<td align="right">0.00181</td>
+<td align="left">L-phenylalanine metabolic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL4</td>
+<td align="left"><a href="GO:1902221" class="uri">GO:1902221</a></td>
+<td align="right">4</td>
+<td align="right">18</td>
+<td align="right">745</td>
+<td align="right">0.00181</td>
+<td align="left">erythrose 4-phosphate/phosphoenolpyruvate family amino acid metabolic process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL4</td>
+<td align="left"><a href="GO:0006559" class="uri">GO:0006559</a></td>
+<td align="right">3</td>
+<td align="right">10</td>
+<td align="right">745</td>
+<td align="right">0.00282</td>
+<td align="left">L-phenylalanine catabolic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL4</td>
+<td align="left"><a href="GO:0009074" class="uri">GO:0009074</a></td>
+<td align="right">3</td>
+<td align="right">10</td>
+<td align="right">745</td>
+<td align="right">0.00282</td>
+<td align="left">aromatic amino acid family catabolic process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL4</td>
+<td align="left"><a href="GO:1902222" class="uri">GO:1902222</a></td>
+<td align="right">3</td>
+<td align="right">10</td>
+<td align="right">745</td>
+<td align="right">0.00282</td>
+<td align="left">erythrose 4-phosphate/phosphoenolpyruvate family amino acid catabolic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL4</td>
+<td align="left"><a href="GO:0016841" class="uri">GO:0016841</a></td>
+<td align="right">3</td>
+<td align="right">11</td>
+<td align="right">745</td>
+<td align="right">0.00379</td>
+<td align="left">ammonia-lyase activity</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code># Module 3 
-zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL3&quot;)</code></pre>
-<pre><code>    Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
- 1:  ZmRoot        MCL3 GO:0006260               24           56           996
- 2:  ZmRoot        MCL3 GO:0000786               37          151           996
- 3:  ZmRoot        MCL3 GO:0032993               37          151           996
- 4:  ZmRoot        MCL3 GO:0044815               37          151           996
- 5:  ZmRoot        MCL3 GO:0006334               37          154           996
- 6:  ZmRoot        MCL3 GO:0034728               37          154           996
- 7:  ZmRoot        MCL3 GO:0065004               37          154           996
- 8:  ZmRoot        MCL3 GO:0071824               37          154           996
- 9:  ZmRoot        MCL3 GO:0044427               42          210           996
-10:  ZmRoot        MCL3 GO:0003777               25           71           996
-11:  ZmRoot        MCL3 GO:0005875               25           71           996
-12:  ZmRoot        MCL3 GO:0006325               39          194           996
-13:  ZmRoot        MCL3 GO:0007018               26           85           996
-14:  ZmRoot        MCL3 GO:0007017               30          120           996
-15:  ZmRoot        MCL3 GO:0044430               32          145           996
-16:  ZmRoot        MCL3 GO:0034622               41          245           996
-17:  ZmRoot        MCL3 GO:0006928               26           99           996
-18:  ZmRoot        MCL3 GO:0003774               26          101           996
-19:  ZmRoot        MCL3 GO:0006259               41          282           996
-20:  ZmRoot        MCL3 GO:0016986               12           20           996
-21:  ZmRoot        MCL3 GO:0006270               11           22           996
-22:  ZmRoot        MCL3 GO:0034061                9           25           996
-23:  ZmRoot        MCL3 GO:0003887                8           23           996
-24:  ZmRoot        MCL3 GO:0006352               14           83           996
-25:  ZmRoot        MCL3 GO:0000280                5            9           996
-26:  ZmRoot        MCL3 GO:0007067                5            9           996
-27:  ZmRoot        MCL3 GO:1903047                5            9           996
-28:  ZmRoot        MCL3 GO:0009360                4            7           996
-29:  ZmRoot        MCL3 GO:0042575                4            7           996
-30:  ZmRoot        MCL3 GO:0048285                5           13           996
-31:  ZmRoot        MCL3 GO:0032774               14          108           996
-32:  ZmRoot        MCL3 GO:0071554               14          108           996
-33:  ZmRoot        MCL3 GO:0022402                6           21           996
-34:  ZmRoot        MCL3 GO:0016779               16          138           996
-35:  ZmRoot        MCL3 GO:0008107                4           14           996
-36:  ZmRoot        MCL3 GO:0008417                4           14           996
-37:  ZmRoot        MCL3 GO:0031127                4           14           996
-38:  ZmRoot        MCL3 GO:0042546                4           15           996
-39:  ZmRoot        MCL3 GO:0004990                3            8           996
-    Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
-        pval                                      GO Term Name
- 1: 3.54e-19                                   DNA replication
- 2: 4.40e-19                                        nucleosome
- 3: 4.40e-19                               protein-DNA complex
- 4: 4.40e-19                             DNA packaging complex
- 5: 9.00e-19                               nucleosome assembly
- 6: 9.00e-19                           nucleosome organization
- 7: 9.00e-19                      protein-DNA complex assembly
- 8: 9.00e-19          protein-DNA complex subunit organization
- 9: 5.92e-18                                  chromosomal part
-10: 1.86e-17                        microtubule motor activity
-11: 1.86e-17                    microtubule associated complex
-12: 7.56e-17                            chromatin organization
-13: 2.24e-16                        microtubule-based movement
-14: 5.45e-16                         microtubule-based process
-15: 2.78e-15                                 cytoskeletal part
-16: 9.82e-15          cellular macromolecular complex assembly
-17: 1.34e-14         movement of cell or subcellular component
-18: 2.26e-14                                    motor activity
-19: 1.22e-12                             DNA metabolic process
-20: 1.67e-12 obsolete transcription initiation factor activity
-21: 2.10e-10                        DNA replication initiation
-22: 3.18e-07                           DNA polymerase activity
-23: 1.98e-06              DNA-directed DNA polymerase activity
-24: 5.60e-06           DNA-templated transcription, initiation
-25: 1.18e-05                                  nuclear division
-26: 1.18e-05                          mitotic nuclear division
-27: 1.18e-05                        mitotic cell cycle process
-28: 8.44e-05                        DNA polymerase III complex
-29: 8.44e-05                            DNA polymerase complex
-30: 1.05e-04                                 organelle fission
-31: 1.16e-04                          RNA biosynthetic process
-32: 1.16e-04              cell wall organization or biogenesis
-33: 1.39e-04                                cell cycle process
-34: 1.50e-04                   nucleotidyltransferase activity
-35: 1.92e-03 galactoside 2-alpha-L-fucosyltransferase activity
-36: 1.92e-03                       fucosyltransferase activity
-37: 1.92e-03           alpha-(1,2)-fucosyltransferase activity
-38: 2.54e-03                              cell wall biogenesis
-39: 3.17e-03                        oxytocin receptor activity
-        pval                                      GO Term Name</code></pre>
+kable(zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL3&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="5%" />
+<col width="8%" />
+<col width="8%" />
+<col width="12%" />
+<col width="9%" />
+<col width="10%" />
+<col width="6%" />
+<col width="37%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Network</th>
+<th align="left">MCL Cluster</th>
+<th align="left">GO Term</th>
+<th align="right">Num Genes common</th>
+<th align="right">Num GO genes</th>
+<th align="right">Num MCL Genes</th>
+<th align="right">pval</th>
+<th align="left">GO Term Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006260" class="uri">GO:0006260</a></td>
+<td align="right">24</td>
+<td align="right">56</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">DNA replication</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0000786" class="uri">GO:0000786</a></td>
+<td align="right">37</td>
+<td align="right">151</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">nucleosome</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0032993" class="uri">GO:0032993</a></td>
+<td align="right">37</td>
+<td align="right">151</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">protein-DNA complex</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044815" class="uri">GO:0044815</a></td>
+<td align="right">37</td>
+<td align="right">151</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">DNA packaging complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006334" class="uri">GO:0006334</a></td>
+<td align="right">37</td>
+<td align="right">154</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">nucleosome assembly</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0034728" class="uri">GO:0034728</a></td>
+<td align="right">37</td>
+<td align="right">154</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">nucleosome organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0065004" class="uri">GO:0065004</a></td>
+<td align="right">37</td>
+<td align="right">154</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">protein-DNA complex assembly</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0071824" class="uri">GO:0071824</a></td>
+<td align="right">37</td>
+<td align="right">154</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">protein-DNA complex subunit organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044427" class="uri">GO:0044427</a></td>
+<td align="right">42</td>
+<td align="right">210</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">chromosomal part</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0003777" class="uri">GO:0003777</a></td>
+<td align="right">25</td>
+<td align="right">71</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">microtubule motor activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0005875" class="uri">GO:0005875</a></td>
+<td align="right">25</td>
+<td align="right">71</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">microtubule associated complex</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006325" class="uri">GO:0006325</a></td>
+<td align="right">39</td>
+<td align="right">194</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">chromatin organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0007018" class="uri">GO:0007018</a></td>
+<td align="right">26</td>
+<td align="right">85</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">microtubule-based movement</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0007017" class="uri">GO:0007017</a></td>
+<td align="right">30</td>
+<td align="right">120</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">microtubule-based process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044430" class="uri">GO:0044430</a></td>
+<td align="right">32</td>
+<td align="right">145</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">cytoskeletal part</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0034622" class="uri">GO:0034622</a></td>
+<td align="right">41</td>
+<td align="right">245</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">cellular macromolecular complex assembly</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006928" class="uri">GO:0006928</a></td>
+<td align="right">26</td>
+<td align="right">99</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">movement of cell or subcellular component</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0003774" class="uri">GO:0003774</a></td>
+<td align="right">26</td>
+<td align="right">101</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">motor activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006259" class="uri">GO:0006259</a></td>
+<td align="right">41</td>
+<td align="right">282</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">DNA metabolic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0016986" class="uri">GO:0016986</a></td>
+<td align="right">12</td>
+<td align="right">20</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">obsolete transcription initiation factor activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006270" class="uri">GO:0006270</a></td>
+<td align="right">11</td>
+<td align="right">22</td>
+<td align="right">996</td>
+<td align="right">0.00e+00</td>
+<td align="left">DNA replication initiation</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0034061" class="uri">GO:0034061</a></td>
+<td align="right">9</td>
+<td align="right">25</td>
+<td align="right">996</td>
+<td align="right">3.00e-07</td>
+<td align="left">DNA polymerase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0003887" class="uri">GO:0003887</a></td>
+<td align="right">8</td>
+<td align="right">23</td>
+<td align="right">996</td>
+<td align="right">2.00e-06</td>
+<td align="left">DNA-directed DNA polymerase activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006352" class="uri">GO:0006352</a></td>
+<td align="right">14</td>
+<td align="right">83</td>
+<td align="right">996</td>
+<td align="right">5.60e-06</td>
+<td align="left">DNA-templated transcription, initiation</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0000280" class="uri">GO:0000280</a></td>
+<td align="right">5</td>
+<td align="right">9</td>
+<td align="right">996</td>
+<td align="right">1.18e-05</td>
+<td align="left">nuclear division</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0007067" class="uri">GO:0007067</a></td>
+<td align="right">5</td>
+<td align="right">9</td>
+<td align="right">996</td>
+<td align="right">1.18e-05</td>
+<td align="left">mitotic nuclear division</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:1903047" class="uri">GO:1903047</a></td>
+<td align="right">5</td>
+<td align="right">9</td>
+<td align="right">996</td>
+<td align="right">1.18e-05</td>
+<td align="left">mitotic cell cycle process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0009360" class="uri">GO:0009360</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">996</td>
+<td align="right">8.44e-05</td>
+<td align="left">DNA polymerase III complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0042575" class="uri">GO:0042575</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">996</td>
+<td align="right">8.44e-05</td>
+<td align="left">DNA polymerase complex</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0048285" class="uri">GO:0048285</a></td>
+<td align="right">5</td>
+<td align="right">13</td>
+<td align="right">996</td>
+<td align="right">1.05e-04</td>
+<td align="left">organelle fission</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0032774" class="uri">GO:0032774</a></td>
+<td align="right">14</td>
+<td align="right">108</td>
+<td align="right">996</td>
+<td align="right">1.16e-04</td>
+<td align="left">RNA biosynthetic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0071554" class="uri">GO:0071554</a></td>
+<td align="right">14</td>
+<td align="right">108</td>
+<td align="right">996</td>
+<td align="right">1.16e-04</td>
+<td align="left">cell wall organization or biogenesis</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0022402" class="uri">GO:0022402</a></td>
+<td align="right">6</td>
+<td align="right">21</td>
+<td align="right">996</td>
+<td align="right">1.39e-04</td>
+<td align="left">cell cycle process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0016779" class="uri">GO:0016779</a></td>
+<td align="right">16</td>
+<td align="right">138</td>
+<td align="right">996</td>
+<td align="right">1.50e-04</td>
+<td align="left">nucleotidyltransferase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0008107" class="uri">GO:0008107</a></td>
+<td align="right">4</td>
+<td align="right">14</td>
+<td align="right">996</td>
+<td align="right">1.92e-03</td>
+<td align="left">galactoside 2-alpha-L-fucosyltransferase activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0008417" class="uri">GO:0008417</a></td>
+<td align="right">4</td>
+<td align="right">14</td>
+<td align="right">996</td>
+<td align="right">1.92e-03</td>
+<td align="left">fucosyltransferase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0031127" class="uri">GO:0031127</a></td>
+<td align="right">4</td>
+<td align="right">14</td>
+<td align="right">996</td>
+<td align="right">1.92e-03</td>
+<td align="left">alpha-(1,2)-fucosyltransferase activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0042546" class="uri">GO:0042546</a></td>
+<td align="right">4</td>
+<td align="right">15</td>
+<td align="right">996</td>
+<td align="right">2.54e-03</td>
+<td align="left">cell wall biogenesis</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0004990" class="uri">GO:0004990</a></td>
+<td align="right">3</td>
+<td align="right">8</td>
+<td align="right">996</td>
+<td align="right">3.17e-03</td>
+<td align="left">oxytocin receptor activity</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code># Module 9 
-zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL9&quot;)</code></pre>
-<pre><code>   Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
-1:  ZmRoot        MCL9 GO:0016706                3            9           204
-2:  ZmRoot        MCL9 GO:0000003                5           64           204
-3:  ZmRoot        MCL9 GO:0019953                5           64           204
-4:  ZmRoot        MCL9 GO:0044703                5           64           204
-5:  ZmRoot        MCL9 GO:0022414                5           66           204
-6:  ZmRoot        MCL9 GO:0051213                3           28           204
-7:  ZmRoot        MCL9 GO:0004470                2           11           204
-       pval
-1: 4.53e-05
-2: 1.90e-04
-3: 1.90e-04
-4: 1.90e-04
-5: 2.20e-04
-6: 1.57e-03
-7: 3.57e-03
-                                                                                                                                                                                        GO Term Name
-1: oxidoreductase activity, acting on paired donors, with incorporation or reduction of molecular oxygen, 2-oxoglutarate as one donor, and incorporation of one atom each of oxygen into both donors
-2:                                                                                                                                                                                      reproduction
-3:                                                                                                                                                                               sexual reproduction
-4:                                                                                                                                                               multi-organism reproductive process
-5:                                                                                                                                                                              reproductive process
-6:                                                                                                                                                                              dioxygenase activity
-7:                                                                                                                                                                             malic enzyme activity</code></pre>
+kable(zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL9&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="2%" />
+<col width="4%" />
+<col width="3%" />
+<col width="6%" />
+<col width="4%" />
+<col width="5%" />
+<col width="3%" />
+<col width="69%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Network</th>
+<th align="left">MCL Cluster</th>
+<th align="left">GO Term</th>
+<th align="right">Num Genes common</th>
+<th align="right">Num GO genes</th>
+<th align="right">Num MCL Genes</th>
+<th align="right">pval</th>
+<th align="left">GO Term Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0016706" class="uri">GO:0016706</a></td>
+<td align="right">3</td>
+<td align="right">9</td>
+<td align="right">204</td>
+<td align="right">4.53e-05</td>
+<td align="left">oxidoreductase activity, acting on paired donors, with incorporation or reduction of molecular oxygen, 2-oxoglutarate as one donor, and incorporation of one atom each of oxygen into both donors</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0000003" class="uri">GO:0000003</a></td>
+<td align="right">5</td>
+<td align="right">64</td>
+<td align="right">204</td>
+<td align="right">1.90e-04</td>
+<td align="left">reproduction</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0019953" class="uri">GO:0019953</a></td>
+<td align="right">5</td>
+<td align="right">64</td>
+<td align="right">204</td>
+<td align="right">1.90e-04</td>
+<td align="left">sexual reproduction</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0044703" class="uri">GO:0044703</a></td>
+<td align="right">5</td>
+<td align="right">64</td>
+<td align="right">204</td>
+<td align="right">1.90e-04</td>
+<td align="left">multi-organism reproductive process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0022414" class="uri">GO:0022414</a></td>
+<td align="right">5</td>
+<td align="right">66</td>
+<td align="right">204</td>
+<td align="right">2.20e-04</td>
+<td align="left">reproductive process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0051213" class="uri">GO:0051213</a></td>
+<td align="right">3</td>
+<td align="right">28</td>
+<td align="right">204</td>
+<td align="right">1.57e-03</td>
+<td align="left">dioxygenase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL9</td>
+<td align="left"><a href="GO:0004470" class="uri">GO:0004470</a></td>
+<td align="right">2</td>
+<td align="right">11</td>
+<td align="right">204</td>
+<td align="right">3.57e-03</td>
+<td align="left">malic enzyme activity</td>
+</tr>
+</tbody>
+</table>
 <pre class="r"><code># Module 8 
-zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL8&quot;)</code></pre>
-<pre><code>    Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
- 1:  ZmRoot        MCL8 GO:0006869                7           60           206
- 2:  ZmRoot        MCL8 GO:0008289                7          102           206
- 3:  ZmRoot        MCL8 GO:0019439                4           35           206
- 4:  ZmRoot        MCL8 GO:1901361                4           43           206
- 5:  ZmRoot        MCL8 GO:0004367                2            6           206
- 6:  ZmRoot        MCL8 GO:0046434                2            7           206
- 7:  ZmRoot        MCL8 GO:0004966                2            9           206
- 8:  ZmRoot        MCL8 GO:0006559                2           10           206
- 9:  ZmRoot        MCL8 GO:0009074                2           10           206
-10:  ZmRoot        MCL8 GO:1902222                2           10           206
-11:  ZmRoot        MCL8 GO:0016841                2           11           206
-        pval
- 1: 6.86e-07
- 2: 2.44e-05
- 3: 2.03e-04
- 4: 4.54e-04
- 5: 1.02e-03
- 6: 1.42e-03
- 7: 2.41e-03
- 8: 3.00e-03
- 9: 3.00e-03
-10: 3.00e-03
-11: 3.64e-03
-                                                                     GO Term Name
- 1:                                                               lipid transport
- 2:                                                                 lipid binding
- 3:                                           aromatic compound catabolic process
- 4:                                     organic cyclic compound catabolic process
- 5:                            glycerol-3-phosphate dehydrogenase [NAD+] activity
- 6:                                             organophosphate catabolic process
- 7:                                                     galanin receptor activity
- 8:                                             L-phenylalanine catabolic process
- 9:                                  aromatic amino acid family catabolic process
-10: erythrose 4-phosphate/phosphoenolpyruvate family amino acid catabolic process
-11:                                                        ammonia-lyase activity</code></pre>
+kable(zmroot %&gt;% filter(`MCL Cluster` == &quot;MCL8&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="7%" />
+<col width="6%" />
+<col width="10%" />
+<col width="8%" />
+<col width="8%" />
+<col width="5%" />
+<col width="48%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Network</th>
+<th align="left">MCL Cluster</th>
+<th align="left">GO Term</th>
+<th align="right">Num Genes common</th>
+<th align="right">Num GO genes</th>
+<th align="right">Num MCL Genes</th>
+<th align="right">pval</th>
+<th align="left">GO Term Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0006869" class="uri">GO:0006869</a></td>
+<td align="right">7</td>
+<td align="right">60</td>
+<td align="right">206</td>
+<td align="right">7.00e-07</td>
+<td align="left">lipid transport</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0008289" class="uri">GO:0008289</a></td>
+<td align="right">7</td>
+<td align="right">102</td>
+<td align="right">206</td>
+<td align="right">2.44e-05</td>
+<td align="left">lipid binding</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0019439" class="uri">GO:0019439</a></td>
+<td align="right">4</td>
+<td align="right">35</td>
+<td align="right">206</td>
+<td align="right">2.03e-04</td>
+<td align="left">aromatic compound catabolic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:1901361" class="uri">GO:1901361</a></td>
+<td align="right">4</td>
+<td align="right">43</td>
+<td align="right">206</td>
+<td align="right">4.54e-04</td>
+<td align="left">organic cyclic compound catabolic process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0004367" class="uri">GO:0004367</a></td>
+<td align="right">2</td>
+<td align="right">6</td>
+<td align="right">206</td>
+<td align="right">1.02e-03</td>
+<td align="left">glycerol-3-phosphate dehydrogenase [NAD+] activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0046434" class="uri">GO:0046434</a></td>
+<td align="right">2</td>
+<td align="right">7</td>
+<td align="right">206</td>
+<td align="right">1.42e-03</td>
+<td align="left">organophosphate catabolic process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0004966" class="uri">GO:0004966</a></td>
+<td align="right">2</td>
+<td align="right">9</td>
+<td align="right">206</td>
+<td align="right">2.41e-03</td>
+<td align="left">galanin receptor activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0006559" class="uri">GO:0006559</a></td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">206</td>
+<td align="right">3.00e-03</td>
+<td align="left">L-phenylalanine catabolic process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0009074" class="uri">GO:0009074</a></td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">206</td>
+<td align="right">3.00e-03</td>
+<td align="left">aromatic amino acid family catabolic process</td>
+</tr>
+<tr class="even">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:1902222" class="uri">GO:1902222</a></td>
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">206</td>
+<td align="right">3.00e-03</td>
+<td align="left">erythrose 4-phosphate/phosphoenolpyruvate family amino acid catabolic process</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmRoot</td>
+<td align="left">MCL8</td>
+<td align="left"><a href="GO:0016841" class="uri">GO:0016841</a></td>
+<td align="right">2</td>
+<td align="right">11</td>
+<td align="right">206</td>
+<td align="right">3.64e-03</td>
+<td align="left">ammonia-lyase activity</td>
+</tr>
+</tbody>
+</table>
 <p>ZmSAM Clusters - get clustes with &gt;= 100 genes</p>
 <pre class="r"><code>dat &lt;- clusters %&gt;% group_by(ZmSAM) %&gt;% mutate(num_genes = n()) %&gt;% filter(num_genes &gt;= 100) 
 names &lt;- unique(dat$ZmSAM)
@@ -1403,19 +2008,83 @@ kable(head(t))</code></pre>
 <pre class="r"><code>zmsam &lt;- info %&gt;% filter(Network == &quot;ZmSAM&quot;) %&gt;% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 2 
-zmsam %&gt;% filter(`MCL Cluster` == &quot;MCL2&quot;)</code></pre>
-<pre><code>   Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
-1:   ZmSAM        MCL2 GO:0033180                8           10           942
-2:   ZmSAM        MCL2 GO:0004347                3            5           942
-3:   ZmSAM        MCL2 GO:0030120                6           24           942
-4:   ZmSAM        MCL2 GO:0000502                3            7           942
-5:   ZmSAM        MCL2 GO:0006094                3            7           942
-       pval                                 GO Term Name
-1: 4.62e-09 proton-transporting V-type ATPase, V1 domain
-2: 1.72e-03       glucose-6-phosphate isomerase activity
-3: 1.93e-03                                 vesicle coat
-4: 5.53e-03                           proteasome complex
-5: 5.53e-03                              gluconeogenesis</code></pre>
+kable(zmsam %&gt;% filter(`MCL Cluster` == &quot;MCL2&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="6%" />
+<col width="9%" />
+<col width="8%" />
+<col width="13%" />
+<col width="10%" />
+<col width="10%" />
+<col width="6%" />
+<col width="35%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Network</th>
+<th align="left">MCL Cluster</th>
+<th align="left">GO Term</th>
+<th align="right">Num Genes common</th>
+<th align="right">Num GO genes</th>
+<th align="right">Num MCL Genes</th>
+<th align="right">pval</th>
+<th align="left">GO Term Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ZmSAM</td>
+<td align="left">MCL2</td>
+<td align="left"><a href="GO:0033180" class="uri">GO:0033180</a></td>
+<td align="right">8</td>
+<td align="right">10</td>
+<td align="right">942</td>
+<td align="right">0.00000</td>
+<td align="left">proton-transporting V-type ATPase, V1 domain</td>
+</tr>
+<tr class="even">
+<td align="left">ZmSAM</td>
+<td align="left">MCL2</td>
+<td align="left"><a href="GO:0004347" class="uri">GO:0004347</a></td>
+<td align="right">3</td>
+<td align="right">5</td>
+<td align="right">942</td>
+<td align="right">0.00172</td>
+<td align="left">glucose-6-phosphate isomerase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmSAM</td>
+<td align="left">MCL2</td>
+<td align="left"><a href="GO:0030120" class="uri">GO:0030120</a></td>
+<td align="right">6</td>
+<td align="right">24</td>
+<td align="right">942</td>
+<td align="right">0.00193</td>
+<td align="left">vesicle coat</td>
+</tr>
+<tr class="even">
+<td align="left">ZmSAM</td>
+<td align="left">MCL2</td>
+<td align="left"><a href="GO:0000502" class="uri">GO:0000502</a></td>
+<td align="right">3</td>
+<td align="right">7</td>
+<td align="right">942</td>
+<td align="right">0.00553</td>
+<td align="left">proteasome complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmSAM</td>
+<td align="left">MCL2</td>
+<td align="left"><a href="GO:0006094" class="uri">GO:0006094</a></td>
+<td align="right">3</td>
+<td align="right">7</td>
+<td align="right">942</td>
+<td align="right">0.00553</td>
+<td align="left">gluconeogenesis</td>
+</tr>
+</tbody>
+</table>
 <p>ZmPAN Clusters - get clustes with &gt;= 100 genes</p>
 <pre class="r"><code>dat &lt;- clusters %&gt;% group_by(ZmPAN) %&gt;% mutate(num_genes = n()) %&gt;% filter(num_genes &gt;= 100)
 names &lt;- unique(dat$ZmPAN)
@@ -1531,101 +2200,483 @@ kable(head(t))</code></pre>
 <pre class="r"><code>zmpan &lt;- info %&gt;% filter(Network == &quot;ZmPAN&quot;) %&gt;% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 3 
-zmpan %&gt;% filter(`MCL Cluster` == &quot;MCL3&quot;)</code></pre>
-<pre><code>    Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
- 1:   ZmPAN        MCL3 GO:0006414               20           37           793
- 2:   ZmPAN        MCL3 GO:0044391               27           84           793
- 3:   ZmPAN        MCL3 GO:0015935               17           49           793
- 4:   ZmPAN        MCL3 GO:0022613                9           12           793
- 5:   ZmPAN        MCL3 GO:0042254                9           12           793
- 6:   ZmPAN        MCL3 GO:0003746               12           25           793
- 7:   ZmPAN        MCL3 GO:0004298               12           27           793
- 8:   ZmPAN        MCL3 GO:0070003               12           27           793
- 9:   ZmPAN        MCL3 GO:0008135               20           90           793
-10:   ZmPAN        MCL3 GO:0005839               12           29           793
-11:   ZmPAN        MCL3 GO:0044085                9           27           793
-12:   ZmPAN        MCL3 GO:0015934               10           36           793
-13:   ZmPAN        MCL3 GO:0006334               20          154           793
-14:   ZmPAN        MCL3 GO:0034728               20          154           793
-15:   ZmPAN        MCL3 GO:0065004               20          154           793
-16:   ZmPAN        MCL3 GO:0071824               20          154           793
-17:   ZmPAN        MCL3 GO:0044429               18          141           793
-18:   ZmPAN        MCL3 GO:0019843                5           10           793
-19:   ZmPAN        MCL3 GO:0006626                4            6           793
-20:   ZmPAN        MCL3 GO:0007007                4            6           793
-21:   ZmPAN        MCL3 GO:0042719                4            6           793
-22:   ZmPAN        MCL3 GO:0045039                4            6           793
-23:   ZmPAN        MCL3 GO:0007005                4            7           793
-24:   ZmPAN        MCL3 GO:0007006                4            7           793
-25:   ZmPAN        MCL3 GO:0044743                4            7           793
-26:   ZmPAN        MCL3 GO:0065002                4            7           793
-27:   ZmPAN        MCL3 GO:0070585                4            7           793
-28:   ZmPAN        MCL3 GO:0071806                4            7           793
-29:   ZmPAN        MCL3 GO:0072655                4            7           793
-30:   ZmPAN        MCL3 GO:0090151                4            7           793
-31:   ZmPAN        MCL3 GO:1990542                4            7           793
-32:   ZmPAN        MCL3 GO:0098798                6           20           793
-33:   ZmPAN        MCL3 GO:0006325               20          194           793
-34:   ZmPAN        MCL3 GO:0000786               17          151           793
-35:   ZmPAN        MCL3 GO:0032993               17          151           793
-36:   ZmPAN        MCL3 GO:0044815               17          151           793
-37:   ZmPAN        MCL3 GO:0034622               23          245           793
-38:   ZmPAN        MCL3 GO:0005853                4            8           793
-39:   ZmPAN        MCL3 GO:0016272                4           10           793
-40:   ZmPAN        MCL3 GO:0006413                8           48           793
-41:   ZmPAN        MCL3 GO:0003743                8           50           793
-42:   ZmPAN        MCL3 GO:0016986                5           20           793
-43:   ZmPAN        MCL3 GO:0017038                4           13           793
-44:   ZmPAN        MCL3 GO:0015929                3            7           793
-45:   ZmPAN        MCL3 GO:0006465                3            8           793
-    Network MCL Cluster    GO Term Num Genes common Num GO genes Num MCL Genes
-        pval                                                    GO Term Name
- 1: 8.91e-19                                        translational elongation
- 2: 1.30e-17                                               ribosomal subunit
- 3: 3.34e-12                                         small ribosomal subunit
- 4: 5.43e-11                            ribonucleoprotein complex biogenesis
- 5: 5.43e-11                                             ribosome biogenesis
- 6: 5.61e-11                          translation elongation factor activity
- 7: 1.74e-10                           threonine-type endopeptidase activity
- 8: 1.74e-10                               threonine-type peptidase activity
- 9: 3.77e-10                        translation factor activity, RNA binding
-10: 4.82e-10                                         proteasome core complex
-11: 6.69e-07                                   cellular component biogenesis
-12: 1.07e-06                                         large ribosomal subunit
-13: 4.13e-06                                             nucleosome assembly
-14: 4.13e-06                                         nucleosome organization
-15: 4.13e-06                                    protein-DNA complex assembly
-16: 4.13e-06                        protein-DNA complex subunit organization
-17: 1.57e-05                                              mitochondrial part
-18: 2.27e-05                                                    rRNA binding
-19: 3.72e-05                              protein targeting to mitochondrion
-20: 3.72e-05                       inner mitochondrial membrane organization
-21: 3.72e-05   mitochondrial intermembrane space protein transporter complex
-22: 3.72e-05                protein import into mitochondrial inner membrane
-23: 8.41e-05                                      mitochondrion organization
-24: 8.41e-05                             mitochondrial membrane organization
-25: 8.41e-05                      intracellular protein transmembrane import
-26: 8.41e-05                   intracellular protein transmembrane transport
-27: 8.41e-05                           protein localization to mitochondrion
-28: 8.41e-05                                 protein transmembrane transport
-29: 8.41e-05          establishment of protein localization to mitochondrion
-30: 8.41e-05 establishment of protein localization to mitochondrial membrane
-31: 8.41e-05                           mitochondrial transmembrane transport
-32: 1.02e-04                                   mitochondrial protein complex
-33: 1.21e-04                                          chromatin organization
-34: 1.32e-04                                                      nucleosome
-35: 1.32e-04                                             protein-DNA complex
-36: 1.32e-04                                           DNA packaging complex
-37: 1.61e-04                        cellular macromolecular complex assembly
-38: 1.63e-04              eukaryotic translation elongation factor 1 complex
-39: 4.58e-04                                               prefoldin complex
-40: 6.18e-04                                        translational initiation
-41: 8.19e-04                          translation initiation factor activity
-42: 9.95e-04               obsolete transcription initiation factor activity
-43: 1.41e-03                                                  protein import
-44: 2.04e-03                                         hexosaminidase activity
-45: 3.16e-03                                       signal peptide processing
-        pval                                                    GO Term Name</code></pre>
+kable(zmpan %&gt;% filter(`MCL Cluster` == &quot;MCL3&quot;))</code></pre>
+<table>
+<colgroup>
+<col width="5%" />
+<col width="8%" />
+<col width="7%" />
+<col width="11%" />
+<col width="8%" />
+<col width="9%" />
+<col width="6%" />
+<col width="43%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Network</th>
+<th align="left">MCL Cluster</th>
+<th align="left">GO Term</th>
+<th align="right">Num Genes common</th>
+<th align="right">Num GO genes</th>
+<th align="right">Num MCL Genes</th>
+<th align="right">pval</th>
+<th align="left">GO Term Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006414" class="uri">GO:0006414</a></td>
+<td align="right">20</td>
+<td align="right">37</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">translational elongation</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044391" class="uri">GO:0044391</a></td>
+<td align="right">27</td>
+<td align="right">84</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">ribosomal subunit</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0015935" class="uri">GO:0015935</a></td>
+<td align="right">17</td>
+<td align="right">49</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">small ribosomal subunit</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0022613" class="uri">GO:0022613</a></td>
+<td align="right">9</td>
+<td align="right">12</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">ribonucleoprotein complex biogenesis</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0042254" class="uri">GO:0042254</a></td>
+<td align="right">9</td>
+<td align="right">12</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">ribosome biogenesis</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0003746" class="uri">GO:0003746</a></td>
+<td align="right">12</td>
+<td align="right">25</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">translation elongation factor activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0004298" class="uri">GO:0004298</a></td>
+<td align="right">12</td>
+<td align="right">27</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">threonine-type endopeptidase activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0070003" class="uri">GO:0070003</a></td>
+<td align="right">12</td>
+<td align="right">27</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">threonine-type peptidase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0008135" class="uri">GO:0008135</a></td>
+<td align="right">20</td>
+<td align="right">90</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">translation factor activity, RNA binding</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0005839" class="uri">GO:0005839</a></td>
+<td align="right">12</td>
+<td align="right">29</td>
+<td align="right">793</td>
+<td align="right">0.00e+00</td>
+<td align="left">proteasome core complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044085" class="uri">GO:0044085</a></td>
+<td align="right">9</td>
+<td align="right">27</td>
+<td align="right">793</td>
+<td align="right">7.00e-07</td>
+<td align="left">cellular component biogenesis</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0015934" class="uri">GO:0015934</a></td>
+<td align="right">10</td>
+<td align="right">36</td>
+<td align="right">793</td>
+<td align="right">1.10e-06</td>
+<td align="left">large ribosomal subunit</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006334" class="uri">GO:0006334</a></td>
+<td align="right">20</td>
+<td align="right">154</td>
+<td align="right">793</td>
+<td align="right">4.10e-06</td>
+<td align="left">nucleosome assembly</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0034728" class="uri">GO:0034728</a></td>
+<td align="right">20</td>
+<td align="right">154</td>
+<td align="right">793</td>
+<td align="right">4.10e-06</td>
+<td align="left">nucleosome organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0065004" class="uri">GO:0065004</a></td>
+<td align="right">20</td>
+<td align="right">154</td>
+<td align="right">793</td>
+<td align="right">4.10e-06</td>
+<td align="left">protein-DNA complex assembly</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0071824" class="uri">GO:0071824</a></td>
+<td align="right">20</td>
+<td align="right">154</td>
+<td align="right">793</td>
+<td align="right">4.10e-06</td>
+<td align="left">protein-DNA complex subunit organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044429" class="uri">GO:0044429</a></td>
+<td align="right">18</td>
+<td align="right">141</td>
+<td align="right">793</td>
+<td align="right">1.57e-05</td>
+<td align="left">mitochondrial part</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0019843" class="uri">GO:0019843</a></td>
+<td align="right">5</td>
+<td align="right">10</td>
+<td align="right">793</td>
+<td align="right">2.27e-05</td>
+<td align="left">rRNA binding</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006626" class="uri">GO:0006626</a></td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">793</td>
+<td align="right">3.72e-05</td>
+<td align="left">protein targeting to mitochondrion</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0007007" class="uri">GO:0007007</a></td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">793</td>
+<td align="right">3.72e-05</td>
+<td align="left">inner mitochondrial membrane organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0042719" class="uri">GO:0042719</a></td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">793</td>
+<td align="right">3.72e-05</td>
+<td align="left">mitochondrial intermembrane space protein transporter complex</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0045039" class="uri">GO:0045039</a></td>
+<td align="right">4</td>
+<td align="right">6</td>
+<td align="right">793</td>
+<td align="right">3.72e-05</td>
+<td align="left">protein import into mitochondrial inner membrane</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0007005" class="uri">GO:0007005</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">mitochondrion organization</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0007006" class="uri">GO:0007006</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">mitochondrial membrane organization</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044743" class="uri">GO:0044743</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">intracellular protein transmembrane import</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0065002" class="uri">GO:0065002</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">intracellular protein transmembrane transport</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0070585" class="uri">GO:0070585</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">protein localization to mitochondrion</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0071806" class="uri">GO:0071806</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">protein transmembrane transport</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0072655" class="uri">GO:0072655</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">establishment of protein localization to mitochondrion</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0090151" class="uri">GO:0090151</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">establishment of protein localization to mitochondrial membrane</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:1990542" class="uri">GO:1990542</a></td>
+<td align="right">4</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">8.41e-05</td>
+<td align="left">mitochondrial transmembrane transport</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0098798" class="uri">GO:0098798</a></td>
+<td align="right">6</td>
+<td align="right">20</td>
+<td align="right">793</td>
+<td align="right">1.02e-04</td>
+<td align="left">mitochondrial protein complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006325" class="uri">GO:0006325</a></td>
+<td align="right">20</td>
+<td align="right">194</td>
+<td align="right">793</td>
+<td align="right">1.21e-04</td>
+<td align="left">chromatin organization</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0000786" class="uri">GO:0000786</a></td>
+<td align="right">17</td>
+<td align="right">151</td>
+<td align="right">793</td>
+<td align="right">1.32e-04</td>
+<td align="left">nucleosome</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0032993" class="uri">GO:0032993</a></td>
+<td align="right">17</td>
+<td align="right">151</td>
+<td align="right">793</td>
+<td align="right">1.32e-04</td>
+<td align="left">protein-DNA complex</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0044815" class="uri">GO:0044815</a></td>
+<td align="right">17</td>
+<td align="right">151</td>
+<td align="right">793</td>
+<td align="right">1.32e-04</td>
+<td align="left">DNA packaging complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0034622" class="uri">GO:0034622</a></td>
+<td align="right">23</td>
+<td align="right">245</td>
+<td align="right">793</td>
+<td align="right">1.61e-04</td>
+<td align="left">cellular macromolecular complex assembly</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0005853" class="uri">GO:0005853</a></td>
+<td align="right">4</td>
+<td align="right">8</td>
+<td align="right">793</td>
+<td align="right">1.63e-04</td>
+<td align="left">eukaryotic translation elongation factor 1 complex</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0016272" class="uri">GO:0016272</a></td>
+<td align="right">4</td>
+<td align="right">10</td>
+<td align="right">793</td>
+<td align="right">4.58e-04</td>
+<td align="left">prefoldin complex</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006413" class="uri">GO:0006413</a></td>
+<td align="right">8</td>
+<td align="right">48</td>
+<td align="right">793</td>
+<td align="right">6.18e-04</td>
+<td align="left">translational initiation</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0003743" class="uri">GO:0003743</a></td>
+<td align="right">8</td>
+<td align="right">50</td>
+<td align="right">793</td>
+<td align="right">8.19e-04</td>
+<td align="left">translation initiation factor activity</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0016986" class="uri">GO:0016986</a></td>
+<td align="right">5</td>
+<td align="right">20</td>
+<td align="right">793</td>
+<td align="right">9.95e-04</td>
+<td align="left">obsolete transcription initiation factor activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0017038" class="uri">GO:0017038</a></td>
+<td align="right">4</td>
+<td align="right">13</td>
+<td align="right">793</td>
+<td align="right">1.41e-03</td>
+<td align="left">protein import</td>
+</tr>
+<tr class="even">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0015929" class="uri">GO:0015929</a></td>
+<td align="right">3</td>
+<td align="right">7</td>
+<td align="right">793</td>
+<td align="right">2.04e-03</td>
+<td align="left">hexosaminidase activity</td>
+</tr>
+<tr class="odd">
+<td align="left">ZmPAN</td>
+<td align="left">MCL3</td>
+<td align="left"><a href="GO:0006465" class="uri">GO:0006465</a></td>
+<td align="right">3</td>
+<td align="right">8</td>
+<td align="right">793</td>
+<td align="right">3.16e-03</td>
+<td align="left">signal peptide processing</td>
+</tr>
+</tbody>
+</table>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
