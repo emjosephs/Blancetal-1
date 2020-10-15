@@ -147,7 +147,7 @@ kable(head(t))
 Let's look at the GO enrichment terms for the most significant clusters (bonferroni p < 0.05)
 ```{r}
 info <- fread("~/Downloads/GO_clusters.csv")
-zmroot <- info %>% filter(Network == "ZmRoot") 
+zmroot <- info %>% filter(Network == "ZmRoot") %>% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 4 
 zmroot %>% filter(`MCL Cluster` == "MCL4")
@@ -164,7 +164,7 @@ zmroot %>% filter(`MCL Cluster` == "MCL8")
 
 ZmSAM Clusters - get clustes with >= 100 genes 
 ```{r}
-dat <- clusters %>% group_by(ZmSAM) %>% mutate(num_genes = n()) %>% filter(num_genes >= 100)
+dat <- clusters %>% group_by(ZmSAM) %>% mutate(num_genes = n()) %>% filter(num_genes >= 100) 
 names <- unique(dat$ZmSAM)
 
 gene_list <- list()
@@ -199,7 +199,7 @@ kable(head(t))
 
 Let's look at the GO enrichment terms for the most significant clusters (bonferroni p < 0.05)
 ```{r}
-zmsam <- info %>% filter(Network == "ZmSAM") 
+zmsam <- info %>% filter(Network == "ZmSAM") %>% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 2 
 zmsam %>% filter(`MCL Cluster` == "MCL2")
@@ -242,7 +242,7 @@ kable(head(t))
 
 Let's look at the GO enrichment terms for the most significant clusters (bonferroni p < 0.05)
 ```{r}
-zmpan <- info %>% filter(Network == "ZmPAN") 
+zmpan <- info %>% filter(Network == "ZmPAN") %>% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 3 
 zmpan %>% filter(`MCL Cluster` == "MCL3")
