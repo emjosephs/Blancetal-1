@@ -144,6 +144,24 @@ t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, metho
 kable(head(t))
 ```
 
+Let's look at the GO enrichment terms for the most significant clusters (bonferroni p < 0.05)
+```{r}
+info <- fread("~/Downloads/GO_clusters.csv")
+zmroot <- info %>% filter(Network == "ZmRoot") 
+
+# Module 4 
+zmroot %>% filter(`MCL Cluster` == "MCL4")
+
+# Module 3 
+zmroot %>% filter(`MCL Cluster` == "MCL3")
+
+# Module 9 
+zmroot %>% filter(`MCL Cluster` == "MCL9")
+
+# Module 8 
+zmroot %>% filter(`MCL Cluster` == "MCL8")
+```
+
 ZmSAM Clusters - get clustes with >= 100 genes 
 ```{r}
 dat <- clusters %>% group_by(ZmSAM) %>% mutate(num_genes = n()) %>% filter(num_genes >= 100)
@@ -179,6 +197,13 @@ t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, metho
 kable(head(t))
 ```
 
+Let's look at the GO enrichment terms for the most significant clusters (bonferroni p < 0.05)
+```{r}
+zmsam <- info %>% filter(Network == "ZmSAM") 
+
+# Module 2 
+zmsam %>% filter(`MCL Cluster` == "MCL2")
+```
 
 ZmPAN Clusters - get clustes with >= 100 genes 
 ```{r}
@@ -215,7 +240,13 @@ t <- bigdf %>% group_by(PC, tissue) %>% mutate(bonferroni = p.adjust(pval, metho
 kable(head(t))
 ```
 
+Let's look at the GO enrichment terms for the most significant clusters (bonferroni p < 0.05)
+```{r}
+zmpan <- info %>% filter(Network == "ZmPAN") 
 
+# Module 3 
+zmpan %>% filter(`MCL Cluster` == "MCL3")
+```
 
 
 
