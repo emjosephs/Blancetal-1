@@ -150,16 +150,16 @@ info <- fread("~/Downloads/GO_clusters.csv")
 zmroot <- info %>% filter(Network == "ZmRoot") %>% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 4 
-zmroot %>% filter(`MCL Cluster` == "MCL4")
+kable(zmroot %>% filter(`MCL Cluster` == "MCL4"))
 
 # Module 3 
-zmroot %>% filter(`MCL Cluster` == "MCL3")
+kable(zmroot %>% filter(`MCL Cluster` == "MCL3"))
 
 # Module 9 
-zmroot %>% filter(`MCL Cluster` == "MCL9")
+kable(zmroot %>% filter(`MCL Cluster` == "MCL9"))
 
 # Module 8 
-zmroot %>% filter(`MCL Cluster` == "MCL8")
+kable(zmroot %>% filter(`MCL Cluster` == "MCL8"))
 ```
 
 ZmSAM Clusters - get clustes with >= 100 genes 
@@ -202,7 +202,7 @@ Let's look at the GO enrichment terms for the most significant clusters (bonferr
 zmsam <- info %>% filter(Network == "ZmSAM") %>% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 2 
-zmsam %>% filter(`MCL Cluster` == "MCL2")
+kable(zmsam %>% filter(`MCL Cluster` == "MCL2"))
 ```
 
 ZmPAN Clusters - get clustes with >= 100 genes 
@@ -245,7 +245,7 @@ Let's look at the GO enrichment terms for the most significant clusters (bonferr
 zmpan <- info %>% filter(Network == "ZmPAN") %>% select(Network, `MCL Cluster`, `GO Term`, `Num Genes common`, `Num GO genes`, `Num MCL Genes`, pval, `GO Term Name`)
 
 # Module 3 
-zmpan %>% filter(`MCL Cluster` == "MCL3")
+kable(zmpan %>% filter(`MCL Cluster` == "MCL3"))
 ```
 
 
